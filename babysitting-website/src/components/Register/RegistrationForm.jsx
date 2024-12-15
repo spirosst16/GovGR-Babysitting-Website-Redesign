@@ -29,14 +29,23 @@ const RegistrationForm = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+  const handleBabysitterClick = async () => {
     try {
       await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
-      alert("Registration successful!");
+      alert("Registered as Babysitter!");
       navigate("/");
     } catch (error) {
-      setError("An error occurred. Please try again.");
+      setError("An error occurred while registering as a Babysitter. Please try again.");
+    }
+  };
+
+  const handleGuardianClick = async () => {
+    try {
+      await createUserWithEmailAndPassword(FIREBASE_AUTH, email, password);
+      alert("Registered as Guardian!");
+      navigate("/");
+    } catch (error) {
+      setError("An error occurred while registering as a Guardian. Please try again.");
     }
   };
 
@@ -76,7 +85,6 @@ const RegistrationForm = () => {
         <Container component="main" maxWidth="xs">
           <Box
             component="form"
-            onSubmit={handleRegister}
             noValidate
             sx={{
               display: 'flex',
@@ -90,7 +98,7 @@ const RegistrationForm = () => {
             }}
           >
             <Typography variant="h4" component="h1" textAlign="center" sx={{ mb: 2 }}>
-              Register
+              Where babysitters and families connect, start your journey today!
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}
             <TextField
@@ -117,19 +125,32 @@ const RegistrationForm = () => {
                 fontFamily: "Poppins, sans-serif",
               }}
             />
-            <Button
-              type="submit"
-              variant="contained"
-              sx={{
-                backgroundColor: '#5e62d1',
-                '&:hover': { backgroundColor: '#4a51a4' },
-                mb: 2,
-                fontFamily: "Poppins, sans-serif",
-              }}
-              fullWidth
-            >
-              Register
-            </Button>
+            <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
+              <Button
+                variant="contained"
+                onClick={handleBabysitterClick}
+                sx={{
+                  backgroundColor: '#5e62d1',
+                  '&:hover': { backgroundColor: '#4a51a4' },
+                  fontFamily: "Poppins, sans-serif",
+                  flex: 1,
+                }}
+              >
+                Continue as Babysitter
+              </Button>
+              <Button
+                variant="contained"
+                onClick={handleGuardianClick}
+                sx={{
+                  backgroundColor: '#5e62d1',
+                  '&:hover': { backgroundColor: '#4a51a4' },
+                  fontFamily: "Poppins, sans-serif",
+                  flex: 1,
+                }}
+              >
+                Continue as Guardian
+              </Button>
+            </Box>
             <Typography variant="body2" textAlign="center" sx={{ mt: 2 }}>
               Already have an account?{' '}
               <Link to="/" style={{ textDecoration: 'none', color: '#1976d2' }}>
