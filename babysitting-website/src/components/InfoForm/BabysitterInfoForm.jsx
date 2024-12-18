@@ -93,41 +93,49 @@ const BabysitterInfoForm = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormValues({ ...formValues, photo: URL.createObjectURL(file) });
+      setFormValues({ ...formValues, photo: file });
     }
   };
 
   const handleSubmit = async (e) => {
-	e.preventDefault();
-  
-	try {
-	  const babysittersCollectionRef = collection(FIREBASE_DB, "babysitters");
-	  await addDoc(babysittersCollectionRef, formValues);
-  
-	  console.log("Document written successfully!");
-	  alert("Form submitted successfully!");
-  
-	  setFormValues({
-		firstName: "",
-		lastName: "",
-		gender: "",
-		dateOfBirth: "",
-		street: "",
-		number: "",
-		city: "",
-		postal: "",
-		email: "",
-		phone: "",
-		experience: "",
-		education: "",
-		bio: "",
-		photo: "",
-	  });
-	  setCurrentStep(0);
-	} catch (error) {
-	  console.error("Error adding document: ", error);
-	  alert("Error submitting form. Please try again.");
-	}
+    e.preventDefault();
+
+    for (const key in formValues) {
+      if (formValues[key] === "") {
+        alert(`Please fill out the ${key} field.`);
+        return;
+      }
+    }
+
+    try {
+      const babysittersCollectionRef = collection(FIREBASE_DB, "babysitters");
+
+      await addDoc(babysittersCollectionRef, formValues);
+
+      console.log("Document written successfully!");
+      alert("Form submitted successfully!");
+
+      setFormValues({
+        firstName: "",
+        lastName: "",
+        gender: "",
+        dateOfBirth: "",
+        street: "",
+        number: "",
+        city: "",
+        postal: "",
+        email: "",
+        phone: "",
+        experience: "",
+        education: "",
+        bio: "",
+        photo: "",
+      });
+      setCurrentStep(0);
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      alert("Error submitting form. Please try again.");
+    }
   };
 
   return (
@@ -252,7 +260,6 @@ const BabysitterInfoForm = () => {
                   >
                     <MenuItem value="Male">Male</MenuItem>
                     <MenuItem value="Female">Female</MenuItem>
-                    <MenuItem value="Other">Other</MenuItem>
                   </TextField>
                   <TextField
                     label="Date of Birth"
@@ -493,7 +500,7 @@ const BabysitterInfoForm = () => {
 				</Button>
 			) : (
 				<Button
-				type="submit"
+				onClick={handleSubmit}
 				variant="contained"
 				sx={{
 					backgroundColor: '#5e62d1',
