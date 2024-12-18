@@ -12,15 +12,37 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 
-// Logo component (positioned in the top left corner)
-const Logo = styled('div')({
-  position: 'absolute',
-  top: '20px',
-  left: '20px',
-  fontSize: '28px',
-  fontWeight: 'bold',
-  color: '#000000',
-});
+// Logo components
+const LogoContainer = styled('div')({
+	position: 'absolute',
+	top: '20px',
+	left: '20px',
+	display: 'flex',
+	alignItems: 'center',
+	gap: '10px',
+  });
+  
+  const Logo = styled('div')({
+	width: '50px',
+	height: '50px',
+	display: 'flex',
+	justifyContent: 'center',
+	alignItems: 'center',
+	overflow: 'hidden'
+  });
+  
+  const LogoImage = styled('img')({
+	width: '100%',
+	height: '100%',
+	objectFit: 'cover',
+  });
+  
+  const LogoText = styled('span')({
+	fontSize: '24px',
+	fontWeight: 'bold',
+	color: '#000000',
+	fontFamily: 'Poppins, sans-serif',
+  });
 
 // Registration Form Component
 const RegistrationForm = () => {
@@ -80,7 +102,12 @@ const RegistrationForm = () => {
           fontFamily: "Poppins, sans-serif",
         }}
       >
-        <Logo>Babysitters</Logo>
+        <LogoContainer>
+          <Logo>
+            <LogoImage src={require('../../assets/baby-picture.png')} alt="Baby" />
+          </Logo>
+          <LogoText>Babysitters</LogoText>
+        </LogoContainer>
 
         <Container component="main" maxWidth="xs">
           <Box

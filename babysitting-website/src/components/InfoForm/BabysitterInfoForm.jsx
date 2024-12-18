@@ -12,16 +12,40 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import defaultProfile from '../../assets/default-profile.jpg';
+import { collection, addDoc } from "firebase/firestore";
+import { FIREBASE_DB } from "../../config/firebase";
 
-const Logo = styled('div')({
-  position: 'absolute',
-  top: '20px',
-  left: '20px',
-  fontSize: '28px',
-  fontWeight: 'bold',
-  color: '#000000',
-  fontFamily: "Poppins, sans-serif",
-});
+// Logo components
+const LogoContainer = styled('div')({
+	position: 'absolute',
+	top: '20px',
+	left: '20px',
+	display: 'flex',
+	alignItems: 'center',
+	gap: '10px',
+  });
+  
+  const Logo = styled('div')({
+	width: '50px',
+	height: '50px',
+	display: 'flex',
+	justifyContent: 'center',
+	alignItems: 'center',
+	overflow: 'hidden'
+  });
+  
+  const LogoImage = styled('img')({
+	width: '100%',
+	height: '100%',
+	objectFit: 'cover',
+  });
+  
+  const LogoText = styled('span')({
+	fontSize: '24px',
+	fontWeight: 'bold',
+	color: '#000000',
+	fontFamily: 'Poppins, sans-serif',
+  });
 
 // Babysitter Info Form Component
 const BabysitterInfoForm = () => {
@@ -70,9 +94,34 @@ const BabysitterInfoForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted:", formValues);
+  const handleSubmit = async (e) => {
+	e.preventDefault();
+  
+	try {
+	  const docRef = await addDoc(collection(FIREBASE_DB, "babysitters"), formValues);
+	  console.log("Document written with ID: ", docRef.id);
+	  alert("Form submitted successfully!");
+	  setFormValues({
+		firstName: "",
+		lastName: "",
+		gender: "",
+		dateOfBirth: "",
+		street: "",
+		number: "",
+		city: "",
+		postal: "",
+		email: "",
+		phone: "",
+		experience: "",
+		education: "",
+		bio: "",
+		photo: "",
+	  });
+	  setCurrentStep(0);
+	} catch (error) {
+	  console.error("Error adding document: ", error);
+	  alert("Error submitting form. Please try again.");
+	}
   };
 
   return (
@@ -107,7 +156,12 @@ const BabysitterInfoForm = () => {
           fontFamily: "Poppins, sans-serif",
         }}
       >
-        <Logo>Babysitters</Logo>
+        <LogoContainer>
+          <Logo>
+            <LogoImage src={require('../../assets/baby-picture.png')} alt="Baby" />
+          </Logo>
+          <LogoText>Babysitters</LogoText>
+        </LogoContainer>
 
         <Container component="main" maxWidth="md">
 		<Stepper
