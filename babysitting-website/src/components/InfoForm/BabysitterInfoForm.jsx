@@ -14,6 +14,7 @@ import { styled } from "@mui/system";
 import { useLocation } from 'react-router-dom';
 import defaultProfile from '../../assets/default-profile.jpg';
 import { collection, addDoc } from "firebase/firestore";
+import { getStorage, ref, uploadString, getDownloadURL } from "firebase/storage";
 import { FIREBASE_DB } from "../../config/firebase";
 
 // Logo components
@@ -91,10 +92,14 @@ const BabysitterInfoForm = () => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormValues({ ...formValues, photo: file });
-    }
+	const file = e.target.files[0];
+	if (file) {
+	  const reader = new FileReader();
+	  reader.onloadend = () => {
+		setFormValues({ ...formValues, photo: reader.result });
+	  };
+	  reader.readAsDataURL(file);
+	}
   };
 
   const handleSubmit = async (e) => {
