@@ -75,7 +75,6 @@ const RegistrationForm = () => {
         return;
       }
 
-      alert(`Registered as ${role}!`);
       navigate("/babysitter-form", { state: { email, password } });
     } catch (error) {
       console.error(error);
