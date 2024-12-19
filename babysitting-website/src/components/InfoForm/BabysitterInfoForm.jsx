@@ -65,6 +65,16 @@ const LogoContainer = styled('div')({
 	"Korean",
   ];
 
+  const childcareActivities = [
+	"Arts and Crafts",
+	"Storytelling",
+	"Outdoor Play",
+	"Meal Preparation",
+	"Tutoring",
+	"Nap Time Assistance",
+  ];
+  
+
 // Babysitter Info Form Component
 const BabysitterInfoForm = () => {
 	const location = useLocation();
@@ -83,8 +93,11 @@ const BabysitterInfoForm = () => {
 	  experience: "",
 	  education: "",
 	  knownLanguages: [],
+	  childcareActivities: [],
 	  bio: "",
 	  photo: "",
+	  rating: 0,
+  	  reviews: []
 	});
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -139,19 +152,23 @@ const BabysitterInfoForm = () => {
 
       setFormValues({
         firstName: "",
-        lastName: "",
-        gender: "",
-        dateOfBirth: "",
-        street: "",
-        number: "",
-        city: "",
-        postal: "",
-        email: "",
-        phone: "",
-        experience: "",
-        education: "",
-        bio: "",
-        photo: "",
+		lastName: "",
+		gender: "",
+		dateOfBirth: "",
+		street: "",
+		number: "",
+		city: "",
+		postal: "",
+		email: email || "",
+		phone: "",
+		experience: "",
+		education: "",
+		knownLanguages: [],
+		childcareActivities: [],
+		bio: "",
+		photo: "",
+		rating: 0,
+		reviews: []
       });
       setCurrentStep(0);
     } catch (error) {
@@ -405,7 +422,7 @@ const BabysitterInfoForm = () => {
 					MenuProps: {
 					PaperProps: {
 						style: {
-						maxHeight: 150,
+						maxHeight: 190,
 						marginTop: '10px',
 						},
 					},
@@ -436,6 +453,37 @@ const BabysitterInfoForm = () => {
 					</MenuItem>
 				))}
 				</TextField>
+				<TextField
+                select
+                label="Childcare Activities"
+                name="childcareActivities"
+                value={formValues.childcareActivities}
+                onChange={(e) =>
+                  setFormValues({
+                    ...formValues,
+                    childcareActivities: e.target.value,
+                  })
+                }
+                SelectProps={{
+                  multiple: true,
+                  MenuProps: {
+                    PaperProps: {
+                      style: {
+                        maxHeight: 115,
+                        marginTop: '10px',
+                      },
+                    },
+                  },
+                }}
+                fullWidth
+                sx={{ mb: 2 }}
+              >
+                {childcareActivities.map((activity) => (
+                  <MenuItem key={activity} value={activity}>
+                    {activity}
+                  </MenuItem>
+                ))}
+              </TextField>
               </div>
             )}
 
