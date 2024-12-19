@@ -1,18 +1,29 @@
-import React from "react";
-import { Container, Typography, Box, Card, CardContent, Avatar, Button } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import {
+  Container,
+  Typography,
+  Box,
+  Card,
+  CardContent,
+  Avatar,
+  Button,
+} from "@mui/material";
+import { Link } from 'react-router-dom';
 import { styled } from "@mui/system";
+import { collection, getDocs } from "firebase/firestore";
+import { FIREBASE_DB } from "../../config/firebase";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
 import BabysitterImage from "../../assets/Babysitter-image.webp";
 
 const HeroSection = styled(Box)({
-	display: "flex",
-	alignItems: "center",
-	justifyContent: "space-around",
-	padding: "120px 20px",
-	backgroundColor: "#f4f4f4",
-	margin: 0,
-  });
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-around",
+  padding: "120px 20px",
+  backgroundColor: "#f4f4f4",
+  margin: 0,
+});
 
 const BabysitterCard = styled(Card)({
   width: "300px",
@@ -37,6 +48,26 @@ const TitleWrapper = styled(Box)({
 });
 
 const WelcomePage = () => {
+  const [babysitters, setBabysitters] = useState([]);
+
+  useEffect(() => {
+    const fetchBabysitters = async () => {
+      try {
+        const babysittersCollectionRef = collection(FIREBASE_DB, "babysitters");
+        const babysitterSnapshot = await getDocs(babysittersCollectionRef);
+        const babysittersList = babysitterSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setBabysitters(babysittersList);
+      } catch (error) {
+        console.error("Error fetching babysitters: ", error);
+      }
+    };
+
+    fetchBabysitters();
+  }, []);
+
   return (
     <>
       <style>
@@ -54,64 +85,116 @@ const WelcomePage = () => {
         `}
       </style>
 
-	  <Navbar/>
-	  
+      <Navbar />
+
       <HeroSection>
-		<Box style={{ maxWidth: "50%" }}>
-			<Typography
-			variant="h1"
-			style={{ fontFamily: "Poppins, sans-serif", marginBottom: "20px", fontSize: "3rem" }}
-			>
-			Babysitters
-			</Typography>
-			<Typography variant="h5" style={{ fontFamily: "Poppins, sans-serif", marginBottom: "30px" }}>
-			Connecting Families with Trusted Babysitters
-			</Typography>
-			<Button
-			variant="contained"
-			style={{ backgroundColor: "#5e62d1", fontFamily: "Poppins, sans-serif" }}
-			>
-			Get started for free
-			</Button>
-		</Box>
-		<Box style={{ maxWidth: "45%" }}>
-			<img
-			src={BabysitterImage}
-			alt="Babysitter"
-			style={{ width: "70%", borderRadius: "10px" }}
-			/>
-		</Box>
+        <Box style={{ maxWidth: "50%" }}>
+          <Typography
+            variant="h1"
+            style={{
+              fontFamily: "Poppins, sans-serif",
+              marginBottom: "20px",
+              fontSize: "3rem",
+            }}
+          >
+            Babysitters
+          </Typography>
+          <Typography
+            variant="h5"
+            style={{
+              fontFamily: "Poppins, sans-serif",
+              marginBottom: "30px",
+            }}
+          >
+            Connecting Families with Trusted Babysitters
+          </Typography>
+          <Button
+            variant="contained"
+			component={Link}
+			to="/register"
+            style={{
+              backgroundColor: "#5e62d1",
+              fontFamily: "Poppins, sans-serif",
+            }}
+          >
+            Get started for free
+          </Button>
+        </Box>
+        <Box style={{ maxWidth: "45%" }}>
+          <img
+            src={BabysitterImage}
+            alt="Babysitter"
+            style={{ width: "70%", borderRadius: "10px" }}
+          />
+        </Box>
       </HeroSection>
 
-      <TitleWrapper>
-        <Typography 
-          variant="h4" 
-          style={{ fontFamily: "Poppins, sans-serif", color: "#fff" }}
-        >
-          Browse Babysitters
-        </Typography>
-      </TitleWrapper>
+      {babysitters.length > 0 && (
+        <>
+          <TitleWrapper>
+            <Typography
+              variant="h4"
+              style={{ fontFamily: "Poppins, sans-serif", color: "#fff" }}
+            >
+              Browse Babysitters
+            </Typography>
+          </TitleWrapper>
 
-      <CardWrapper>
-        <Box display="flex" justifyContent="center" flexWrap="wrap">
-          {["Dora Panteli", "Eleni Papadaki", "Tzeni Georgiou"].map((name, index) => (
-            <BabysitterCard key={index}>
-              <CardContent style={{ textAlign: "center" }}>
-                <Avatar style={{ margin: "10px auto", width: "80px", height: "80px" }} />
-                <Typography variant="h6" style={{ fontFamily: "Poppins, sans-serif", color: "#000" }}>
-                  {name}
-                </Typography>
-                <Typography style={{ color: "#888", fontFamily: "Poppins, sans-serif" }}>
-                  20A
-                </Typography>
-              </CardContent>
-            </BabysitterCard>
-          ))}
-        </Box>
-      </CardWrapper>
+          <CardWrapper>
+            <Box display="flex" justifyContent="center" flexWrap="wrap">
+              {babysitters.map((babysitter) => (
+                <BabysitterCard key={babysitter.id}>
+                  <CardContent style={{ textAlign: "center" }}>
+                    <Avatar
+                      src={babysitter.photo || ""}
+                      style={{
+                        margin: "10px auto",
+                        width: "80px",
+                        height: "80px",
+                      }}
+                    />
+                    <Typography
+                      variant="h6"
+                      style={{
+                        fontFamily: "Poppins, sans-serif",
+                        color: "#000",
+                      }}
+                    >
+                      {`${babysitter.firstName} ${babysitter.lastName}`}
+                    </Typography>
+                    <Typography
+                      style={{
+                        color: "#888",
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      {babysitter.city}
+                    </Typography>
+                    <Typography
+                      style={{
+                        color: "#888",
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      {`Rating: ${babysitter.rating}`}
+                    </Typography>
+                  </CardContent>
+                </BabysitterCard>
+              ))}
+            </Box>
+          </CardWrapper>
+        </>
+      )}
 
       <Container style={{ margin: "50px auto" }}>
-        <Typography variant="h4" style={{ textAlign: "center", marginBottom: "30px", fontFamily: "Poppins, sans-serif" }}>
+        <Typography
+          variant="h4"
+          style={{
+            textAlign: "center",
+            marginBottom: "30px",
+            fontFamily: "Poppins, sans-serif",
+          }}
+        >
           Find Babysitters or jobs, fast and easy!
         </Typography>
         <Box display="flex" flexDirection="column" alignItems="center">
@@ -150,12 +233,19 @@ const WelcomePage = () => {
                 {index + 1}
               </Box>
               <Box>
-                <Typography style={{ fontFamily: "Poppins, sans-serif", fontWeight: "bold", marginBottom: "5px" }}>
+                <Typography
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontWeight: "bold",
+                    marginBottom: "5px",
+                  }}
+                >
                   {step}
                 </Typography>
                 {index === 0 && (
                   <Typography style={{ fontFamily: "Poppins, sans-serif" }}>
-                    Use filters based on your needs and check recommended profiles.
+                    Use filters based on your needs and check recommended
+                    profiles.
                   </Typography>
                 )}
                 {index === 1 && (
@@ -165,7 +255,8 @@ const WelcomePage = () => {
                 )}
                 {index === 2 && (
                   <Typography style={{ fontFamily: "Poppins, sans-serif" }}>
-                    Book childcare, make payments or get paid, and download receipts for your expenses.
+                    Book childcare, make payments or get paid, and download
+                    receipts for your expenses.
                   </Typography>
                 )}
               </Box>
@@ -173,7 +264,7 @@ const WelcomePage = () => {
           ))}
         </Box>
       </Container>
-	  <Footer/>
+      <Footer />
     </>
   );
 };
