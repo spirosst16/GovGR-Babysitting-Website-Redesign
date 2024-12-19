@@ -40,12 +40,14 @@ const Navbar = () => {
   return (
     <AppBar position="absolute" sx={{ background: 'transparent', boxShadow: 'none' }}>
       <Toolbar>
-        <LogoContainer>
-          <Logo>
-            <LogoImage src={require('../../assets/baby-picture.png')} alt="Baby" />
-          </Logo>
-          <LogoText>Babysitters</LogoText>
-        </LogoContainer>
+		  <Link to="/" style={{ textDecoration: 'none' }}>
+			<LogoContainer>
+				<Logo>
+				<LogoImage src={require('../../assets/baby-picture.png')} alt="Baby" />
+				</Logo>
+				<LogoText>Babysitters</LogoText>
+			</LogoContainer>
+		  </Link>
         <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', gap: '30px' }}>
           <Button component={Link} to="/babysitters" sx={{ color: '#444444', fontWeight: 'bold' }}>
             Babysitters

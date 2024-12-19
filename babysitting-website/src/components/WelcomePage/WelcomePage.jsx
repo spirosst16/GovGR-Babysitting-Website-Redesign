@@ -7,6 +7,7 @@ import {
   CardContent,
   Avatar,
   Button,
+  Rating,
 } from "@mui/material";
 import { Link } from 'react-router-dom';
 import { styled } from "@mui/system";
@@ -173,14 +174,13 @@ const WelcomePage = () => {
                     >
                       {babysitter.city}
                     </Typography>
-                    <Typography
-                      style={{
-                        color: "#888",
-                        fontFamily: "Poppins, sans-serif",
-                      }}
-                    >
-                      {`Rating: ${babysitter.rating}`}
-                    </Typography>
+                    <Rating
+                        name={`rating-${babysitter.id}`}
+                        value={babysitter.rating}
+                        precision={0.5}
+                        readOnly
+                        size="large"
+                    />
                   </CardContent>
                 </BabysitterCard>
               ))}
