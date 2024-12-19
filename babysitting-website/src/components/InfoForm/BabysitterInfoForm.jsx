@@ -49,6 +49,22 @@ const LogoContainer = styled('div')({
 	fontFamily: 'Poppins, sans-serif',
   });
 
+  const languages = [
+	"Greek",
+	"English",
+	"Spanish",
+	"French",
+	"German",
+	"Chinese",
+	"Japanese",
+	"Hindi",
+	"Arabic",
+	"Russian",
+	"Portuguese",
+	"Italian",
+	"Korean",
+  ];
+
 // Babysitter Info Form Component
 const BabysitterInfoForm = () => {
 	const location = useLocation();
@@ -66,6 +82,7 @@ const BabysitterInfoForm = () => {
 	  phone: "",
 	  experience: "",
 	  education: "",
+	  knownLanguages: [],
 	  bio: "",
 	  photo: "",
 	});
@@ -375,6 +392,50 @@ const BabysitterInfoForm = () => {
                   rows={4}
                   sx={{ mb: 2 }}
                 />
+				<TextField
+				select
+				label="Known Languages"
+				name="knownLanguages"
+				value={formValues.knownLanguages}
+				onChange={(e) =>
+					setFormValues({ ...formValues, knownLanguages: e.target.value })
+				}
+				SelectProps={{
+					multiple: true,
+					MenuProps: {
+					PaperProps: {
+						style: {
+						maxHeight: 150,
+						marginTop: '10px',
+						},
+					},
+					anchorOrigin: {
+						vertical: "bottom",
+						horizontal: "left",
+					},
+					transformOrigin: {
+						vertical: "top",
+						horizontal: "left",
+					},
+					},
+				}}
+				fullWidth
+				sx={{ mb: 2 }}
+				>
+				{languages.map((language) => (
+					<MenuItem
+					key={language}
+					value={language}
+					sx={{
+						"&:hover": {
+						backgroundColor: "#f0f0f0",
+						},
+					}}
+					>
+					{language}
+					</MenuItem>
+				))}
+				</TextField>
               </div>
             )}
 
