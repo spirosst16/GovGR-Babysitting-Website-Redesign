@@ -142,7 +142,10 @@ const WelcomePage = () => {
 
           <CardWrapper>
             <Box display="flex" justifyContent="center" flexWrap="wrap">
-              {babysitters.map((babysitter) => (
+              {babysitters
+			  	.sort((a, b) => b.rating - a.rating)
+      			.slice(0, 3)
+				.map((babysitter) => (
                 <BabysitterCard key={babysitter.id}>
                   <CardContent style={{ textAlign: "center" }}>
                     <Avatar
