@@ -3,38 +3,40 @@ import { Box, Typography, Button, Grid } from '@mui/material';
 import { styled } from '@mui/system';
 import { Link } from 'react-router-dom';
 
-// Custom styled components for the footer
 const FooterContainer = styled(Box)({
   backgroundColor: '#f4f4f4',
-  padding: '20px 0',
+  padding: '40px 0',
   marginTop: '40px',
+  textAlign: 'center',
+  borderTop: '1px solid #ddd',
 });
 
 const FooterLogoContainer = styled(Box)({
   display: 'flex',
-  alignItems: 'center',
-  gap: '10px',
   justifyContent: 'center',
-  marginBottom: '10px',
+  alignItems: 'center',
+  gap: '15px',
+  marginBottom: '20px',
 });
 
 const FooterLogo = styled('img')({
-  width: '30px',
-  height: '30px',
+  width: '40px',
+  height: '40px',
   objectFit: 'cover',
 });
 
 const FooterText = styled(Typography)({
-  textAlign: 'center',
   color: '#333333',
-  fontSize: '14px',
+  fontSize: '16px',
+  fontWeight: '500',
   marginBottom: '10px',
+  letterSpacing: '1px',
 });
 
 const FooterLinksContainer = styled(Box)({
   display: 'flex',
   justifyContent: 'center',
-  gap: '50px',
+  gap: '30px',
   marginBottom: '20px',
 });
 
@@ -42,34 +44,39 @@ const FooterLink = styled(Button)({
   color: '#333333',
   fontWeight: 'bold',
   textTransform: 'none',
+  '&:hover': {
+    color: '#0066cc',
+  },
 });
 
 const FooterInfoContainer = styled(Box)({
   display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  gap: '20px',
+  justifyContent: 'center',
+  gap: '40px',
+  marginTop: '30px',
   maxWidth: '1000px',
   margin: '0 auto',
+  flexWrap: 'wrap',
 });
 
 const FooterInfo = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
-  gap: '5px',
+  gap: '8px',
   textAlign: 'center',
 });
 
 const FooterContact = styled(Typography)({
   color: '#333333',
   fontSize: '14px',
+  fontWeight: '400',
 });
 
 const FooterLocation = styled(Box)({
   display: 'flex',
   flexDirection: 'column',
-  gap: '5px',
-  alignItems: 'flex-end',
+  gap: '8px',
+  alignItems: 'flex-start',
 });
 
 const Footer = () => {
