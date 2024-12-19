@@ -38,7 +38,7 @@ const LogoText = styled('span')({
 // Navbar Component
 const Navbar = () => {
   return (
-    <AppBar position="fixed" sx={{ background: 'transparent', boxShadow: 'none' }}>
+    <AppBar position="absolute" sx={{ background: 'transparent', boxShadow: 'none' }}>
       <Toolbar>
         <LogoContainer>
           <Logo>

@@ -5,6 +5,7 @@ import RegistrationForm from "./components/Register/RegistrationForm";
 import LoginForm from "./components/Login/LoginForm";
 import BabysitterInfoForm from "./components/InfoForm/BabysitterInfoForm";
 
+
 function App() {
   return (
     <BrowserRouter>

@@ -1,13 +1,18 @@
 import React from "react";
 import { Container, Typography, Box, Card, CardContent, Avatar, Button } from "@mui/material";
 import { styled } from "@mui/system";
+import Navbar from "../Navbar/Navbar";
+import Footer from "../Footer/Footer";
+import BabysitterImage from "../../assets/Babysitter-image.webp";
 
 const HeroSection = styled(Box)({
-  textAlign: "center",
-  padding: "200px 20px",
-  backgroundColor: "#f4f4f4",
-  margin: 0,
-});
+	display: "flex",
+	alignItems: "center",
+	justifyContent: "space-around",
+	padding: "120px 20px",
+	backgroundColor: "#f4f4f4",
+	margin: 0,
+  });
 
 const BabysitterCard = styled(Card)({
   width: "300px",
@@ -49,23 +54,35 @@ const WelcomePage = () => {
         `}
       </style>
 
-      {/* Hero Section */}
+	  <Navbar/>
+	  
       <HeroSection>
-        <Typography 
-          variant="h1"
-          style={{ fontFamily: "Poppins, sans-serif", marginBottom: "20px", fontSize: "3rem" }}
-        >
-          Babysitters
-        </Typography>
-        <Typography variant="h5" style={{ fontFamily: "Poppins, sans-serif", marginBottom: "30px" }}>
-          Connecting Families with Trusted Babysitters
-        </Typography>
-        <Button variant="contained" style={{ backgroundColor: "#5e62d1", fontFamily: "Poppins, sans-serif" }}>
-          Get started for free
-        </Button>
+		<Box style={{ maxWidth: "50%" }}>
+			<Typography
+			variant="h1"
+			style={{ fontFamily: "Poppins, sans-serif", marginBottom: "20px", fontSize: "3rem" }}
+			>
+			Babysitters
+			</Typography>
+			<Typography variant="h5" style={{ fontFamily: "Poppins, sans-serif", marginBottom: "30px" }}>
+			Connecting Families with Trusted Babysitters
+			</Typography>
+			<Button
+			variant="contained"
+			style={{ backgroundColor: "#5e62d1", fontFamily: "Poppins, sans-serif" }}
+			>
+			Get started for free
+			</Button>
+		</Box>
+		<Box style={{ maxWidth: "45%" }}>
+			<img
+			src={BabysitterImage}
+			alt="Babysitter"
+			style={{ width: "70%", borderRadius: "10px" }}
+			/>
+		</Box>
       </HeroSection>
 
-      {/* Title Section Above Cards */}
       <TitleWrapper>
         <Typography 
           variant="h4" 
@@ -75,7 +92,6 @@ const WelcomePage = () => {
         </Typography>
       </TitleWrapper>
 
-      {/* Browse Babysitters - CardWrapper */}
       <CardWrapper>
         <Box display="flex" justifyContent="center" flexWrap="wrap">
           {["Dora Panteli", "Eleni Papadaki", "Tzeni Georgiou"].map((name, index) => (
@@ -94,7 +110,6 @@ const WelcomePage = () => {
         </Box>
       </CardWrapper>
 
-      {/* Steps Section */}
       <Container style={{ margin: "50px auto" }}>
         <Typography variant="h4" style={{ textAlign: "center", marginBottom: "30px", fontFamily: "Poppins, sans-serif" }}>
           Find Babysitters or jobs, fast and easy!
@@ -158,6 +173,7 @@ const WelcomePage = () => {
           ))}
         </Box>
       </Container>
+	  <Footer/>
     </>
   );
 };
