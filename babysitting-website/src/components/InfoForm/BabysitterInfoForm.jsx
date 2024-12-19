@@ -20,7 +20,7 @@ import { FIREBASE_DB } from "../../config/firebase";
 // Logo components
 const LogoContainer = styled('div')({
 	position: 'absolute',
-	top: '20px',
+	top: '10px',
 	left: '20px',
 	display: 'flex',
 	alignItems: 'center',
