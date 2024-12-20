@@ -48,7 +48,7 @@ const Navbar = () => {
 				<LogoText>Babysitters</LogoText>
 			</LogoContainer>
 		  </Link>
-        <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', gap: '30px' }}>
+        <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', gap: '30px', marginTop: '10px' }}>
           <Button component={Link} to="/babysitters" sx={{ color: '#444444', fontWeight: 'bold' }}>
             Babysitters
           </Button>
@@ -62,7 +62,7 @@ const Navbar = () => {
             My Applications & Jobs
           </Button>
         </Box>
-        <Box sx={{ display: 'flex', gap: '10px' }}>
+        <Box sx={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
           <Button variant="outlined" component={Link} to="/register" sx={{ color: '#5e62d1' }}>
             Join
           </Button>
