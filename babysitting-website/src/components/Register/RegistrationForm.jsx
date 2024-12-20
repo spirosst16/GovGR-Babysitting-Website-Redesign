@@ -53,44 +53,44 @@ const RegistrationForm = () => {
   const navigate = useNavigate();
 
   const handleRegistration = async (role) => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        FIREBASE_AUTH,
-        email,
-        password
-      );
-      const { uid } = userCredential.user;
-
-      // Try to write the user data to Firestore
-      try {
-        const userDocRef = doc(FIREBASE_DB, "users", uid);
-        await setDoc(userDocRef, {
-          email,
-          password,
-          role,
-        });
-      } catch (dbError) {
-        console.error("Firestore error:", dbError);
-        setError("Failed to write to Firestore.");
-        return;
-      }
-
-      navigate("/babysitter-form", { state: { email, password } });
-    } catch (error) {
-      console.error(error);
-
-      // Handle specific Firebase errors
-      if (error.code === "auth/email-already-in-use") {
-        setError("This email is already in use.");
-      } else if (error.code === "auth/invalid-email") {
-        setError("The email address is not valid.");
-      } else if (error.code === "auth/weak-password") {
-        setError("The password is too weak.");
-      } else {
-        setError(`An error occurred while registering as a ${role}. Please try again.`);
-      }
-    }
-  };
+	try {
+	  const userCredential = await createUserWithEmailAndPassword(
+		FIREBASE_AUTH,
+		email,
+		password
+	  );
+	  const { uid } = userCredential.user;
+  
+	  try {
+		const userDocRef = doc(FIREBASE_DB, "users", uid);
+		await setDoc(userDocRef, {
+		  email,
+		  password,
+		  role,
+		});
+	  } catch (dbError) {
+		console.error("Firestore error:", dbError);
+		setError("Failed to write to Firestore.");
+		return;
+	  }
+  
+	  const path = role === "Babysitter" ? "/babysitter-form" : "/guardian-form";
+  
+	  navigate(path, { state: { email, password } });
+	} catch (error) {
+	  console.error(error);
+  
+	  if (error.code === "auth/email-already-in-use") {
+		setError("This email is already in use.");
+	  } else if (error.code === "auth/invalid-email") {
+		setError("The email address is not valid.");
+	  } else if (error.code === "auth/weak-password") {
+		setError("The password is too weak.");
+	  } else {
+		setError(`An error occurred while registering as a ${role}. Please try again.`);
+	  }
+	}
+  };  
 
   return (
     <>

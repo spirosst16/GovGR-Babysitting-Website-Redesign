@@ -18,90 +18,69 @@ import { FIREBASE_DB } from "../../config/firebase";
 
 // Logo components
 const LogoContainer = styled('div')({
-	position: 'absolute',
-	top: '10px',
-	left: '20px',
-	display: 'flex',
-	alignItems: 'center',
-	gap: '10px',
-  });
-  
-  const Logo = styled('div')({
-	width: '50px',
-	height: '50px',
-	display: 'flex',
-	justifyContent: 'center',
-	alignItems: 'center',
-	overflow: 'hidden'
-  });
-  
-  const LogoImage = styled('img')({
-	width: '100%',
-	height: '100%',
-	objectFit: 'cover',
-  });
-  
-  const LogoText = styled('span')({
-	fontSize: '24px',
-	fontWeight: 'bold',
-	color: '#000000',
-	fontFamily: 'Poppins, sans-serif',
-  });
+  position: 'absolute',
+  top: '10px',
+  left: '20px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+});
 
-  const languages = [
-	"Greek",
-	"English",
-	"Spanish",
-	"French",
-	"German",
-	"Chinese",
-	"Japanese",
-	"Hindi",
-	"Arabic",
-	"Russian",
-	"Portuguese",
-	"Italian",
-	"Korean",
-  ];
+const Logo = styled('div')({
+  width: '50px',
+  height: '50px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  overflow: 'hidden'
+});
 
-  const childcareActivities = [
-	"Arts and Crafts",
-	"Storytelling",
-	"Outdoor Play",
-	"Meal Preparation",
-	"Tutoring",
-	"Nap Time Assistance",
-  ];
-  
+const LogoImage = styled('img')({
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+});
 
-// Babysitter Info Form Component
-const BabysitterInfoForm = () => {
-	const location = useLocation();
-  	const { email, password } = location.state || {};
-	const [formValues, setFormValues] = useState({
-	  firstName: "",
-	  lastName: "",
-	  gender: "",
-	  dateOfBirth: "",
-	  street: "",
-	  number: "",
-	  city: "",
-	  postal: "",
-	  email: email || "",
-	  phone: "",
-	  experience: "",
-	  education: "",
-	  knownLanguages: [],
-	  childcareActivities: [],
-	  bio: "",
-	  photo: "",
-	  rating: 0,
-  	  reviews: []
-	});
+const LogoText = styled('span')({
+  fontSize: '24px',
+  fontWeight: 'bold',
+  color: '#000000',
+  fontFamily: 'Poppins, sans-serif',
+});
+
+const ageGroups = [
+  "Infant (0-2 years)",
+  "Toddler (3-5 years)",
+  "Child (6-12 years)",
+  "Teen (13+ years)",
+];
+
+// Guardian Info Form Component
+const GuardianInfoForm = () => {
+  const location = useLocation();
+  const { email, password } = location.state || {};
+  const [formValues, setFormValues] = useState({
+    firstName: "",
+    lastName: "",
+    gender: "",
+    dateOfBirth: "",
+    street: "",
+    number: "",
+    city: "",
+    postal: "",
+    email: email || "",
+    phone: "",
+    numberOfChildren: "",
+    childrenAgeGroups: [],
+    childrenDescription: "",
+    photo: "",
+	rating: 0,
+	reviews: []
+  });
 
   const [currentStep, setCurrentStep] = useState(0);
 
-  const steps = ["Personal Information", "Experience & Education", "Bio & Photo"];
+  const steps = ["Personal Information", "Child Info & Needs", "Photo"];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -121,14 +100,14 @@ const BabysitterInfoForm = () => {
   };
 
   const handleFileChange = (e) => {
-	const file = e.target.files[0];
-	if (file) {
-	  const reader = new FileReader();
-	  reader.onloadend = () => {
-		setFormValues({ ...formValues, photo: reader.result });
-	  };
-	  reader.readAsDataURL(file);
-	}
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormValues({ ...formValues, photo: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -142,30 +121,28 @@ const BabysitterInfoForm = () => {
     }
 
     try {
-      const babysittersCollectionRef = collection(FIREBASE_DB, "babysitters");
+      const guardiansCollectionRef = collection(FIREBASE_DB, "guardians");
 
-      await addDoc(babysittersCollectionRef, formValues);
+      await addDoc(guardiansCollectionRef, formValues);
 
       console.log("Document written successfully!");
       alert("Form submitted successfully!");
 
       setFormValues({
         firstName: "",
-		lastName: "",
-		gender: "",
-		dateOfBirth: "",
-		street: "",
-		number: "",
-		city: "",
-		postal: "",
-		email: email || "",
-		phone: "",
-		experience: "",
-		education: "",
-		knownLanguages: [],
-		childcareActivities: [],
-		bio: "",
-		photo: "",
+        lastName: "",
+        gender: "",
+        dateOfBirth: "",
+        street: "",
+        number: "",
+        city: "",
+        postal: "",
+        email: email || "",
+        phone: "",
+        numberOfChildren: "",
+        childrenAgeGroups: [],
+        childrenDescription: "",
+        photo: "",
 		rating: 0,
 		reviews: []
       });
@@ -216,27 +193,27 @@ const BabysitterInfoForm = () => {
         </LogoContainer>
 
         <Container component="main" maxWidth="md">
-		  <Stepper
-			activeStep={currentStep}
-			alternativeLabel
-			sx={{
-				'.MuiStepIcon-root': {
-				color: '#5e62d1',
-				},
-				'.MuiStepIcon-root.Mui-active': {
-				color: '#5e62d1',
-				},
-				'.MuiStepIcon-root.Mui-completed': {
-				color: '#5e62d1',
-				},
-			}}
-			>
-			{steps.map((step, index) => (
-				<Step key={index}>
-				<StepLabel>{step}</StepLabel>
-				</Step>
-			))}
-		  </Stepper>
+          <Stepper
+            activeStep={currentStep}
+            alternativeLabel
+            sx={{
+              '.MuiStepIcon-root': {
+                color: '#5e62d1',
+              },
+              '.MuiStepIcon-root.Mui-active': {
+                color: '#5e62d1',
+              },
+              '.MuiStepIcon-root.Mui-completed': {
+                color: '#5e62d1',
+              },
+            }}
+          >
+            {steps.map((step, index) => (
+              <Step key={index}>
+                <StepLabel>{step}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
 
           <Box
             component="form"
@@ -362,7 +339,6 @@ const BabysitterInfoForm = () => {
                   <TextField
                     label="Phone"
                     name="phone"
-                    type="tel"
                     value={formValues.phone}
                     onChange={handleChange}
                     required
@@ -384,143 +360,84 @@ const BabysitterInfoForm = () => {
                     fontFamily: "Poppins, sans-serif",
                   }}
                 >
-                  Experience & Education
+                  Child Info & Needs
                 </Typography>
-                <TextField
-                  label="Experience"
-                  name="experience"
-                  value={formValues.experience}
-                  onChange={handleChange}
-                  required
-                  fullWidth
-                  multiline
-                  rows={4}
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  label="Education"
-                  name="education"
-                  value={formValues.education}
-                  onChange={handleChange}
-                  required
-                  fullWidth
-                  multiline
-                  rows={4}
-                  sx={{ mb: 2 }}
-                />
-				<TextField
-				select
-				label="Known Languages"
-				name="knownLanguages"
-				value={formValues.knownLanguages}
-				onChange={(e) =>
-					setFormValues({ ...formValues, knownLanguages: e.target.value })
-				}
-				SelectProps={{
-					multiple: true,
-					MenuProps: {
-					PaperProps: {
-						style: {
-						maxHeight: 190,
-						marginTop: '10px',
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                  <TextField
+                    label="Number of Children"
+                    name="numberOfChildren"
+                    value={formValues.numberOfChildren}
+                    onChange={handleChange}
+                    required
+                    fullWidth
+                    sx={{ flex: "1 1 calc(50% - 16px)" }}
+                  />
+                  <TextField
+					select
+					label="Children Age Groups"
+					name="childrenAgeGroups"
+					value={formValues.childrenAgeGroups}
+					onChange={(e) =>
+						setFormValues({
+						...formValues,
+						childrenAgeGroups: typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value,
+						})
+					}
+					SelectProps={{
+						multiple: true,
+						MenuProps: {
+						PaperProps: {
+							style: {
+							marginTop: '10px',
+							},
 						},
-					},
-					anchorOrigin: {
-						vertical: "bottom",
-						horizontal: "left",
-					},
-					transformOrigin: {
-						vertical: "top",
-						horizontal: "left",
-					},
-					},
-				}}
-				fullWidth
-				sx={{ mb: 2 }}
-				>
-				{languages.map((language) => (
-					<MenuItem
-					key={language}
-					value={language}
-					sx={{
-						"&:hover": {
-						backgroundColor: "#f0f0f0",
 						},
 					}}
+					fullWidth
+					sx={{ mb: 2 }}
 					>
-					{language}
-					</MenuItem>
-				))}
-				</TextField>
-				<TextField
-                select
-                label="Childcare Activities"
-                name="childcareActivities"
-                value={formValues.childcareActivities}
-                onChange={(e) =>
-                  setFormValues({
-                    ...formValues,
-                    childcareActivities: e.target.value,
-                  })
-                }
-                SelectProps={{
-                  multiple: true,
-                  MenuProps: {
-                    PaperProps: {
-                      style: {
-                        maxHeight: 115,
-                        marginTop: '10px',
-                      },
-                    },
-                  },
-                }}
-                fullWidth
-                sx={{ mb: 2 }}
-              >
-                {childcareActivities.map((activity) => (
-                  <MenuItem key={activity} value={activity}>
-                    {activity}
-                  </MenuItem>
-                ))}
-              </TextField>
+					{ageGroups.map((ageGroup, index) => (
+						<MenuItem
+						key={index}
+						value={ageGroup}
+						sx={{
+							"&:hover": {
+							backgroundColor: "#f0f0f0",
+							},
+						}}
+						>
+						{ageGroup}
+						</MenuItem>
+					))}
+				  </TextField>
+                  <TextField
+                    label="Children Description & Special Needs"
+                    name="childrenDescription"
+                    value={formValues.childrenDescription}
+                    onChange={handleChange}
+                    required
+                    fullWidth
+                    multiline
+                    rows={4}
+                  />
+                </Box>
               </div>
             )}
 
-			{currentStep === 2 && (
-			<div>
-				<Typography
-				variant="h4"
-				component="h1"
-				textAlign="center"
-				sx={{
-					mb: 2,
-					fontFamily: "Poppins, sans-serif",
-				}}
-				>
-				Bio & Photo
-				</Typography>
-
-				<Box
-				sx={{
-					display: 'flex',
-					flexDirection: 'row',
-					alignItems: 'center',
-					gap: 3,
-				}}
-				>
-				<TextField
-					label="Bio"
-					name="bio"
-					value={formValues.bio}
-					onChange={handleChange}
-					required
-					fullWidth
-					multiline
-					rows={6}
-					sx={{ flex: 1 }}
-				/>
-
-				<Box
+            {currentStep === 2 && (
+              <div>
+                <Typography
+                  variant="h4"
+                  component="h1"
+                  textAlign="center"
+                  sx={{
+                    mb: 2,
+                    fontFamily: "Poppins, sans-serif",
+                  }}
+                >
+                  Upload Photo
+                </Typography>
+                <Box
 					sx={{
 					position: 'relative',
 					width: '240px',
@@ -531,6 +448,7 @@ const BabysitterInfoForm = () => {
 					display: 'flex',
 					justifyContent: 'center',
 					alignItems: 'center',
+					margin: '0 auto',
 					}}
 				>
 					<img
@@ -574,11 +492,10 @@ const BabysitterInfoForm = () => {
 					/>
 					</Button>
 				</Box>
-				</Box>
-			</div>
-			)}
+              </div>
+            )}
 
-			<Box
+            <Box
 			sx={{
 				display: 'flex',
 				justifyContent: 'space-between',
@@ -633,4 +550,4 @@ const BabysitterInfoForm = () => {
   );
 };
 
-export default BabysitterInfoForm;
+export default GuardianInfoForm;

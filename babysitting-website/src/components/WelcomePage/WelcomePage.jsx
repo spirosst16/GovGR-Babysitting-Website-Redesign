@@ -145,7 +145,7 @@ const WelcomePage = () => {
             <Box display="flex" justifyContent="center" flexWrap="wrap">
               {babysitters
 			  	.sort((a, b) => b.rating - a.rating)
-      			.slice(0, 3)
+      			.slice(0, 4)
 				.map((babysitter) => (
                 <BabysitterCard key={babysitter.id}>
                   <CardContent style={{ textAlign: "center" }}>
