@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { FIREBASE_AUTH } from "../../config/firebase";
+import { FIREBASE_AUTH, FIREBASE_DB } from "../../config/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Container,
@@ -51,13 +52,56 @@ const LoginForm = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const checkUserRoleAndNavigate = async (uid) => {
+    try {
+
+	const babysitterQuery = query(
+		collection(FIREBASE_DB, "babysitters"),
+		where("email", "==", email)
+		);
+		const babysitterSnapshot = await getDocs(babysitterQuery);
+
+		if (!babysitterSnapshot.empty) {
+		navigate("/");
+		return;
+		}
+
+		const guardianQuery = query(
+		collection(FIREBASE_DB, "guardians"),
+		where("email", "==", email)
+		);
+		const guardianSnapshot = await getDocs(guardianQuery);
+
+		if (!guardianSnapshot.empty) {
+		navigate("/");
+		return;
+		}
+
+      const userDoc = await getDoc(doc(FIREBASE_DB, "users", uid));
+      const role = userDoc.data()?.role;
+
+      if (role === "Babysitter") {
+        navigate("/babysitter-form", { state: { email } });
+      } else if (role === "Guardian") {
+        navigate("/guardian-form", { state: { email } });
+      } else {
+        setError("Role not defined. Please contact support.");
+      }
+    } catch (dbError) {
+      console.error("Error checking user role:", dbError);
+      setError("Failed to verify user role. Please try again.");
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
     try {
-      await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
-      alert("Login successful!");
-      navigate("/");
-    } catch (error) {
+      const userCredential = await signInWithEmailAndPassword(FIREBASE_AUTH, email, password);
+      const { uid } = userCredential.user;
+      await checkUserRoleAndNavigate(uid);
+    } catch (authError) {
+      console.error("Authentication error:", authError);
       setError("Wrong email or password. Please try again.");
     }
   };
