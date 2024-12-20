@@ -5,7 +5,7 @@ import RegistrationForm from "./components/Register/RegistrationForm";
 import LoginForm from "./components/Login/LoginForm";
 import BabysitterInfoForm from "./components/InfoForm/BabysitterInfoForm";
 import GuardianInfoForm from "./components/InfoForm/GuardianInfoForm";
-
+import BabysittersPage from "./components/BabysittersPage/BabysittersPage";
 
 function App() {
   return (
@@ -14,8 +14,9 @@ function App() {
         <Route path="/" element={<WelcomePage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegistrationForm />} />
-		<Route path="/babysitter-form" element={<BabysitterInfoForm />} />
-		<Route path="/guardian-form" element={<GuardianInfoForm />} />
+		    <Route path="/babysitter-form" element={<BabysitterInfoForm />} />
+		    <Route path="/guardian-form" element={<GuardianInfoForm />} />
+        <Route path="/babysitters" element={<BabysittersPage />} />
       </Routes>
     </BrowserRouter>
   );
