@@ -13,7 +13,10 @@ import { collection, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
-import { APIProvider, Map, Marker } from "@vis.gl/react-google-maps";
+
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 const BabysitterCard = styled(Card)({
   width: "300px",
@@ -66,8 +69,8 @@ const BabysittersPage = () => {
   };
 
   const defaultCenter = {
-    lat: 37.9838, // Default latitude for Athens, Greece
-    lng: 23.7275, // Default longitude for Athens, Greece
+    lat: 37.9838,
+    lng: 23.7275,
   };
 
   return (
@@ -127,23 +130,31 @@ const BabysittersPage = () => {
         </CardWrapper>
 
         <MapWrapper>
-          <APIProvider apiKey="AIzaSyBn-8X4orGhxNYyGh5wliFu25X6sCnQLV8">
-            <Map
-              center={defaultCenter}
-              zoom={12}
-              style={{ height: "400px", width: "100%" }}
-            >
-              {filteredBabysitters.map((babysitter) => (
-                <Marker
-                  key={babysitter.id}
-                  position={{
-                    lat: babysitter.latitude,
-                    lng: babysitter.longitude,
-                  }}
-                />
-              ))}
-            </Map>
-          </APIProvider>
+          <MapContainer
+            center={defaultCenter}
+            zoom={12}
+            style={{ height: "400px", width: "100%" }}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            {filteredBabysitters.map((babysitter) => (
+              <Marker
+                key={babysitter.id}
+                position={{
+                  lat: babysitter.latitude,
+                  lng: babysitter.longitude,
+                }}
+                icon={new L.Icon({ iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png", iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] })}
+              >
+                <Popup>
+                  <Typography variant="h6">{`${babysitter.firstName} ${babysitter.lastName}`}</Typography>
+                  <Typography>{babysitter.city}</Typography>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
         </MapWrapper>
       </Box>
 

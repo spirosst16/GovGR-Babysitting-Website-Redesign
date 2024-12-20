@@ -6,11 +6,12 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@mui/material": "^6.2.0",
-    "@vis.gl/react-google-maps": "^1.4.2",
     "cra-template": "1.2.0",
     "firebase": "^11.1.0",
+    "leaflet": "^1.9.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.0.2",
     "react-scripts": "5.0.1"
   },
