@@ -105,9 +105,11 @@ const Navbar = () => {
           <Button component={Link} to="/how-it-works" sx={{ color: '#444444', fontWeight: 'bold' }}>
             How it works
           </Button>
-          <Button component={Link} to="/my-applications-and-jobs" sx={{ color: '#444444', fontWeight: 'bold' }}>
-            My Applications & Jobs
-          </Button>
+          {isLoggedIn && (
+            <Button component={Link} to="/my-applications-and-jobs" sx={{ color: '#444444', fontWeight: 'bold' }}>
+              My Applications & Jobs
+            </Button>
+          )}
         </Box>
         <Box sx={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
           {isLoggedIn && userPhoto ? (
