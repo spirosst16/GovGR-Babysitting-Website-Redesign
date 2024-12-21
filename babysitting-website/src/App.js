@@ -10,6 +10,7 @@ import GuardianInfoForm from "./components/InfoForm/GuardianInfoForm";
 import BabysittersPage from "./components/BabysittersPage/BabysittersPage";
 import HowItWorksPage from "./components/HowItWorksPage/HowItWorksPage";
 import BabysitterApplicationForm from "./components/ApplicationForm/BabysitterApplicationForm";
+import MyApplicationsJobsPage from "./components/ApplicationAndJobs/MyApplicationsJobsPage";
 
 function App() {
 
@@ -30,6 +31,7 @@ function App() {
         <Route path="/babysitters" element={<BabysittersPage />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
 		<Route path="/babysitter-application" element={<BabysitterApplicationForm />} />
+		<Route path="/my-applications-and-jobs" element={<MyApplicationsJobsPage />} />
       </Routes>
     </BrowserRouter>
   );
