@@ -8,6 +8,7 @@ import LoginForm from "./components/Login/LoginForm";
 import BabysitterInfoForm from "./components/InfoForm/BabysitterInfoForm";
 import GuardianInfoForm from "./components/InfoForm/GuardianInfoForm";
 import BabysittersPage from "./components/BabysittersPage/BabysittersPage";
+import HowItWorksPage from "./components/HowItWorksPage/HowItWorksPage";
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
 		    <Route path="/babysitter-form" element={<BabysitterInfoForm />} />
 		    <Route path="/guardian-form" element={<GuardianInfoForm />} />
         <Route path="/babysitters" element={<BabysittersPage />} />
+        <Route path="/how-it-works" element={<HowItWorksPage />} />
       </Routes>
     </BrowserRouter>
   );
