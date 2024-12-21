@@ -8,14 +8,17 @@ import {
   Avatar,
   Button,
   Rating,
+  TextField
 } from "@mui/material";
 import { Link } from 'react-router-dom';
 import { styled } from "@mui/system";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
 import BabysitterImage from "../../assets/Babysitter-image.webp";
+import { FIREBASE_AUTH } from "../../config/firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 const HeroSection = styled(Box)({
   display: "flex",
@@ -50,6 +53,9 @@ const TitleWrapper = styled(Box)({
 
 const WelcomePage = () => {
   const [babysitters, setBabysitters] = useState([]);
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState("");
+  const [firstName, setFirstName] = useState("");
 
   useEffect(() => {
     const fetchBabysitters = async () => {
@@ -67,6 +73,51 @@ const WelcomePage = () => {
     };
 
     fetchBabysitters();
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (authUser) => {
+      if (authUser) {
+        setUser(authUser);
+        const email = authUser.email;
+
+        // Check if the user is a Babysitter or Guardian
+        const checkRole = async () => {
+          const babysitterQuery = query(
+            collection(FIREBASE_DB, "babysitters"),
+            where("email", "==", email)
+          );
+          const babysitterSnapshot = await getDocs(babysitterQuery);
+
+          if (!babysitterSnapshot.empty) {
+            const babysitterData = babysitterSnapshot.docs[0].data();
+            setRole("babysitter");
+            setFirstName(babysitterData.firstName);
+            return;
+          }
+
+          const guardianQuery = query(
+            collection(FIREBASE_DB, "guardians"),
+            where("email", "==", email)
+          );
+          const guardianSnapshot = await getDocs(guardianQuery);
+
+          if (!guardianSnapshot.empty) {
+            const guardianData = guardianSnapshot.docs[0].data();
+            setRole("guardian");
+            setFirstName(guardianData.firstName);
+          }
+        };
+
+        checkRole();
+      } else {
+        setUser(null);
+        setRole("");
+        setFirstName("");
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   return (

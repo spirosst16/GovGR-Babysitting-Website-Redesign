@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { FIREBASE_AUTH } from "./config/firebase";
 import WelcomePage from "./components/WelcomePage/WelcomePage";
 import RegistrationForm from "./components/Register/RegistrationForm";
 import LoginForm from "./components/Login/LoginForm";
@@ -8,6 +10,13 @@ import GuardianInfoForm from "./components/InfoForm/GuardianInfoForm";
 import BabysittersPage from "./components/BabysittersPage/BabysittersPage";
 
 function App() {
+
+  useEffect(() => {
+	signOut(FIREBASE_AUTH).catch((error) => {
+	console.error("Error logging out:", error);
+	});
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>

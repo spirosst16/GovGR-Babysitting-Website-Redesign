@@ -14,10 +14,6 @@ import { FIREBASE_DB } from "../../config/firebase";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-
 const BabysitterCard = styled(Card)({
   width: "300px",
   margin: "10px",
@@ -30,12 +26,6 @@ const CardWrapper = styled(Box)({
   justifyContent: "center",
   flexWrap: "wrap",
   marginTop: 0,
-});
-
-const MapWrapper = styled(Box)({
-  height: "400px",
-  width: "100%",
-  marginTop: "20px",
 });
 
 const BabysittersPage = () => {
@@ -66,11 +56,6 @@ const BabysittersPage = () => {
       babysitter.city.toLowerCase().includes(city.toLowerCase())
     );
     setFilteredBabysitters(filtered);
-  };
-
-  const defaultCenter = {
-    lat: 37.9838,
-    lng: 23.7275,
   };
 
   return (
@@ -128,34 +113,6 @@ const BabysittersPage = () => {
             </BabysitterCard>
           ))}
         </CardWrapper>
-
-        <MapWrapper>
-          <MapContainer
-            center={defaultCenter}
-            zoom={12}
-            style={{ height: "400px", width: "100%" }}
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            {filteredBabysitters.map((babysitter) => (
-              <Marker
-                key={babysitter.id}
-                position={{
-                  lat: babysitter.latitude,
-                  lng: babysitter.longitude,
-                }}
-                icon={new L.Icon({ iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png", iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41] })}
-              >
-                <Popup>
-                  <Typography variant="h6">{`${babysitter.firstName} ${babysitter.lastName}`}</Typography>
-                  <Typography>{babysitter.city}</Typography>
-                </Popup>
-              </Marker>
-            ))}
-          </MapContainer>
-        </MapWrapper>
       </Box>
 
       <Footer />
