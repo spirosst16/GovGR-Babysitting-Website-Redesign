@@ -11,6 +11,10 @@ import {
   StepLabel,
   FormGroup,
   FormControlLabel,
+  Radio, 
+  RadioGroup, 
+  FormControl, 
+  FormLabel,
   Checkbox,
   Grid
 } from "@mui/material";
@@ -57,15 +61,16 @@ const BabysitterApplicationForm = () => {
     area: "",
     jobType: "",
     availability: [],
-    babysittingPlace: "",
+    babysittingPlace: [],
   });
 
   const [currentStep, setCurrentStep] = useState(0);
 
+  const [isFocused, setIsFocused] = useState(false);
+
   const steps = [
-    "Babysitting Area & Job Type",
+    "Babysitting Area, Job Type & Babysitting Place",
     "Availability",
-    "Babysitting Place",
     "Review & Submit"
   ];
 
@@ -118,7 +123,7 @@ const BabysitterApplicationForm = () => {
 		area: "",
 		jobType: "",
 		availability: [],
-		babysittingPlace: "",
+		babysittingPlace: [],
 	  });
 	  setCurrentStep(0);
 	} catch (error) {
@@ -191,42 +196,92 @@ const BabysitterApplicationForm = () => {
             }}
           >
             {currentStep === 0 && (
-              <div>
-                <Typography
-                  variant="h4"
-                  component="h1"
-                  textAlign="center"
-                  sx={{
-                    mb: 2,
-                    fontFamily: "Poppins, sans-serif",
-                  }}
-                >
-                  Babysitting Area & Job Type
-                </Typography>
-                <TextField
-                  label="Preferred Area"
-                  name="area"
-                  value={formValues.area}
-                  onChange={handleChange}
-                  required
-                  fullWidth
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  select
-                  label="Job Type"
-                  name="jobType"
-                  value={formValues.jobType}
-                  onChange={handleChange}
-                  required
-                  fullWidth
-                  sx={{ mb: 2 }}
-                >
-                  <MenuItem value="Part-time">Part-time</MenuItem>
-                  <MenuItem value="Full-time">Full-time</MenuItem>
-                </TextField>
-              </div>
-            )}
+			<div>
+				<Typography
+				variant="h4"
+				component="h1"
+				textAlign="center"
+				sx={{
+					mb: 2,
+					fontFamily: "Poppins, sans-serif",
+				}}
+				>
+				Babysitting Area, Job Type & Babysitting Place
+				</Typography>
+				
+				<FormControl component="fieldset" fullWidth sx={{ mb: 2 }}>
+				<FormLabel component="legend">Preferred Area</FormLabel>
+				<TextField
+					label="Preferred Area"
+					name="area"
+					value={formValues.area}
+					onChange={handleChange}
+					required
+					fullWidth
+					sx={{ mb: 2, mt: 1 }}
+					onFocus={() => setIsFocused(true)}
+					onBlur={() => setIsFocused(false)}
+					InputLabelProps={{
+					shrink: false,
+					style: {
+						visibility: formValues.area || isFocused ? 'hidden' : 'visible',
+					},
+					}}
+				/>
+				</FormControl>
+
+				<Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+				<FormControl component="fieldset" sx={{ mb: 2 }}>
+					<FormLabel component="legend">Job Type</FormLabel>
+					<RadioGroup
+					name="jobType"
+					value={formValues.jobType}
+					onChange={handleChange}
+					sx={{ display: 'flex', flexDirection: 'row' }}
+					>
+					<FormControlLabel value="Part-time" control={<Radio />} label="Part-time" />
+					<FormControlLabel value="Full-time" control={<Radio />} label="Full-time" />
+					</RadioGroup>
+				</FormControl>
+
+				<FormControl component="fieldset" sx={{ mb: 2 }}>
+				<FormLabel component="legend">Babysitting Place</FormLabel>
+				<Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+					<FormControlLabel
+					control={
+						<Checkbox
+						checked={formValues.babysittingPlace.includes("Family's House")}
+						onChange={(e) => {
+							const newBabysittingPlace = e.target.checked
+							? [...formValues.babysittingPlace, "Family's House"]
+							: formValues.babysittingPlace.filter(place => place !== "Family's House");
+							setFormValues({ ...formValues, babysittingPlace: newBabysittingPlace });
+						}}
+						value="Family's House"
+						/>
+					}
+					label="Family's House"
+					/>
+					<FormControlLabel
+					control={
+						<Checkbox
+						checked={formValues.babysittingPlace.includes("Babysitter's House")}
+						onChange={(e) => {
+							const newBabysittingPlace = e.target.checked
+							? [...formValues.babysittingPlace, "Babysitter's House"]
+							: formValues.babysittingPlace.filter(place => place !== "Babysitter's House");
+							setFormValues({ ...formValues, babysittingPlace: newBabysittingPlace });
+						}}
+						value="Babysitter's House"
+						/>
+					}
+					label="Babysitter's House"
+					/>
+				</Box>
+				</FormControl>
+				</Box>
+			</div>
+			)}
 
 			{currentStep === 1 && (
 			<div>
@@ -338,7 +393,6 @@ const BabysitterApplicationForm = () => {
 				</Grid>
 
 				<Grid item xs={12} sm={6} md={3}>
-					{/* Wednesday */}
 					<Typography variant="h6">Wednesday</Typography>
 					<FormGroup>
 					<FormControlLabel
@@ -433,7 +487,6 @@ const BabysitterApplicationForm = () => {
 				</Grid>
 
 				<Grid item xs={12} sm={6} md={3}>
-					{/* Friday */}
 					<Typography variant="h6">Friday</Typography>
 					<FormGroup>
 					<FormControlLabel
@@ -589,41 +642,12 @@ const BabysitterApplicationForm = () => {
                     fontFamily: "Poppins, sans-serif",
                   }}
                 >
-                  Babysitting Place
-                </Typography>
-                <TextField
-                  select
-                  label="Babysitting Place"
-                  name="babysittingPlace"
-                  value={formValues.babysittingPlace}
-                  onChange={handleChange}
-                  required
-                  fullWidth
-                  sx={{ mb: 2 }}
-                >
-                  <MenuItem value="Family's House">Family's House</MenuItem>
-                  <MenuItem value="Babysitter's House">Babysitter's House</MenuItem>
-                </TextField>
-              </div>
-            )}
-
-            {currentStep === 3 && (
-              <div>
-                <Typography
-                  variant="h4"
-                  component="h1"
-                  textAlign="center"
-                  sx={{
-                    mb: 2,
-                    fontFamily: "Poppins, sans-serif",
-                  }}
-                >
                   Review & Submit
                 </Typography>
                 <Typography variant="h6">Area: {formValues.area}</Typography>
                 <Typography variant="h6">Job Type: {formValues.jobType}</Typography>
+				<Typography variant="h6">Babysitting Place: {formValues.babysittingPlace}</Typography>
                 <Typography variant="h6">Availability: {formValues.availability.join(", ")}</Typography>
-                <Typography variant="h6">Babysitting Place: {formValues.babysittingPlace}</Typography>
               </div>
             )}
 
