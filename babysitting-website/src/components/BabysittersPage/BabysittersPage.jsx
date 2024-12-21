@@ -23,7 +23,7 @@ const BabysitterCard = styled(Card)({
   boxShadow: "0 8px 15px rgba(0, 0, 0, 0.15)",
   borderRadius: "15px",
   overflow: "hidden",
-  background: "linear-gradient(135deg, #ffffff 0%, #f7f7f7 100%)",
+  background: "ffffff",
   transition: "transform 0.3s ease, box-shadow 0.3s ease",
   "&:hover": {
     transform: "translateY(-3px)",
