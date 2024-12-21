@@ -12,6 +12,7 @@ import {
   Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import '../../style.css';
 
 // Logo components
 const LogoContainer = styled('div')({
@@ -108,20 +109,6 @@ const LoginForm = () => {
 
   return (
     <>
-      <style>
-        {`
-          * {
-            box-sizing: border-box;
-          }
-
-          body {
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-          }
-        `}
-      </style>
-
       <div
         style={{
           position: 'relative',

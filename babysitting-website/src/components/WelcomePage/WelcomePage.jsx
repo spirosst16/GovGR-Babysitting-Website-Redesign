@@ -19,6 +19,7 @@ import Footer from "../Footer/Footer";
 import BabysitterImage from "../../assets/Babysitter-image.webp";
 import { FIREBASE_AUTH } from "../../config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import '../../style.css';
 
 const HeroSection = styled(Box)({
   display: "flex",
@@ -122,21 +123,6 @@ const WelcomePage = () => {
 
   return (
     <>
-      <style>
-        {`
-          * {
-            box-sizing: border-box;
-          }
-
-          body {
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-            font-family: "Poppins, sans-serif";
-          }
-        `}
-      </style>
-
       <Navbar />
 
       <HeroSection>

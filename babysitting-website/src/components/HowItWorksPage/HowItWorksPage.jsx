@@ -3,9 +3,10 @@ import { Box, Typography, Card } from "@mui/material";
 import { styled } from "@mui/system";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
+import '../../style.css';
 
 const PageWrapper = styled(Box)({
-  backgroundColor: "#f9f9f9",
+  backgroundColor: "#f4f4f4",
   padding: 0,
   margin: 0,
   minHeight: "100vh",
@@ -104,8 +105,9 @@ const HowItWorksPage = () => {
             variant="h4"
             style={{
               textAlign: "center",
-              margin: "70px 0 50px", // Adds separation from the navbar and space below
+              margin: "100px 0 50px",
               fontFamily: "Poppins, sans-serif",
+			  fontWeight: "600",
             }}
           >
             How It Works

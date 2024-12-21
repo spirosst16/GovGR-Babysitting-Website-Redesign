@@ -15,6 +15,7 @@ import { useLocation } from 'react-router-dom';
 import defaultProfile from '../../assets/default-profile.jpg';
 import { collection, addDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
+import '../../style.css';
 
 // Logo components
 const LogoContainer = styled('div')({
@@ -155,21 +156,6 @@ const GuardianInfoForm = () => {
 
   return (
     <>
-      <style>
-        {`
-          * {
-            box-sizing: border-box;
-          }
-
-          body {
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-            font-family: "Poppins, sans-serif";
-          }
-        `}
-      </style>
-
       <div
         style={{
           position: 'relative',
