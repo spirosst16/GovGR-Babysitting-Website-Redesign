@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const FooterContainer = styled(Box)({
   backgroundColor: '#f4f4f4',
   padding: '40px 0',
-  marginTop: '40px',
+  marginTop: '0px',
   textAlign: 'center',
   borderTop: '1px solid #ddd',
 });

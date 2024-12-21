@@ -9,7 +9,7 @@ import Footer from '../Footer/Footer';
 
 // Styled components
 const ApplicationCard = styled(Card)({
-  marginBottom: '20px',
+  marginBottom: '0px',
   boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
   borderRadius: '10px',
 });
@@ -24,7 +24,7 @@ const HeroSection = styled(Box)({
   padding: '100px 20px',
   backgroundColor: '#f4f4f4',
   textAlign: 'center',
-  marginBottom: '40px',
+  marginBottom: '0px',
 });
 
 const ActionButton = styled(Button)({
@@ -99,7 +99,6 @@ const MyApplicationsJobs = () => {
       </HeroSection>
 
       <Box style={{ backgroundColor: '#5e62d1', padding: '40px 20px' }}>
-        {/* Container for your applications content */}
         <Container maxWidth="lg">
           {loading ? (
             <Box display="flex" justifyContent="center" alignItems="center">
