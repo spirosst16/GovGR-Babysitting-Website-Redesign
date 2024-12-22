@@ -31,6 +31,7 @@ import "../../style.css";
 
 const BabysitterCard = styled(Card)({
   width: "250px",
+  height: "380px",
   margin: "20px",
   boxShadow: "0 8px 15px rgba(0, 0, 0, 0.15)",
   borderRadius: "15px",
@@ -408,15 +409,48 @@ const BabysittersPage = () => {
               </Select>
             </FormControl>
           </DialogContent>
-
           <DialogActions>
-            <Button onClick={applyFilters} color="primary" variant="contained">
-              Apply Filters
-            </Button>
-            <Button onClick={() => setOpenFilterDialog(false)} color="secondary">
-              Cancel
-            </Button>
-          </DialogActions>
+			<Button
+				onClick={applyFilters}
+				style={{
+				backgroundColor: "#5e62d1",
+				color: "white",
+				borderRadius: "30px",
+				textTransform: "none",
+				}}
+				variant="contained"
+			>
+				Apply Filters
+			</Button>
+			<Button
+				onClick={() =>
+				setFilters({ area: "", availability: [], babysittingPlace: [], childAges: [], jobType: "" })
+				}
+				style={{
+					backgroundColor: "white",
+					color: "#5e62d1",
+					borderRadius: "30px",
+					textTransform: "none",
+					border: "1px solid #5e62d1",
+				}}
+				variant="outlined"
+			>
+				Clear Filters
+			</Button>
+			<Button
+				onClick={() => setOpenFilterDialog(false)}
+				style={{
+					backgroundColor: "white",
+					color: "#5e62d1",
+					borderRadius: "30px",
+					textTransform: "none",
+					border: "1px solid #5e62d1",
+				}}
+				variant="outlined"
+			>
+				Cancel
+			</Button>
+		  </DialogActions>
         </Dialog>
       </Box>
 
