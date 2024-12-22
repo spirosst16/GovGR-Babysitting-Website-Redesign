@@ -11,8 +11,9 @@ import {
   StepLabel,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import defaultProfile from '../../assets/default-profile.jpg';
+import { getAuth } from 'firebase/auth';
 import { collection, addDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import '../../style.css';
@@ -58,6 +59,7 @@ const ageGroups = [
 
 // Guardian Info Form Component
 const GuardianInfoForm = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { email, password } = location.state || {};
   const [formValues, setFormValues] = useState({
@@ -122,12 +124,26 @@ const GuardianInfoForm = () => {
     }
 
     try {
-      const guardiansCollectionRef = collection(FIREBASE_DB, "guardians");
 
-      await addDoc(guardiansCollectionRef, formValues);
+		const auth = getAuth();
+		const currentUser = auth.currentUser;
+	
+		if (!currentUser) {
+		  alert("You must be logged in to submit the application.");
+		  return;
+		}
+
+		const guardiansCollectionRef = collection(FIREBASE_DB, "guardians");
+
+		await addDoc(guardiansCollectionRef, {
+		...formValues,
+		userId: currentUser.uid,
+		});
 
       console.log("Document written successfully!");
       alert("Form submitted successfully!");
+
+	  navigate("/");
 
       setFormValues({
         firstName: "",

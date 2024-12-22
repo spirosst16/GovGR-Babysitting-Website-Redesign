@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { FIREBASE_AUTH } from "./config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-
 import WelcomePage from "./components/WelcomePage/WelcomePage";
 import RegistrationForm from "./components/Register/RegistrationForm";
 import LoginForm from "./components/Login/LoginForm";

@@ -62,6 +62,7 @@ const BabysitterApplicationForm = () => {
     jobType: "",
     availability: [],
     babysittingPlace: [],
+	childAges: [],
   });
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -69,7 +70,7 @@ const BabysitterApplicationForm = () => {
   const [isFocused, setIsFocused] = useState(false);
 
   const steps = [
-    "Babysitting Area, Job Type & Babysitting Place",
+    "Babysitting Area, Job Type, Babysitting Place & Children Age Groups",
     "Availability",
     "Review & Submit"
   ];
@@ -124,6 +125,7 @@ const BabysitterApplicationForm = () => {
 		jobType: "",
 		availability: [],
 		babysittingPlace: [],
+		childAges: [],
 	  });
 	  setCurrentStep(0);
 	} catch (error) {
@@ -145,7 +147,7 @@ const BabysitterApplicationForm = () => {
           justifyContent: 'center',
           alignItems: 'center',
           margin: 0,
-          padding: 0,
+		  padding: '100px 0 50px 0',
           fontFamily: "Poppins, sans-serif",
         }}
       >
@@ -206,7 +208,7 @@ const BabysitterApplicationForm = () => {
 					fontFamily: "Poppins, sans-serif",
 				}}
 				>
-				Babysitting Area, Job Type & Babysitting Place
+				Babysitting Area, Job Type, Babysitting Place & Children Age Groups
 				</Typography>
 				
 				<FormControl component="fieldset" fullWidth sx={{ mb: 2 }}>
@@ -279,6 +281,81 @@ const BabysitterApplicationForm = () => {
 					/>
 				</Box>
 				</FormControl>
+				<FormControl component="fieldset" sx={{ mb: 2 }}>
+                  <FormLabel component="legend">Child Age Range</FormLabel>
+                  <FormGroup>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={formValues.childAges.includes("0-1")}
+                          onChange={(e) => {
+                            const newChildAges = e.target.checked
+                              ? [...formValues.childAges, "0-1"]
+                              : formValues.childAges.filter(age => age !== "0-1");
+                            setFormValues({ ...formValues, childAges: newChildAges });
+                          }}
+                        />
+                      }
+                      label="Infant (0-1)"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={formValues.childAges.includes("2-3")}
+                          onChange={(e) => {
+                            const newChildAges = e.target.checked
+                              ? [...formValues.childAges, "2-3"]
+                              : formValues.childAges.filter(age => age !== "2-3");
+                            setFormValues({ ...formValues, childAges: newChildAges });
+                          }}
+                        />
+                      }
+                      label="Toddler (2-3)"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={formValues.childAges.includes("4-5")}
+                          onChange={(e) => {
+                            const newChildAges = e.target.checked
+                              ? [...formValues.childAges, "4-5"]
+                              : formValues.childAges.filter(age => age !== "4-5");
+                            setFormValues({ ...formValues, childAges: newChildAges });
+                          }}
+                        />
+                      }
+                      label="Preschooler (4-5)"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={formValues.childAges.includes("6-12")}
+                          onChange={(e) => {
+                            const newChildAges = e.target.checked
+                              ? [...formValues.childAges, "6-12"]
+                              : formValues.childAges.filter(age => age !== "6-12");
+                            setFormValues({ ...formValues, childAges: newChildAges });
+                          }}
+                        />
+                      }
+                      label="School-age (6-12)"
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={formValues.childAges.includes("13-17")}
+                          onChange={(e) => {
+                            const newChildAges = e.target.checked
+                              ? [...formValues.childAges, "13-17"]
+                              : formValues.childAges.filter(age => age !== "13-17");
+                            setFormValues({ ...formValues, childAges: newChildAges });
+                          }}
+                        />
+                      }
+                      label="Teenager (13-17)"
+                    />
+                  </FormGroup>
+                </FormControl>
 				</Box>
 			</div>
 			)}
@@ -344,6 +421,20 @@ const BabysitterApplicationForm = () => {
 						label="Evening"
 					/>
 					</FormGroup>
+					<FormControlLabel
+						control={
+						<Checkbox
+							checked={formValues.availability.includes("Monday Night")}
+							onChange={(e) => {
+							const updatedAvailability = e.target.checked
+								? [...formValues.availability, "Monday Night"]
+								: formValues.availability.filter(time => time !== "Monday Night");
+							setFormValues({ ...formValues, availability: updatedAvailability });
+							}}
+						/>
+						}
+						label="Night"
+					/>
 
 					<Typography variant="h6">Tuesday</Typography>
 					<FormGroup>
@@ -388,6 +479,20 @@ const BabysitterApplicationForm = () => {
 						/>
 						}
 						label="Evening"
+					/>
+					<FormControlLabel
+						control={
+						<Checkbox
+							checked={formValues.availability.includes("Tuesday Night")}
+							onChange={(e) => {
+							const updatedAvailability = e.target.checked
+								? [...formValues.availability, "Tuesday Night"]
+								: formValues.availability.filter(time => time !== "Tuesday Night");
+							setFormValues({ ...formValues, availability: updatedAvailability });
+							}}
+						/>
+						}
+						label="Night"
 					/>
 					</FormGroup>
 				</Grid>
@@ -437,6 +542,20 @@ const BabysitterApplicationForm = () => {
 						}
 						label="Evening"
 					/>
+					<FormControlLabel
+						control={
+						<Checkbox
+							checked={formValues.availability.includes("Wednesday Night")}
+							onChange={(e) => {
+							const updatedAvailability = e.target.checked
+								? [...formValues.availability, "Wednesday Night"]
+								: formValues.availability.filter(time => time !== "Wednesday Night");
+							setFormValues({ ...formValues, availability: updatedAvailability });
+							}}
+						/>
+						}
+						label="Night"
+					/>
 					</FormGroup>
 
 					<Typography variant="h6">Thursday</Typography>
@@ -482,6 +601,20 @@ const BabysitterApplicationForm = () => {
 						/>
 						}
 						label="Evening"
+					/>
+					<FormControlLabel
+						control={
+						<Checkbox
+							checked={formValues.availability.includes("Thursday Night")}
+							onChange={(e) => {
+							const updatedAvailability = e.target.checked
+								? [...formValues.availability, "Thursday Night"]
+								: formValues.availability.filter(time => time !== "Thursday Night");
+							setFormValues({ ...formValues, availability: updatedAvailability });
+							}}
+						/>
+						}
+						label="Night"
 					/>
 					</FormGroup>
 				</Grid>
@@ -531,6 +664,20 @@ const BabysitterApplicationForm = () => {
 						}
 						label="Evening"
 					/>
+					<FormControlLabel
+						control={
+						<Checkbox
+							checked={formValues.availability.includes("Friday Night")}
+							onChange={(e) => {
+							const updatedAvailability = e.target.checked
+								? [...formValues.availability, "Friday Night"]
+								: formValues.availability.filter(time => time !== "Friday Night");
+							setFormValues({ ...formValues, availability: updatedAvailability });
+							}}
+						/>
+						}
+						label="Night"
+					/>
 					</FormGroup>
 
 					<Typography variant="h6">Saturday</Typography>
@@ -576,6 +723,20 @@ const BabysitterApplicationForm = () => {
 						/>
 						}
 						label="Evening"
+					/>
+					<FormControlLabel
+						control={
+						<Checkbox
+							checked={formValues.availability.includes("Saturday Night")}
+							onChange={(e) => {
+							const updatedAvailability = e.target.checked
+								? [...formValues.availability, "Saturday Night"]
+								: formValues.availability.filter(time => time !== "Saturday Night");
+							setFormValues({ ...formValues, availability: updatedAvailability });
+							}}
+						/>
+						}
+						label="Night"
 					/>
 					</FormGroup>
 				</Grid>
@@ -624,6 +785,20 @@ const BabysitterApplicationForm = () => {
 						/>
 						}
 						label="Evening"
+					/>
+					<FormControlLabel
+						control={
+						<Checkbox
+							checked={formValues.availability.includes("Sunday Night")}
+							onChange={(e) => {
+							const updatedAvailability = e.target.checked
+								? [...formValues.availability, "Sunday Night"]
+								: formValues.availability.filter(time => time !== "Sunday Night");
+							setFormValues({ ...formValues, availability: updatedAvailability });
+							}}
+						/>
+						}
+						label="Night"
 					/>
 					</FormGroup>
 				</Grid>
