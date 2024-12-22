@@ -28,7 +28,7 @@ const StepCard = styled(Card)({
     transform: "scale(1.05)",
   },
   marginBottom: "30px",
-  padding: "20px",
+  padding: "20px 40px",
 });
 
 const StepNumber = styled(Box)({
@@ -81,14 +81,15 @@ const HowItWorksPage = () => {
       title: "Secure Payments",
       description: [
         "Parents: Pay securely via our integrated system—no cash needed.",
-        "Babysitters: Receive payments directly to your account.",
+        "Babysitters: Receive the payment amount and the necessary payment details directly to your account.",
       ],
     },
     {
       title: "Leave Reviews",
       description: [
-        "Parents: Share your feedback on babysitters to help other families.",
-        "Babysitters: Review your experience with the family to build trust in the community.",
+        "Parents: Share your feedback on babysitters and rate them, so other families",
+        "will choose more effectively their babysitter.",
+        "Babysitters: Review your experience and collaboration with the family to build trust in the community.",
       ],
     },
   ];
