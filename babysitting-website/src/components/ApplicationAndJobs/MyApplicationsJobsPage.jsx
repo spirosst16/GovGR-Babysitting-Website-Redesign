@@ -1,30 +1,74 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Card, CardContent, Button, CircularProgress } from '@mui/material';
+import React from 'react';
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
+  Card,
+  CardContent,
+  Tabs,
+  Tab,
+  CircularProgress,
+} from '@mui/material';
 import { styled } from '@mui/system';
-import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { FIREBASE_DB } from '../../config/firebase';
-import { getAuth } from 'firebase/auth';
-import Navbar from '../Navbar/Navbar';
-import Footer from '../Footer/Footer';
+import { Link } from 'react-router-dom';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import HistoryIcon from '@mui/icons-material/History';
+import DoneIcon from '@mui/icons-material/Done';
+import Navbar from '../Navbar/Navbar'; // Import Navbar component
 
 // Styled components
-const ApplicationCard = styled(Card)({
-  marginBottom: '0px',
-  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-  borderRadius: '10px',
+const Container = styled(Box)({
+  backgroundColor: '#f4f4f4',
+  minHeight: '100vh',
+  padding: '20px',
+  paddingTop: '120px', // Added padding to account for navbar
 });
 
-const ApplicationActions = styled(Box)({
+const Header = styled(Box)({
+  backgroundColor: '#5e62d1',
+  padding: '40px',
+  textAlign: 'center',
+  color: '#fff',
+  borderRadius: '10px',
+  boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.3)',
+});
+
+const TabContainer = styled(Box)({
+  margin: '20px 0',
+});
+
+const ApplicationCard = styled(Card)({
+  margin: '15px',
+  boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+  borderRadius: '10px',
+  transition: 'transform 0.2s, box-shadow 0.2s',
+  '&:hover': {
+    transform: 'scale(1.03)',
+    boxShadow: '0px 6px 25px rgba(0, 0, 0, 0.3)',
+  },
+});
+
+const CardHeader = styled(Box)({
   display: 'flex',
   justifyContent: 'space-between',
-  padding: '15px',
+  alignItems: 'center',
 });
 
-const HeroSection = styled(Box)({
-  padding: '100px 20px',
-  backgroundColor: '#f4f4f4',
-  textAlign: 'center',
-  marginBottom: '0px',
+const StatusChip = styled(Box)(({ status }) => ({
+  backgroundColor: status === 'draft' ? '#FFC107' : status === 'active' ? '#4CAF50' : '#9E9E9E',
+  color: '#fff',
+  padding: '5px 10px',
+  borderRadius: '20px',
+  fontSize: '12px',
+  fontWeight: 'bold',
+}));
+
+const ProgressContainer = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  margin: '10px 0',
 });
 
 const ActionButton = styled(Button)({
@@ -33,122 +77,191 @@ const ActionButton = styled(Button)({
   '&:hover': {
     backgroundColor: '#4d56b1',
   },
+  margin: '5px',
+});
+
+const EmptyState = styled(Box)({
+  textAlign: 'center',
+  padding: '50px 20px',
 });
 
 const MyApplicationsJobs = () => {
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [currentTab, setCurrentTab] = React.useState(0);
 
-  useEffect(() => {
-    const fetchApplications = async () => {
-      setLoading(true);
-      const auth = getAuth();
-      const currentUser = auth.currentUser;
-
-      if (currentUser) {
-        const babysitterApplicationsRef = collection(FIREBASE_DB, 'babysitterApplications');
-        const querySnapshot = await getDocs(
-          query(babysitterApplicationsRef, where('userId', '==', currentUser.uid))
-        );
-        const applicationsList = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setApplications(applicationsList);
-      } else {
-        setApplications([]);
-      }
-
-      setLoading(false);
-    };
-
-    fetchApplications();
-  }, []);
-
-  const handleEditApplication = async (applicationId) => {
-    const applicationRef = doc(FIREBASE_DB, 'babysitterApplications', applicationId);
-    const updatedFields = { status: 'draft' };
-    await updateDoc(applicationRef, updatedFields);
-    alert('Application updated to draft status!');
-    setApplications(prevApplications =>
-      prevApplications.map(app =>
-        app.id === applicationId ? { ...app, status: 'draft' } : app
-      )
-    );
+  const handleTabChange = (event, newValue) => {
+    setCurrentTab(newValue);
   };
 
-  const handleDeleteApplication = async (applicationId) => {
-    const applicationRef = doc(FIREBASE_DB, 'babysitterApplications', applicationId);
-    await updateDoc(applicationRef, { status: 'deleted' });
-    alert('Application deleted!');
-    setApplications(prevApplications =>
-      prevApplications.filter(app => app.id !== applicationId)
-    );
+  const sampleApplications = [
+    {
+      id: 1,
+      area: 'Kesariani',
+      jobType: 'Part-time',
+      availability: ['Monday Morning', 'Friday Evening'],
+      babysittingPlace: ["Family's House"],
+      status: 'draft',
+      progress: 40,
+    },
+    {
+      id: 2,
+      area: 'Kifisia',
+      jobType: 'Full-time',
+      availability: ['Weekdays'],
+      babysittingPlace: ["Babysitter's House"],
+      status: 'active',
+      progress: 80,
+    },
+  ];
+
+  const activeJobs = [
+    {
+      id: 1,
+      area: 'Marousi',
+      jobType: 'Full-time',
+      status: 'active',
+      babysittingPlace: ["Family's House"],
+    },
+  ];
+
+  const historyJobs = [
+    {
+      id: 1,
+      area: 'Nea Smyrni',
+      jobType: 'Part-time',
+      status: 'completed',
+    },
+  ];
+
+  const renderTabContent = () => {
+    if (currentTab === 0) {
+      return (
+        <Grid container spacing={3}>
+          {sampleApplications.map((application) => (
+            <Grid item xs={12} sm={6} md={4} key={application.id}>
+              <ApplicationCard>
+                <CardContent>
+                  <CardHeader>
+                    <Typography variant="h6" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                      {application.area}
+                    </Typography>
+                    <StatusChip status={application.status}>{application.status}</StatusChip>
+                  </CardHeader>
+                  <Typography variant="body2" style={{ margin: '10px 0' }}>
+                    <strong>Job Type:</strong> {application.jobType}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Availability:</strong> {application.availability.join(', ')}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Babysitting Place:</strong> {application.babysittingPlace.join(', ')}
+                  </Typography>
+                  <ProgressContainer>
+                    <Typography variant="body2">Progress:</Typography>
+                    <CircularProgress
+                      variant="determinate"
+                      value={application.progress}
+                      size={25}
+                      style={{ color: '#5e62d1' }}
+                    />
+                  </ProgressContainer>
+                  <Box display="flex" justifyContent="center" marginTop="10px">
+                    <ActionButton>Edit</ActionButton>
+                    <ActionButton>Delete</ActionButton>
+                  </Box>
+                </CardContent>
+              </ApplicationCard>
+            </Grid>
+          ))}
+        </Grid>
+      );
+    } else if (currentTab === 1) {
+      return (
+        <Grid container spacing={3}>
+          {activeJobs.map((job) => (
+            <Grid item xs={12} sm={6} md={4} key={job.id}>
+              <ApplicationCard>
+                <CardContent>
+                  <CardHeader>
+                    <Typography variant="h6">{job.area}</Typography>
+                    <StatusChip status={job.status}>{job.status}</StatusChip>
+                  </CardHeader>
+                  <Typography variant="body2">
+                    <strong>Job Type:</strong> {job.jobType}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Babysitting Place:</strong> {job.babysittingPlace.join(', ')}
+                  </Typography>
+                  <Box display="flex" justifyContent="center" marginTop="10px">
+                    <ActionButton>View</ActionButton>
+                  </Box>
+                </CardContent>
+              </ApplicationCard>
+            </Grid>
+          ))}
+        </Grid>
+      );
+    } else {
+      return (
+        <Grid container spacing={3}>
+          {historyJobs.length > 0 ? (
+            historyJobs.map((job) => (
+              <Grid item xs={12} sm={6} md={4} key={job.id}>
+                <ApplicationCard>
+                  <CardContent>
+                    <CardHeader>
+                      <Typography variant="h6">{job.area}</Typography>
+                      <StatusChip status={job.status}>{job.status}</StatusChip>
+                    </CardHeader>
+                    <Typography variant="body2">
+                      <strong>Job Type:</strong> {job.jobType}
+                    </Typography>
+                  </CardContent>
+                </ApplicationCard>
+              </Grid>
+            ))
+          ) : (
+            <EmptyState>
+              <HistoryIcon style={{ fontSize: 50, color: '#9E9E9E' }} />
+              <Typography variant="body1" color="textSecondary">
+                No history available yet.
+              </Typography>
+            </EmptyState>
+          )}
+        </Grid>
+      );
+    }
   };
 
   return (
     <>
       <Navbar />
-      <HeroSection>
-        <Typography variant="h4" style={{ fontFamily: 'Poppins, sans-serif', marginBottom: '20px' }}>
-          My Applications & Jobs
-        </Typography>
-        <Typography variant="h6" style={{ fontFamily: 'Poppins, sans-serif', color: '#555' }}>
-          Review your applications and current jobs below.
-        </Typography>
-      </HeroSection>
+      <Container>
+        <Header>
+          <Typography variant="h4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            My Applications & Jobs
+          </Typography>
+          <Typography variant="h6" style={{ fontFamily: 'Poppins, sans-serif', marginTop: '10px' }}>
+            Manage your applications and job history seamlessly.
+          </Typography>
+        </Header>
 
-      <Box style={{ backgroundColor: '#5e62d1', padding: '40px 20px' }}>
-        <Container maxWidth="lg">
-          {loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <CircularProgress />
-            </Box>
-          ) : (
-            <>
-              {applications.length > 0 ? (
-                applications.map(application => (
-                  <ApplicationCard key={application.id}>
-                    <CardContent>
-                      <Typography variant="h5" style={{ fontFamily: 'Poppins, sans-serif', color: '#333' }}>
-                        {application.area}
-                      </Typography>
-                      <Typography variant="body1" color="textSecondary" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                        Job Type: {application.jobType}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                        Availability: {application.availability.join(', ')}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                        Babysitting Place: {application.babysittingPlace.join(', ')}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" style={{ fontFamily: 'Poppins, sans-serif', marginTop: '10px' }}>
-                        Status: {application.status}
-                      </Typography>
-                    </CardContent>
+        <TabContainer>
+          <Tabs
+            value={currentTab}
+            onChange={handleTabChange}
+            indicatorColor="primary"
+            textColor="primary"
+            centered
+          >
+            <Tab label="Applications" icon={<WorkOutlineIcon />} />
+            <Tab label="Active Jobs" icon={<DoneIcon />} />
+            <Tab label="History" icon={<HistoryIcon />} />
+          </Tabs>
+        </TabContainer>
 
-                    <ApplicationActions>
-                      <ActionButton variant="outlined" onClick={() => handleEditApplication(application.id)}>
-                        Edit Application
-                      </ActionButton>
-                      {application.status !== 'deleted' && (
-                        <ActionButton variant="outlined" onClick={() => handleDeleteApplication(application.id)}>
-                          Delete
-                        </ActionButton>
-                      )}
-                    </ApplicationActions>
-                  </ApplicationCard>
-                ))
-              ) : (
-                <Typography variant="body1" style={{ textAlign: 'center', color: '#888' }}>
-                  You have no applications or jobs yet.
-                </Typography>
-              )}
-            </>
-          )}
-        </Container>
-      </Box>
-      <Footer />
+        {/* Tab Content */}
+        {renderTabContent()}
+      </Container>
     </>
   );
 };
