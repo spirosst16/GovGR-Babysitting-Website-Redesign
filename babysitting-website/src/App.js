@@ -20,7 +20,13 @@ function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (currentUser) => {
-      setUser(currentUser);
+      if (currentUser) {
+        console.log("User logged in:", currentUser);
+        setUser(currentUser);
+      } else {
+        console.log("No user logged in");
+        setUser(null);
+      }
     });
     return unsubscribe;
   }, []);
