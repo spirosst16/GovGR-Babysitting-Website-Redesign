@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { AppBar, Toolbar, Button, Box, Avatar, Menu, MenuItem } from '@mui/material';
+import { AppBar, Toolbar, Button, Box, Avatar, Menu, MenuItem, CircularProgress } from '@mui/material';
 import { styled } from '@mui/system';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FIREBASE_DB } from '../../config/firebase';
-import { getAuth, signOut } from 'firebase/auth';
+import { getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const LogoContainer = styled('div')({
@@ -57,25 +57,28 @@ const DropdownButton = styled(Box)(({ theme }) => ({
   },
 }));
 
-
 const Navbar = () => {
   const [userPhoto, setUserPhoto] = useState(null);
   const [userInitials, setUserInitials] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     const auth = getAuth();
-    const user = auth.currentUser;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+        fetchUserProfile(user.email);
+      } else {
+        setIsLoggedIn(false);
+        setLoading(false);
+      }
+    });
 
-    if (user) {
-      setIsLoggedIn(true);
-      fetchUserProfile(user.email);
-    } else {
-      setIsLoggedIn(false);
-    }
+    return () => unsubscribe();
   }, []);
 
   const fetchUserProfile = async (email) => {
@@ -90,6 +93,7 @@ const Navbar = () => {
         const babysitterData = babysitterSnapshot.docs[0].data();
         setUserPhoto(babysitterData.photo);
         setUserInitials(getInitials(babysitterData.name));
+        setLoading(false);
         return;
       }
 
@@ -103,10 +107,14 @@ const Navbar = () => {
         const guardianData = guardianSnapshot.docs[0].data();
         setUserPhoto(guardianData.photo);
         setUserInitials(getInitials(guardianData.name));
+        setLoading(false);
         return;
       }
+
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching user profile:', error);
+      setLoading(false);
     }
   };
 
@@ -129,7 +137,8 @@ const Navbar = () => {
       const auth = getAuth();
       await signOut(auth);
       setIsLoggedIn(false);
-      navigate('/logout');
+      setLoading(false);
+      navigate('/');
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -176,7 +185,9 @@ const Navbar = () => {
           )}
         </Box>
         <Box sx={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-          {isLoggedIn ? (
+          {loading ? (
+            <CircularProgress size={24} sx={{ color: '#5e62d1' }} />
+          ) : isLoggedIn ? (
             <>
               <DropdownButton onClick={handleAvatarClick}>
                 <Avatar
