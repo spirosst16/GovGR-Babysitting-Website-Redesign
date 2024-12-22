@@ -151,6 +151,17 @@ const RegistrationForm = () => {
               sx={{
                 mb: 2,
                 fontFamily: "Poppins, sans-serif",
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#5e62d1', // Change border color on focus
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'Poppins, sans-serif', // Ensure font matches
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#5e62d1', // Change label color on focus
+                },
               }}
             />
             <TextField
@@ -163,6 +174,17 @@ const RegistrationForm = () => {
               sx={{
                 mb: 2,
                 fontFamily: "Poppins, sans-serif",
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#5e62d1',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'Poppins, sans-serif',
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#5e62d1',
+                },
               }}
             />
             <Box
@@ -174,25 +196,29 @@ const RegistrationForm = () => {
               }}
             >
               <Button
-                onClick={() => handleRegistration("Babysitter")}
+                type="submit"
                 variant="contained"
                 sx={{
-                  backgroundColor: "#5e62d1",
-                  "&:hover": { backgroundColor: "#4a4fbf" },
+                  backgroundColor: '#5e62d1',
+                  '&:hover': { backgroundColor: '#4a51a4' },
+                  mb: 1,
                   fontFamily: "Poppins, sans-serif",
-                  flex: 1,
+                  borderRadius: '20px',
+                  textTransform: 'none'
                 }}
               >
                 Register as Babysitter
               </Button>
               <Button
-                onClick={() => handleRegistration("Guardian")}
+                type="submit"
                 variant="contained"
                 sx={{
-                  backgroundColor: "#5e62d1",
-                  "&:hover": { backgroundColor: "#4a4fbf" },
+                  backgroundColor: '#5e62d1',
+                  '&:hover': { backgroundColor: '#4a51a4' },
+                  mb: 1,
                   fontFamily: "Poppins, sans-serif",
-                  flex: 1,
+                  borderRadius: '20px',
+                  textTransform: 'none'
                 }}
               >
                 Register as Guardian
@@ -203,10 +229,28 @@ const RegistrationForm = () => {
               textAlign="center"
               sx={{ mt: 2, fontFamily: "Poppins, sans-serif" }}
             >
-              Already have an account?{" "}
+              Already have an account?{' '}
               <Link
                 to="/login"
-                style={{ textDecoration: "none", color: "#1976d2" }}
+                style={{
+                  textDecoration: 'none',
+                  color: '#5e62d1',
+                  borderRadius: '0',
+                  transition: 'all 0.3s',
+                  padding: '2px 6px',
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.textDecoration = 'underline';
+                  e.target.style.color = '#4845a2';
+                  e.target.style.borderRadius = '30px';
+                  e.target.style.backgroundColor = 'rgba(94, 98, 209, 0.1)';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.textDecoration = 'none';
+                  e.target.style.color = '#5e62d1';
+                  e.target.style.borderRadius = '0';
+                  e.target.style.backgroundColor = 'transparent';
+                }}
               >
                 Login
               </Link>

@@ -14,7 +14,6 @@ import {
 import { styled } from "@mui/system";
 import '../../style.css';
 
-// Logo components
 const LogoContainer = styled('div')({
   position: 'absolute',
   top: '10px',
@@ -46,7 +45,6 @@ const LogoText = styled('span')({
   fontFamily: 'Poppins, sans-serif',
 });
 
-// Login Form Component
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -160,7 +158,18 @@ const LoginForm = () => {
               fullWidth
               sx={{
                 mb: 2,
-				fontFamily: "Poppins, sans-serif"
+                fontFamily: "Poppins, sans-serif",
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#5e62d1', // Change border color on focus
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'Poppins, sans-serif', // Ensure font matches
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#5e62d1', // Change label color on focus
+                },
               }}
             />
             <TextField
@@ -172,7 +181,18 @@ const LoginForm = () => {
               fullWidth
               sx={{
                 mb: 2,
-				fontFamily: "Poppins, sans-serif"
+                fontFamily: "Poppins, sans-serif",
+                '& .MuiOutlinedInput-root': {
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#5e62d1',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  fontFamily: 'Poppins, sans-serif',
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#5e62d1',
+                },
               }}
             />
             <Button
@@ -181,16 +201,44 @@ const LoginForm = () => {
               sx={{
                 backgroundColor: '#5e62d1',
                 '&:hover': { backgroundColor: '#4a51a4' },
-                mb: 2,
-				fontFamily: "Poppins, sans-serif"
+                mb: 1,
+				        fontFamily: "Poppins, sans-serif",
+                fontSize: '1rem',
+                borderRadius: '20px',
+                textTransform: 'none'
               }}
               fullWidth
             >
               Login
             </Button>
-            <Typography variant="body2" textAlign="center" sx={{ mt: 2, fontFamily: "Poppins, sans-serif" }}>
+            <Typography
+              variant="body2"
+              textAlign="center"
+              sx={{ mt: 2, fontFamily: "Poppins, sans-serif" }}
+            >
               Don't have an account?{' '}
-              <Link to="/register" style={{ textDecoration: 'none', color: '#1976d2' }}>
+              <Link
+                to="/register"
+                style={{
+                  textDecoration: 'none',
+                  color: '#5e62d1',
+                  borderRadius: '0',
+                  transition: 'all 0.3s',
+                  padding: '2px 6px',
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.textDecoration = 'underline';
+                  e.target.style.color = '#4845a2';
+                  e.target.style.borderRadius = '30px';
+                  e.target.style.backgroundColor = 'rgba(94, 98, 209, 0.1)';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.textDecoration = 'none';
+                  e.target.style.color = '#5e62d1';
+                  e.target.style.borderRadius = '0';
+                  e.target.style.backgroundColor = 'transparent';
+                }}
+              >
                 Register
               </Link>
             </Typography>
