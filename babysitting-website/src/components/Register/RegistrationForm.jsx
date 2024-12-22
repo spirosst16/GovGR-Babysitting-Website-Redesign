@@ -153,14 +153,14 @@ const RegistrationForm = () => {
                 fontFamily: "Poppins, sans-serif",
                 '& .MuiOutlinedInput-root': {
                   '&.Mui-focused fieldset': {
-                    borderColor: '#5e62d1', // Change border color on focus
+                    borderColor: '#5e62d1',
                   },
                 },
                 '& .MuiInputLabel-root': {
-                  fontFamily: 'Poppins, sans-serif', // Ensure font matches
+                  fontFamily: 'Poppins, sans-serif',
                 },
                 '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#5e62d1', // Change label color on focus
+                  color: '#5e62d1',
                 },
               }}
             />
@@ -196,7 +196,7 @@ const RegistrationForm = () => {
               }}
             >
               <Button
-                type="submit"
+                onClick={() => handleRegistration("Babysitter")}
                 variant="contained"
                 sx={{
                   backgroundColor: '#5e62d1',
@@ -210,7 +210,7 @@ const RegistrationForm = () => {
                 Register as Babysitter
               </Button>
               <Button
-                type="submit"
+                onClick={() => handleRegistration("Guardian")}
                 variant="contained"
                 sx={{
                   backgroundColor: '#5e62d1',
