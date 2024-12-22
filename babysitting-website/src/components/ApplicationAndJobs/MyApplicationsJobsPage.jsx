@@ -20,7 +20,7 @@ const Container = styled(Box)({
   backgroundColor: '#f4f4f4',
   minHeight: '100vh',
   padding: '20px',
-  paddingTop: '120px',
+  paddingTop: '100px',
 });
 
 const Header = styled(Box)({
@@ -127,72 +127,72 @@ const MyApplicationsJobs = () => {
 
   const renderTabContent = () => {
     if (currentTab === 0) {
-      return (
-        <Grid container spacing={3}>
-          {sampleApplications.map((application) => (
-            <Grid item xs={12} sm={6} md={4} key={application.id}>
-              <ApplicationCard>
-                <CardContent>
-                  <CardHeader>
-                    <Typography variant="h6" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                      {application.area}
-                    </Typography>
-                    <StatusChip status={application.status}>{application.status}</StatusChip>
-                  </CardHeader>
-                  <Typography variant="body2" style={{ margin: '10px 0' }}>
-                    <strong>Job Type:</strong> {application.jobType}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Availability:</strong> {application.availability.join(', ')}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Babysitting Place:</strong> {application.babysittingPlace.join(', ')}
-                  </Typography>
-                  <ProgressContainer>
-                    <Typography variant="body2">Progress:</Typography>
-                    <CircularProgress
-                      variant="determinate"
-                      value={application.progress}
-                      size={25}
-                      style={{ color: '#5e62d1' }}
-                    />
-                  </ProgressContainer>
-                  <Box display="flex" justifyContent="center" marginTop="10px">
-                    <ActionButton>Edit</ActionButton>
-                    <ActionButton>Delete</ActionButton>
-                  </Box>
-                </CardContent>
-              </ApplicationCard>
-            </Grid>
-          ))}
-        </Grid>
-      );
+	  return (
+		<Grid container spacing={3}>
+			{activeJobs.map((job) => (
+			<Grid item xs={12} sm={6} md={4} key={job.id}>
+				<ApplicationCard>
+				<CardContent>
+					<CardHeader>
+					<Typography variant="h6">{job.area}</Typography>
+					<StatusChip status={job.status}>{job.status}</StatusChip>
+					</CardHeader>
+					<Typography variant="body2">
+					<strong>Job Type:</strong> {job.jobType}
+					</Typography>
+					<Typography variant="body2">
+					<strong>Babysitting Place:</strong> {job.babysittingPlace.join(', ')}
+					</Typography>
+					<Box display="flex" justifyContent="center" marginTop="10px">
+					<ActionButton>View</ActionButton>
+					</Box>
+				</CardContent>
+				</ApplicationCard>
+			</Grid>
+			))}
+		</Grid>
+	  );
     } else if (currentTab === 1) {
-      return (
-        <Grid container spacing={3}>
-          {activeJobs.map((job) => (
-            <Grid item xs={12} sm={6} md={4} key={job.id}>
-              <ApplicationCard>
-                <CardContent>
-                  <CardHeader>
-                    <Typography variant="h6">{job.area}</Typography>
-                    <StatusChip status={job.status}>{job.status}</StatusChip>
-                  </CardHeader>
-                  <Typography variant="body2">
-                    <strong>Job Type:</strong> {job.jobType}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Babysitting Place:</strong> {job.babysittingPlace.join(', ')}
-                  </Typography>
-                  <Box display="flex" justifyContent="center" marginTop="10px">
-                    <ActionButton>View</ActionButton>
-                  </Box>
-                </CardContent>
-              </ApplicationCard>
-            </Grid>
-          ))}
-        </Grid>
-      );
+	  return (
+		<Grid container spacing={3}>
+			{sampleApplications.map((application) => (
+			<Grid item xs={12} sm={6} md={4} key={application.id}>
+				<ApplicationCard>
+				<CardContent>
+					<CardHeader>
+					<Typography variant="h6" style={{ fontFamily: 'Poppins, sans-serif' }}>
+						{application.area}
+					</Typography>
+					<StatusChip status={application.status}>{application.status}</StatusChip>
+					</CardHeader>
+					<Typography variant="body2" style={{ margin: '10px 0' }}>
+					<strong>Job Type:</strong> {application.jobType}
+					</Typography>
+					<Typography variant="body2">
+					<strong>Availability:</strong> {application.availability.join(', ')}
+					</Typography>
+					<Typography variant="body2">
+					<strong>Babysitting Place:</strong> {application.babysittingPlace.join(', ')}
+					</Typography>
+					<ProgressContainer>
+					<Typography variant="body2">Progress:</Typography>
+					<CircularProgress
+						variant="determinate"
+						value={application.progress}
+						size={25}
+						style={{ color: '#5e62d1' }}
+					/>
+					</ProgressContainer>
+					<Box display="flex" justifyContent="center" marginTop="10px">
+					<ActionButton>Edit</ActionButton>
+					<ActionButton>Delete</ActionButton>
+					</Box>
+				</CardContent>
+				</ApplicationCard>
+			</Grid>
+			))}
+		</Grid>
+	  );
     } else {
       return (
         <Grid container spacing={3}>
@@ -245,13 +245,12 @@ const MyApplicationsJobs = () => {
             textColor="primary"
             centered
           >
-            <Tab label="Applications" icon={<WorkOutlineIcon />} />
-            <Tab label="Active Jobs" icon={<DoneIcon />} />
+            <Tab label="Active Jobs" icon={<WorkOutlineIcon />} />
+            <Tab label="Applications" icon={<DoneIcon />} />
             <Tab label="History" icon={<HistoryIcon />} />
           </Tabs>
         </TabContainer>
 
-        {/* Tab Content */}
         {renderTabContent()}
       </Container>
     </>
