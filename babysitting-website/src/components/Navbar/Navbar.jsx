@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { AppBar, Toolbar, Button, Box, Avatar } from '@mui/material';
+import { AppBar, Toolbar, Button, Box, Avatar, Menu, MenuItem } from '@mui/material';
 import { styled } from '@mui/system';
-import { Link } from 'react-router-dom';
-import { FIREBASE_AUTH, FIREBASE_DB } from '../../config/firebase';
-import { getAuth } from 'firebase/auth';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { FIREBASE_DB } from '../../config/firebase';
+import { getAuth, signOut } from 'firebase/auth';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 
 const LogoContainer = styled('div')({
@@ -37,9 +37,31 @@ const LogoText = styled('span')({
   fontFamily: 'Poppins, sans-serif',
 });
 
+const DropdownButton = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: '5px 10px',
+  borderRadius: '25px',
+  cursor: 'pointer',
+  transition: 'background-color 0.3s, color 0.3s',
+  '&:hover': {
+    backgroundColor: '#ffffff',
+    span: {
+      color: '#000',
+    },
+  },
+  span: {
+    color: '#444444',
+  },
+}));
+
 const Navbar = () => {
   const [userPhoto, setUserPhoto] = useState(null);
+  const [userInitials, setUserInitials] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const auth = getAuth();
@@ -64,10 +86,10 @@ const Navbar = () => {
       if (!babysitterSnapshot.empty) {
         const babysitterData = babysitterSnapshot.docs[0].data();
         setUserPhoto(babysitterData.photo);
+        setUserInitials(getInitials(babysitterData.name));
         return;
       }
 
-      // Check if the user is a guardian
       const guardianQuery = query(
         collection(FIREBASE_DB, 'guardians'),
         where('email', '==', email)
@@ -77,11 +99,38 @@ const Navbar = () => {
       if (!guardianSnapshot.empty) {
         const guardianData = guardianSnapshot.docs[0].data();
         setUserPhoto(guardianData.photo);
+        setUserInitials(getInitials(guardianData.name));
         return;
       }
     } catch (error) {
-      console.error("Error fetching user profile:", error);
+      console.error('Error fetching user profile:', error);
     }
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '';
+    const initials = name.split(' ').map((n) => n[0].toUpperCase()).join('');
+    return initials.slice(0, 2);
+  };
+
+  const handleAvatarClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth);
+      setIsLoggedIn(false);
+      navigate('/logout');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+    handleMenuClose();
   };
 
   return (
@@ -96,24 +145,54 @@ const Navbar = () => {
           </LogoContainer>
         </Link>
         <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', gap: '30px', marginTop: '10px' }}>
-          <Button component={Link} to="/babysitters" sx={{ color: '#444444', fontWeight: 'bold' }}>
-            Babysitters
-          </Button>
-          <Button component={Link} to="/babysitting-jobs" sx={{ color: '#444444', fontWeight: 'bold' }}>
-            Babysitting Jobs
-          </Button>
-          <Button component={Link} to="/how-it-works" sx={{ color: '#444444', fontWeight: 'bold' }}>
-            How it works
-          </Button>
-          {isLoggedIn && (
-            <Button component={Link} to="/my-applications-and-jobs" sx={{ color: '#444444', fontWeight: 'bold' }}>
-              My Applications & Jobs
-            </Button>
+          {[
+            { to: '/babysitters', label: 'Babysitters' },
+            { to: '/babysitting-jobs', label: 'Babysitting Jobs' },
+            { to: '/how-it-works', label: 'How it works' },
+            { to: '/my-applications-and-jobs', label: 'My Applications & Jobs', requiresLogin: true },
+          ].map(
+            ({ to, label, requiresLogin }) =>
+              (!requiresLogin || isLoggedIn) && (
+                <Button
+                  key={to}
+                  component={Link}
+                  to={to}
+                  sx={{
+                    color: '#444444',
+                    fontWeight: 'bold',
+                    backgroundColor: location.pathname === to ? '#ffffff' : 'transparent', // Background white if on the page
+                    borderRadius: '5px',
+                    '&:hover': {
+                      color: '#000',
+                    },
+                  }}
+                >
+                  {label}
+                </Button>
+              )
           )}
         </Box>
         <Box sx={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-          {isLoggedIn && userPhoto ? (
-            <Avatar src={userPhoto} sx={{ width: 40, height: 40 }} />
+          {isLoggedIn ? (
+            <>
+              <DropdownButton onClick={handleAvatarClick}>
+                <Avatar
+                  src={userPhoto}
+                  sx={{ width: 35, height: 35, marginRight: '5px' }}
+                >
+                  {!userPhoto && userInitials}
+                </Avatar>
+                <span>▼</span>
+              </DropdownButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={() => { handleMenuClose(); navigate('/profile'); }}>Profile</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
+            </>
           ) : (
             <>
               <Button variant="outlined" component={Link} to="/register" sx={{ color: '#5e62d1' }}>
