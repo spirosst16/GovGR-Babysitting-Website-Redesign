@@ -198,10 +198,41 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Button variant="outlined" component={Link} to="/register" sx={{ color: '#5e62d1' }}>
+              <Button
+                variant="outlined"
+                component={Link}
+                to="/register"
+                sx={{
+                  fontFamily: 'Poppins, sans-serif',
+                  color: '#5e62d1',
+                  borderColor: '#5e62d1',
+                  borderRadius: '30px',
+                  padding: '8px 20px',
+                  textTransform: 'none',
+                  '&:hover': {
+                    borderColor: '#5e62d1',
+                    backgroundColor: '#f0f4ff',
+                  },
+                }}
+              >
                 Join
               </Button>
-              <Button variant="contained" component={Link} to="/login" sx={{ color: '#fff', backgroundColor: '#5e62d1' }}>
+              <Button
+                variant="contained"
+                component={Link}
+                to="/login"
+                sx={{
+                  fontFamily: 'Poppins, sans-serif',
+                  color: '#fff',
+                  backgroundColor: '#5e62d1',
+                  borderRadius: '30px',
+                  padding: '8px 20px',
+                  textTransform: 'none',
+                  '&:hover': {
+                    backgroundColor: '#4a54c2',
+                  },
+                }}
+              >
                 Log in
               </Button>
             </>

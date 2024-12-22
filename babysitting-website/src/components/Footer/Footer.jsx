@@ -45,7 +45,7 @@ const FooterLink = styled(Button)({
   fontWeight: 'bold',
   textTransform: 'none',
   '&:hover': {
-    color: '#0066cc',
+    color: '#5e62d1',
   },
 });
 

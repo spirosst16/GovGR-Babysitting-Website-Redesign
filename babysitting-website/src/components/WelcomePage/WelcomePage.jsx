@@ -149,6 +149,9 @@ const WelcomePage = () => {
             style={{
               backgroundColor: "#5e62d1",
               fontFamily: "Poppins, sans-serif",
+              fontSize: "1.2rem",
+              borderRadius: "30px",
+              textTransform: "none",
             }}
           >
             Get started for free
