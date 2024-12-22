@@ -21,6 +21,7 @@ import {
   DialogTitle,
   IconButton,
   Tooltip,
+  Chip
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { collection, getDocs } from "firebase/firestore";
@@ -278,6 +279,71 @@ const BabysittersPage = () => {
             </IconButton>
           </Tooltip>
         </Box>
+
+		<Box
+			style={{
+			display: "flex",
+			justifyContent: "center",
+			alignItems: "center",
+			flexWrap: "wrap",
+			marginTop: "20px",
+			gap: "10px",
+			}}
+		>
+			{filters.area && (
+			<Chip
+				label={`Area: ${filters.area}`}
+				onDelete={() => handleFilterChange("area", "")}
+				style={{ backgroundColor: "#5e62d1", color: "#fff" }}
+			/>
+			)}
+			{filters.availability.map((option, index) => (
+			<Chip
+				key={index}
+				label={`Availability: ${option}`}
+				onDelete={() =>
+				handleFilterChange(
+					"availability",
+					filters.availability.filter((item) => item !== option)
+				)
+				}
+				style={{ backgroundColor: "#5e62d1", color: "#fff" }}
+			/>
+			))}
+			{filters.babysittingPlace.map((option, index) => (
+			<Chip
+				key={index}
+				label={`Babysitting Place: ${option}`}
+				onDelete={() =>
+				handleFilterChange(
+					"babysittingPlace",
+					filters.babysittingPlace.filter((item) => item !== option)
+				)
+				}
+				style={{ backgroundColor: "#5e62d1", color: "#fff" }}
+			/>
+			))}
+			{filters.childAges.map((option, index) => (
+			<Chip
+				key={index}
+				label={`Child Age: ${option}`}
+				onDelete={() =>
+				handleFilterChange(
+					"childAges",
+					filters.childAges.filter((item) => item !== option)
+				)
+				}
+				style={{ backgroundColor: "#5e62d1", color: "#fff" }}
+			/>
+			))}
+			{filters.jobType && (
+			<Chip
+				label={`Job Type: ${filters.jobType}`}
+				onDelete={() => handleFilterChange("jobType", "")}
+				style={{ backgroundColor: "#5e62d1", color: "#fff" }}
+			/>
+			)}
+		</Box>
 
         <Box
           style={{
