@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   Avatar,
+  Container,
   Button,
   TextField,
   Rating,
@@ -24,8 +25,8 @@ import {
 import { styled } from "@mui/system";
 import { collection, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
-import SearchIcon from "@mui/icons-material/Search"; // for the search icon
-import FilterAltIcon from "@mui/icons-material/FilterAlt"; // for the filter icon
+import SearchIcon from "@mui/icons-material/Search";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import "../../style.css";
 
 const BabysitterCard = styled(Card)({
@@ -46,10 +47,10 @@ const BabysitterCard = styled(Card)({
 });
 
 const AvatarWrapper = styled(Avatar)({
-  width: "100px",
-  height: "100px",
+  width: "180px",
+  height: "180px",
   marginTop: "20px",
-  borderRadius: "50%",
+  borderRadius: "10%",
 });
 
 const CardContentWrapper = styled(CardContent)({
@@ -57,8 +58,16 @@ const CardContentWrapper = styled(CardContent)({
   flexDirection: "column",
   justifyContent: "center",
   textAlign: "center",
-  padding: "10px",
+  padding: "20px",
   width: "100%",
+});
+
+const ApplicationSectionWrapper = styled(Box)({
+	textAlign: "center",
+	marginBottom: "0",
+	marginTop: "0",
+	backgroundColor: "#5e62d1",
+	padding: "20px",
 });
 
 const FilterBox = styled(Box)({
@@ -87,14 +96,36 @@ const BabysittersPage = () => {
 
   const availabilityOptions = [
     "Monday Morning",
+    "Monday Afternoon",
+    "Monday Evening",
+    "Monday Night",
+    "Tuesday Morning",
+    "Tuesday Afternoon",
+    "Tuesday Evening",
+    "Tuesday Night",
     "Wednesday Morning",
     "Wednesday Afternoon",
+    "Wednesday Evening",
+    "Wednesday Night",
+    "Thursday Morning",
+    "Thursday Afternoon",
+    "Thursday Evening",
+    "Thursday Night",
+    "Friday Morning",
+    "Friday Afternoon",
+    "Friday Evening",
     "Friday Night",
+    "Saturday Morning",
     "Saturday Afternoon",
+    "Saturday Evening",
+    "Saturday Night",
+    "Sunday Morning",
     "Sunday Afternoon",
+    "Sunday Evening",
+    "Sunday Night",
   ];
   const babysittingPlaceOptions = ["Family's House", "Babysitter's House"];
-  const childAgeOptions = ["0-1", "2-3", "4-5"];
+  const childAgeOptions = ["0-1", "2-3", "4-5", "6-12", "13-17"];
   const jobTypeOptions = ["Part-time", "Full-time"];
 
   useEffect(() => {
@@ -114,7 +145,11 @@ const BabysittersPage = () => {
 		  ...doc.data(),
 		}));
   
-		const combinedData = babysittersList.map((babysitter) => {
+		const combinedData = babysittersList
+		  .filter((babysitter) =>
+			applicationsList.some((app) => app.userId === babysitter.userId)
+		  )
+		  .map((babysitter) => {
 		  const application = applicationsList.find(
 			(app) => app.userId === babysitter.userId
 		  );
@@ -143,36 +178,38 @@ const BabysittersPage = () => {
   };
 
   const applyFilters = () => {
-    const filtered = babysitters.filter((babysitter) => {
-      const matchesArea =
-        !filters.area || babysitter.area.toLowerCase() === filters.area.toLowerCase();
-      const matchesAvailability =
-        filters.availability.length === 0 ||
-        filters.availability.some((time) => babysitter.availability?.includes(time));
-      const matchesPlace =
-        filters.babysittingPlace.length === 0 ||
-        filters.babysittingPlace.includes(babysitter.babysittingPlace);
-      const matchesChildAges =
-        filters.childAges.length === 0 ||
-        filters.childAges.some((age) => babysitter.childAges?.includes(age));
-      const matchesJobType =
-        !filters.jobType || babysitter.jobType === filters.jobType;
-
-      return (
-        matchesArea &&
-        matchesAvailability &&
-        matchesPlace &&
-        matchesChildAges &&
-        matchesJobType
-      );
-    });
-
-    setFilteredBabysitters(filtered);
-    setOpenFilterDialog(false);
-  };
+	const filtered = babysitters.filter((babysitter) => {
+	  const matchesArea =
+		!filters.area || babysitter.preferredArea.toLowerCase() === filters.area.toLowerCase();
+	  const matchesAvailability =
+		filters.availability.length === 0 ||
+		filters.availability.some((time) => babysitter.availability?.includes(time));
+	  const matchesPlace =
+		filters.babysittingPlace.length === 0 ||
+		filters.babysittingPlace.some((place) => babysitter.babysittingPlace?.includes(place));
+	  const matchesChildAges =
+		filters.childAges.length === 0 ||
+		filters.childAges.some((age) => babysitter.childAges?.includes(age));
+	  const matchesJobType =
+		!filters.jobType || babysitter.jobType === filters.jobType;
+  
+	  return (
+		matchesArea &&
+		matchesAvailability &&
+		matchesPlace &&
+		matchesChildAges &&
+		matchesJobType
+	  );
+	});
+  
+	setFilteredBabysitters(filtered);
+	setOpenFilterDialog(false);
+  };  
 
   const displayBabysitters = filteredBabysitters.length > 0
-    ? filteredBabysitters
+    ? filteredBabysitters.filter((babysitter) =>
+		babysitter.preferredArea.toLowerCase().includes(filters.area.toLowerCase())
+	  )
     : babysitters;
 
   return (
@@ -254,78 +291,50 @@ const BabysittersPage = () => {
           }}
         >
           {displayBabysitters.map((babysitter) => (
-            <BabysitterCard key={babysitter.id}>
-              <AvatarWrapper src={babysitter.photo || ""} />
-              <CardContentWrapper>
-                <Typography
-                  variant="h6"
-                  style={{
-                    fontFamily: "Poppins, sans-serif",
-                    color: "#000",
-                    fontWeight: "600",
-                    marginBottom: "8px",
-                  }}
-                >
-                  {`${babysitter.firstName} ${babysitter.lastName}`}
-                </Typography>
-                <Typography
-                  style={{
-                    color: "#888",
-                    fontFamily: "Poppins, sans-serif",
-                    marginBottom: "10px",
-                    fontSize: "14px",
-                  }}
-                >
-                  {babysitter.preferredArea}
-                </Typography>
-                <Rating
-                  name={`rating-${babysitter.id}`}
-                  value={babysitter.rating}
-                  precision={0.5}
-                  readOnly
-                  size="small"
-                />
-                <Typography
-                  style={{
-                    color: "#666",
-                    fontSize: "12px",
-                    marginTop: "10px",
-                  }}
-                >
-                  Bio: {babysitter.bio}
-                </Typography>
-                <Typography
-                  style={{
-                    color: "#666",
-                    fontSize: "12px",
-                    marginTop: "10px",
-                  }}
-                >
-                  Experience: {babysitter.experience}
-                </Typography>
-                <Typography
-                  style={{
-                    color: "#666",
-                    fontSize: "12px",
-                    marginTop: "10px",
-                  }}
-                >
-                  Education: {babysitter.education}
-                </Typography>
-                <Typography
-                  style={{
-                    color: "#666",
-                    fontSize: "12px",
-                    marginTop: "10px",
-                  }}
-                >
-                  Languages: {babysitter.knownLanguages.join(", ")}
-                </Typography>
-              </CardContentWrapper>
-            </BabysitterCard>
-          ))}
+			<BabysitterCard key={babysitter.id}>
+				<AvatarWrapper src={babysitter.photo || ""} />
+				<CardContentWrapper>
+				<Typography
+					variant="h6"
+					style={{
+					fontFamily: "Poppins, sans-serif",
+					color: "#000",
+					fontWeight: "600",
+					marginBottom: "8px",
+					}}
+				>
+					{`${babysitter.firstName} ${babysitter.lastName}`}
+				</Typography>
+				<Typography
+					style={{
+					color: "#888",
+					fontFamily: "Poppins, sans-serif",
+					marginBottom: "10px",
+					fontSize: "14px",
+					}}
+				>
+					{babysitter.preferredArea}
+				</Typography>
+				
+				<Box
+					style={{
+					display: "flex",
+					justifyContent: "center",
+					marginBottom: "10px",
+					}}
+				>
+					<Rating
+					name={`rating-${babysitter.id}`}
+					value={babysitter.rating}
+					precision={0.5}
+					readOnly
+					size="small"
+					/>
+				</Box>
+				</CardContentWrapper>
+			</BabysitterCard>
+		  ))}
         </Box>
-
         <Dialog
           open={openFilterDialog}
           onClose={() => setOpenFilterDialog(false)}
@@ -410,6 +419,123 @@ const BabysittersPage = () => {
           </DialogActions>
         </Dialog>
       </Box>
+
+	  <ApplicationSectionWrapper>
+		<Typography
+			variant="h4"
+			style={{
+			fontFamily: "Poppins, sans-serif",
+			color: "#fff",
+			marginBottom: "10px",
+			}}
+		>
+			Need a Babysitter? Let us help you find the perfect match!
+		</Typography>
+		<Typography
+			variant="subtitle1"
+			style={{
+			fontFamily: "Poppins, sans-serif",
+			color: "#e0e0e0",
+			marginBottom: "20px",
+			}}
+		>
+			Create an application with your needs and connect with qualified babysitters in your area.
+		</Typography>
+		<Button
+			variant="contained"
+			style={{
+			backgroundColor: "#fff",
+			color: "#5e62d1",
+			fontFamily: "Poppins, sans-serif",
+			textTransform: "none",
+			padding: "10px 20px",
+			borderRadius: "30px",
+			fontWeight: "600",
+			fontSize: "16px",
+			}}
+			onClick={() => (window.location.href = "/my-applications-and-jobs")}
+		>
+			Create an application now
+		</Button>
+	  </ApplicationSectionWrapper>
+	  <Container style={{ margin: "50px auto" }}>
+        <Typography
+          variant="h4"
+          style={{
+            textAlign: "center",
+            marginBottom: "30px",
+            fontFamily: "Poppins, sans-serif",
+          }}
+        >
+          Find Babysitters or jobs, fast and easy!
+        </Typography>
+        <Box display="flex" flexDirection="column" alignItems="center">
+          {["Search", "Contact", "Childcare Services"].map((step, index) => (
+            <Box
+              key={index}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                textAlign: "left",
+                margin: "20px 0",
+                maxWidth: "600px",
+                width: "100%",
+                position: "relative",
+                paddingLeft: "70px",
+              }}
+            >
+              <Box
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "50px",
+                  height: "50px",
+                  backgroundColor: "#5e62d1",
+                  color: "white",
+                  fontWeight: "bold",
+                  borderRadius: "50%",
+                  fontFamily: "Poppins, sans-serif",
+                  fontSize: "24px",
+                  position: "absolute",
+                  left: "0",
+                }}
+              >
+                {index + 1}
+              </Box>
+              <Box>
+                <Typography
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontWeight: "bold",
+                    marginBottom: "5px",
+                  }}
+                >
+                  {step}
+                </Typography>
+                {index === 0 && (
+                  <Typography style={{ fontFamily: "Poppins, sans-serif" }}>
+                    Use filters based on your needs and check recommended
+                    profiles.
+                  </Typography>
+                )}
+                {index === 1 && (
+                  <Typography style={{ fontFamily: "Poppins, sans-serif" }}>
+                    Send messages, rate members, and schedule a meet-up.
+                  </Typography>
+                )}
+                {index === 2 && (
+                  <Typography style={{ fontFamily: "Poppins, sans-serif" }}>
+                    Book childcare, make payments or get paid, and download
+                    receipts for your expenses.
+                  </Typography>
+                )}
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      </Container>
     </>
   );
 };

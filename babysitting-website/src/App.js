@@ -50,7 +50,7 @@ function App() {
         <Route path="/register" element={<RegistrationForm />} />
         <Route path="/babysitter-form" element={user ? <BabysitterInfoForm /> : <Navigate to="/login" />} />
         <Route path="/guardian-form" element={user ? <GuardianInfoForm /> : <Navigate to="/login" />} />
-        <Route path="/babysitters" element={user ? <BabysittersPage /> : <Navigate to="/login" />} />
+        <Route path="/babysitters" element={<BabysittersPage />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="/babysitter-application" element={user ? <BabysitterApplicationForm /> : <Navigate to="/login" />} />
         <Route path="/my-applications-and-jobs" element={user ? <MyApplicationsJobsPage /> : <Navigate to="/login" />} />
