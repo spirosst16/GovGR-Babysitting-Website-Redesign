@@ -181,12 +181,14 @@ const BabysittersPage = () => {
 
   const applyFilters = () => {
 	const filtered = babysitters.filter((babysitter) => {
-		const matchesArea =
+	  const matchesArea =
 		!filters.area ||
 		babysitter.preferredArea.toLowerCase().includes(filters.area.toLowerCase());
 	  const matchesAvailability =
 		filters.availability.length === 0 ||
-		filters.availability.some((time) => babysitter.availability?.includes(time));
+		filters.availability.some((time) => {
+		  return babysitter.availability?.includes(time);
+		});
 	  const matchesPlace =
 		filters.babysittingPlace.length === 0 ||
 		filters.babysittingPlace.some((place) => babysitter.babysittingPlace?.includes(place));
