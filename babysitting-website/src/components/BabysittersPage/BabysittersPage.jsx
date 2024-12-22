@@ -21,7 +21,7 @@ import {
   DialogTitle,
   IconButton,
   Tooltip,
-  Chip
+  Chip,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { collection, getDocs } from "firebase/firestore";
@@ -65,11 +65,11 @@ const CardContentWrapper = styled(CardContent)({
 });
 
 const ApplicationSectionWrapper = styled(Box)({
-	textAlign: "center",
-	marginBottom: "0",
-	marginTop: "0",
-	backgroundColor: "#5e62d1",
-	padding: "20px",
+  textAlign: "center",
+  marginBottom: "0",
+  marginTop: "0",
+  backgroundColor: "#5e62d1",
+  padding: "20px",
 });
 
 const FilterBox = styled(Box)({
@@ -131,87 +131,94 @@ const BabysittersPage = () => {
   const jobTypeOptions = ["Part-time", "Full-time"];
 
   useEffect(() => {
-	const fetchBabysitters = async () => {
-	  try {
-		const babysittersCollectionRef = collection(FIREBASE_DB, "babysitters");
-		const babysitterSnapshot = await getDocs(babysittersCollectionRef);
-		const babysittersList = babysitterSnapshot.docs.map((doc) => ({
-		  id: doc.id,
-		  ...doc.data(),
-		}));
-  
-		const applicationsCollectionRef = collection(FIREBASE_DB, "babysitterApplications");
-		const applicationSnapshot = await getDocs(applicationsCollectionRef);
-		const applicationsList = applicationSnapshot.docs.map((doc) => ({
-		  id: doc.id,
-		  ...doc.data(),
-		}));
-  
-		const combinedData = babysittersList
-		  .filter((babysitter) =>
-			applicationsList.some((app) => app.userId === babysitter.userId)
-		  )
-		  .map((babysitter) => {
-		  const application = applicationsList.find(
-			(app) => app.userId === babysitter.userId
-		  );
-		  return {
-			...babysitter,
-			preferredArea: application ? application.area : "",
-			availability: application ? application.availability : "",
-			babysittingPlace: application ? application.babysittingPlace : "",
-			childAges: application ? application.childAges : "",
-			jobType: application ? application.jobType : "",
-		  };
-		});
-  
-		setBabysitters(combinedData);
-	  } catch (error) {
-		console.error("Error fetching babysitters: ", error);
-	  }
-	};
-  
-	fetchBabysitters();
+    const fetchBabysitters = async () => {
+      try {
+        const babysittersCollectionRef = collection(FIREBASE_DB, "babysitters");
+        const babysitterSnapshot = await getDocs(babysittersCollectionRef);
+        const babysittersList = babysitterSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const applicationsCollectionRef = collection(
+          FIREBASE_DB,
+          "babysitterApplications"
+        );
+        const applicationSnapshot = await getDocs(applicationsCollectionRef);
+        const applicationsList = applicationSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        const combinedData = babysittersList
+          .filter((babysitter) =>
+            applicationsList.some((app) => app.userId === babysitter.userId)
+          )
+          .map((babysitter) => {
+            const application = applicationsList.find(
+              (app) => app.userId === babysitter.userId
+            );
+            return {
+              ...babysitter,
+              preferredArea: application ? application.area : "",
+              availability: application ? application.availability : "",
+              babysittingPlace: application ? application.babysittingPlace : "",
+              childAges: application ? application.childAges : "",
+              jobType: application ? application.jobType : "",
+            };
+          });
+
+        setBabysitters(combinedData);
+      } catch (error) {
+        console.error("Error fetching babysitters: ", error);
+      }
+    };
+
+    fetchBabysitters();
   }, []);
-  
 
   const handleFilterChange = (key, value) => {
     setFilters((prevFilters) => ({ ...prevFilters, [key]: value }));
   };
 
   const applyFilters = () => {
-	const filtered = babysitters.filter((babysitter) => {
-	  const matchesArea =
-		!filters.area ||
-		babysitter.preferredArea.toLowerCase().includes(filters.area.toLowerCase());
-	  const matchesAvailability =
-		filters.availability.length === 0 ||
-		filters.availability.some((time) => {
-		  return babysitter.availability?.includes(time);
-		});
-	  const matchesPlace =
-		filters.babysittingPlace.length === 0 ||
-		filters.babysittingPlace.some((place) => babysitter.babysittingPlace?.includes(place));
-	  const matchesChildAges =
-		filters.childAges.length === 0 ||
-		filters.childAges.some((age) => babysitter.childAges?.includes(age));
-	  const matchesJobType =
-		!filters.jobType || babysitter.jobType === filters.jobType;
-  
-	  return (
-		matchesArea &&
-		matchesAvailability &&
-		matchesPlace &&
-		matchesChildAges &&
-		matchesJobType
-	  );
-	});
-  
-	setFilteredBabysitters(filtered);
-	setOpenFilterDialog(false);
-  };  
+    const filtered = babysitters.filter((babysitter) => {
+      const matchesArea =
+        !filters.area ||
+        babysitter.preferredArea
+          .toLowerCase()
+          .includes(filters.area.toLowerCase());
+      const matchesAvailability =
+        filters.availability.length === 0 ||
+        filters.availability.some((time) => {
+          return babysitter.availability?.includes(time);
+        });
+      const matchesPlace =
+        filters.babysittingPlace.length === 0 ||
+        filters.babysittingPlace.some((place) =>
+          babysitter.babysittingPlace?.includes(place)
+        );
+      const matchesChildAges =
+        filters.childAges.length === 0 ||
+        filters.childAges.some((age) => babysitter.childAges?.includes(age));
+      const matchesJobType =
+        !filters.jobType || babysitter.jobType === filters.jobType;
 
-  const displayBabysitters = filteredBabysitters.length > 0 ? filteredBabysitters : babysitters;
+      return (
+        matchesArea &&
+        matchesAvailability &&
+        matchesPlace &&
+        matchesChildAges &&
+        matchesJobType
+      );
+    });
+
+    setFilteredBabysitters(filtered);
+    setOpenFilterDialog(false);
+  };
+
+  const displayBabysitters =
+    filteredBabysitters.length > 0 ? filteredBabysitters : babysitters;
 
   return (
     <>
@@ -252,8 +259,34 @@ const BabysittersPage = () => {
             variant="outlined"
             value={filters.area}
             onChange={(e) => handleFilterChange("area", e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                applyFilters();
+              }
+            }}
             fullWidth
-            style={{ maxWidth: "500px" }}
+            sx={{
+              maxWidth: "500px",
+              borderRadius: "25px",
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "25px",
+                "& fieldset": {
+                  borderColor: "rgba(0, 0, 0, 0.23)",
+                },
+                "&:hover fieldset": {
+                  borderColor: "rgba(0, 0, 0, 0.23)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#5e62d1",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: "rgba(0, 0, 0, 0.6)",
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: "#5e62d1",
+              },
+            }}
           />
           <IconButton
             onClick={() => applyFilters()}
@@ -282,70 +315,70 @@ const BabysittersPage = () => {
           </Tooltip>
         </Box>
 
-		<Box
-			style={{
-			display: "flex",
-			justifyContent: "center",
-			alignItems: "center",
-			flexWrap: "wrap",
-			marginTop: "20px",
-			gap: "10px",
-			}}
-		>
-			{filters.area && (
-			<Chip
-				label={`Area: ${filters.area}`}
-				onDelete={() => handleFilterChange("area", "")}
-				style={{ backgroundColor: "#5e62d1", color: "#fff" }}
-			/>
-			)}
-			{filters.availability.map((option, index) => (
-			<Chip
-				key={index}
-				label={`Availability: ${option}`}
-				onDelete={() =>
-				handleFilterChange(
-					"availability",
-					filters.availability.filter((item) => item !== option)
-				)
-				}
-				style={{ backgroundColor: "#5e62d1", color: "#fff" }}
-			/>
-			))}
-			{filters.babysittingPlace.map((option, index) => (
-			<Chip
-				key={index}
-				label={`Babysitting Place: ${option}`}
-				onDelete={() =>
-				handleFilterChange(
-					"babysittingPlace",
-					filters.babysittingPlace.filter((item) => item !== option)
-				)
-				}
-				style={{ backgroundColor: "#5e62d1", color: "#fff" }}
-			/>
-			))}
-			{filters.childAges.map((option, index) => (
-			<Chip
-				key={index}
-				label={`Child Age: ${option}`}
-				onDelete={() =>
-				handleFilterChange(
-					"childAges",
-					filters.childAges.filter((item) => item !== option)
-				)
-				}
-				style={{ backgroundColor: "#5e62d1", color: "#fff" }}
-			/>
-			))}
-			{filters.jobType && (
-			<Chip
-				label={`Job Type: ${filters.jobType}`}
-				onDelete={() => handleFilterChange("jobType", "")}
-				style={{ backgroundColor: "#5e62d1", color: "#fff" }}
-			/>
-			)}
-		</Box>
+        <Box
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            flexWrap: "wrap",
+            marginTop: "20px",
+            gap: "10px",
+          }}
+        >
+          {filters.area && (
+            <Chip
+              label={`Area: ${filters.area}`}
+              onDelete={() => handleFilterChange("area", "")}
+              style={{ backgroundColor: "#5e62d1", color: "#fff" }}
+            />
+          )}
+          {filters.availability.map((option, index) => (
+            <Chip
+              key={index}
+              label={`Availability: ${option}`}
+              onDelete={() =>
+                handleFilterChange(
+                  "availability",
+                  filters.availability.filter((item) => item !== option)
+                )
+              }
+              style={{ backgroundColor: "#5e62d1", color: "#fff" }}
+            />
+          ))}
+          {filters.babysittingPlace.map((option, index) => (
+            <Chip
+              key={index}
+              label={`Babysitting Place: ${option}`}
+              onDelete={() =>
+                handleFilterChange(
+                  "babysittingPlace",
+                  filters.babysittingPlace.filter((item) => item !== option)
+                )
+              }
+              style={{ backgroundColor: "#5e62d1", color: "#fff" }}
+            />
+          ))}
+          {filters.childAges.map((option, index) => (
+            <Chip
+              key={index}
+              label={`Child Age: ${option}`}
+              onDelete={() =>
+                handleFilterChange(
+                  "childAges",
+                  filters.childAges.filter((item) => item !== option)
+                )
+              }
+              style={{ backgroundColor: "#5e62d1", color: "#fff" }}
+            />
+          ))}
+          {filters.jobType && (
+            <Chip
+              label={`Job Type: ${filters.jobType}`}
+              onDelete={() => handleFilterChange("jobType", "")}
+              style={{ backgroundColor: "#5e62d1", color: "#fff" }}
+            />
+          )}
+        </Box>
 
         <Box
           style={{
@@ -357,207 +390,253 @@ const BabysittersPage = () => {
           }}
         >
           {displayBabysitters.map((babysitter) => (
-			<BabysitterCard key={babysitter.id}>
-				<AvatarWrapper src={babysitter.photo || ""} />
-				<CardContentWrapper>
-				<Typography
-					variant="h6"
-					style={{
-					fontFamily: "Poppins, sans-serif",
-					color: "#000",
-					fontWeight: "600",
-					marginBottom: "8px",
-					}}
-				>
-					{`${babysitter.firstName} ${babysitter.lastName}`}
-				</Typography>
-				<Typography
-					style={{
-					color: "#888",
-					fontFamily: "Poppins, sans-serif",
-					marginBottom: "10px",
-					fontSize: "14px",
-					}}
-				>
-					{babysitter.preferredArea}
-				</Typography>
-				
-				<Box
-					style={{
-					display: "flex",
-					justifyContent: "center",
-					marginBottom: "10px",
-					}}
-				>
-					<Rating
-					name={`rating-${babysitter.id}`}
-					value={babysitter.rating}
-					precision={0.5}
-					readOnly
-					size="small"
-					/>
-				</Box>
-				</CardContentWrapper>
-			</BabysitterCard>
-		  ))}
+            <BabysitterCard key={babysitter.id}>
+              <AvatarWrapper src={babysitter.photo || ""} />
+              <CardContentWrapper>
+                <Typography
+                  variant="h6"
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    color: "#000",
+                    fontWeight: "600",
+                    marginBottom: "8px",
+                  }}
+                >
+                  {`${babysitter.firstName} ${babysitter.lastName}`}
+                </Typography>
+                <Typography
+                  style={{
+                    color: "#888",
+                    fontFamily: "Poppins, sans-serif",
+                    marginBottom: "10px",
+                    fontSize: "14px",
+                  }}
+                >
+                  {babysitter.preferredArea}
+                </Typography>
+
+                <Box
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <Rating
+                    name={`rating-${babysitter.id}`}
+                    value={babysitter.rating}
+                    precision={0.5}
+                    readOnly
+                    size="small"
+                  />
+                </Box>
+              </CardContentWrapper>
+            </BabysitterCard>
+          ))}
         </Box>
         <Dialog
           open={openFilterDialog}
           onClose={() => setOpenFilterDialog(false)}
           maxWidth="md"
-          fullWidth
         >
           <DialogTitle>Apply Filters</DialogTitle>
           <DialogContent>
-            <FormControl fullWidth style={{ marginBottom: "20px" }}>
-              <InputLabel>Availability</InputLabel>
-              <Select
-                multiple
-                value={filters.availability}
-                onChange={(e) => handleFilterChange("availability", e.target.value)}
-                renderValue={(selected) => selected.join(", ")}
-              >
-                {availabilityOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    <Checkbox checked={filters.availability.includes(option)} />
-                    <ListItemText primary={option} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth style={{ marginBottom: "20px" }}>
-              <InputLabel>Babysitting Place</InputLabel>
-              <Select
-                multiple
-                value={filters.babysittingPlace}
-                onChange={(e) => handleFilterChange("babysittingPlace", e.target.value)}
-                renderValue={(selected) => selected.join(", ")}
-              >
-                {babysittingPlaceOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    <Checkbox checked={filters.babysittingPlace.includes(option)} />
-                    <ListItemText primary={option} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth style={{ marginBottom: "20px" }}>
-              <InputLabel>Child Ages</InputLabel>
-              <Select
-                multiple
-                value={filters.childAges}
-                onChange={(e) => handleFilterChange("childAges", e.target.value)}
-                renderValue={(selected) => selected.join(", ")}
-              >
-                {childAgeOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    <Checkbox checked={filters.childAges.includes(option)} />
-                    <ListItemText primary={option} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth style={{ marginBottom: "20px" }}>
-              <InputLabel>Job Type</InputLabel>
-              <Select
-                value={filters.jobType}
-                onChange={(e) => handleFilterChange("jobType", e.target.value)}
-              >
-                {jobTypeOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            {[
+              {
+                label: "Availability",
+                value: filters.availability,
+                options: availabilityOptions,
+                multiple: true,
+                onChange: (e) =>
+                  handleFilterChange("availability", e.target.value),
+              },
+              {
+                label: "Babysitting Place",
+                value: filters.babysittingPlace,
+                options: babysittingPlaceOptions,
+                multiple: true,
+                onChange: (e) =>
+                  handleFilterChange("babysittingPlace", e.target.value),
+              },
+              {
+                label: "Child Ages",
+                value: filters.childAges,
+                options: childAgeOptions,
+                multiple: true,
+                onChange: (e) =>
+                  handleFilterChange("childAges", e.target.value),
+              },
+              {
+                label: "Job Type",
+                value: filters.jobType,
+                options: jobTypeOptions,
+                multiple: false,
+                onChange: (e) => handleFilterChange("jobType", e.target.value),
+              },
+            ].map(({ label, value, options, multiple, onChange }, index) => {
+              const labelId = `${label
+                .toLowerCase()
+                .replace(/\s+/g, "-")}-label`;
+              return (
+                <FormControl
+                  fullWidth
+                  sx={{ mb: 2 }}
+                  key={index}
+                  variant="outlined"
+                >
+                  <InputLabel
+                    id={labelId}
+                    sx={{
+                      "&.Mui-focused": { color: "#5e62d1" },
+                    }}
+                  >
+                    {label}
+                  </InputLabel>
+                  <Select
+                    labelId={labelId}
+                    value={value}
+                    onChange={onChange}
+                    multiple={multiple}
+                    renderValue={(selected) =>
+                      Array.isArray(selected) ? selected.join(", ") : selected
+                    }
+                    sx={{
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "rgba(0, 0, 0, 0.23)",
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "rgba(0, 0, 0, 0.5)",
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#5e62d1",
+                      },
+                    }}
+                  >
+                    {options.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        <Checkbox
+                          checked={value.includes(option)}
+                          sx={{
+                            color: "#5e62d1",
+                            "&.Mui-checked": {
+                              color: "#5e62d1",
+                            },
+                          }}
+                        />
+                        <ListItemText primary={option} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              );
+            })}
           </DialogContent>
           <DialogActions>
-			<Button
-				onClick={applyFilters}
-				style={{
-				backgroundColor: "#5e62d1",
-				color: "white",
-				borderRadius: "30px",
-				textTransform: "none",
-				}}
-				variant="contained"
-			>
-				Apply Filters
-			</Button>
-			<Button
-				onClick={() =>
-				setFilters({ area: "", availability: [], babysittingPlace: [], childAges: [], jobType: "" })
-				}
-				style={{
-					backgroundColor: "white",
-					color: "#5e62d1",
-					borderRadius: "30px",
-					textTransform: "none",
-					border: "1px solid #5e62d1",
-				}}
-				variant="outlined"
-			>
-				Clear Filters
-			</Button>
-			<Button
-				onClick={() => setOpenFilterDialog(false)}
-				style={{
-					backgroundColor: "white",
-					color: "#5e62d1",
-					borderRadius: "30px",
-					textTransform: "none",
-					border: "1px solid #5e62d1",
-				}}
-				variant="outlined"
-			>
-				Cancel
-			</Button>
-		  </DialogActions>
+            {[
+              {
+                label: "Apply Filters",
+                onClick: applyFilters,
+                variant: "contained",
+                style: {
+                  backgroundColor: "#5e62d1",
+                  color: "white",
+                },
+                hover: {
+                  backgroundColor: "#4a54c2",
+                },
+              },
+              {
+                label: "Clear Filters",
+                onClick: () =>
+                  setFilters({
+                    area: "",
+                    availability: [],
+                    babysittingPlace: [],
+                    childAges: [],
+                    jobType: "",
+                  }),
+                variant: "outlined",
+                style: {
+                  backgroundColor: "white",
+                  color: "#5e62d1",
+                  border: "1px solid #5e62d1",
+                },
+                hover: {
+                  backgroundColor: "#f0f4ff",
+                },
+              },
+              {
+                label: "Cancel",
+                onClick: () => setOpenFilterDialog(false),
+                variant: "outlined",
+                style: {
+                  backgroundColor: "white",
+                  color: "#5e62d1",
+                  border: "1px solid #5e62d1",
+                },
+                hover: {
+                  backgroundColor: "#f0f4ff",
+                },
+              },
+            ].map(({ label, onClick, variant, style, hover }, index) => (
+              <Button
+                key={index}
+                onClick={onClick}
+                variant={variant}
+                sx={{
+                  borderRadius: "30px",
+                  textTransform: "none",
+                  ...style,
+                  "&:hover": hover,
+                }}
+              >
+                {label}
+              </Button>
+            ))}
+          </DialogActions>
         </Dialog>
       </Box>
 
-	  <ApplicationSectionWrapper>
-		<Typography
-			variant="h4"
-			style={{
-			fontFamily: "Poppins, sans-serif",
-			color: "#fff",
-			marginBottom: "10px",
-			}}
-		>
-			Need a Babysitter? Let us help you find the perfect match!
-		</Typography>
-		<Typography
-			variant="subtitle1"
-			style={{
-			fontFamily: "Poppins, sans-serif",
-			color: "#e0e0e0",
-			marginBottom: "20px",
-			}}
-		>
-			Create an application with your needs and connect with qualified babysitters in your area.
-		</Typography>
-		<Button
-			variant="contained"
-			style={{
-			backgroundColor: "#fff",
-			color: "#5e62d1",
-			fontFamily: "Poppins, sans-serif",
-			textTransform: "none",
-			padding: "10px 20px",
-			borderRadius: "30px",
-			fontWeight: "600",
-			fontSize: "16px",
-			}}
-			onClick={() => (window.location.href = "/my-applications-and-jobs")}
-		>
-			Create an application now
-		</Button>
-	  </ApplicationSectionWrapper>
-	  <Container style={{ margin: "50px auto" }}>
+      <ApplicationSectionWrapper>
+        <Typography
+          variant="h4"
+          style={{
+            fontFamily: "Poppins, sans-serif",
+            color: "#fff",
+            marginBottom: "10px",
+          }}
+        >
+          Need a Babysitter? Let us help you find the perfect match!
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          style={{
+            fontFamily: "Poppins, sans-serif",
+            color: "#e0e0e0",
+            marginBottom: "20px",
+          }}
+        >
+          Create an application with your needs and connect with qualified
+          babysitters in your area.
+        </Typography>
+        <Button
+          variant="contained"
+          style={{
+            backgroundColor: "#fff",
+            color: "#5e62d1",
+            fontFamily: "Poppins, sans-serif",
+            textTransform: "none",
+            padding: "10px 20px",
+            borderRadius: "30px",
+            fontWeight: "600",
+            fontSize: "16px",
+          }}
+          onClick={() => (window.location.href = "/my-applications-and-jobs")}
+        >
+          Create an application now
+        </Button>
+      </ApplicationSectionWrapper>
+      <Container style={{ margin: "50px auto" }}>
         <Typography
           variant="h4"
           style={{
