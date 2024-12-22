@@ -180,8 +180,9 @@ const BabysittersPage = () => {
 
   const applyFilters = () => {
 	const filtered = babysitters.filter((babysitter) => {
-	  const matchesArea =
-		!filters.area || babysitter.preferredArea.toLowerCase() === filters.area.toLowerCase();
+		const matchesArea =
+		!filters.area ||
+		babysitter.preferredArea.toLowerCase().includes(filters.area.toLowerCase());
 	  const matchesAvailability =
 		filters.availability.length === 0 ||
 		filters.availability.some((time) => babysitter.availability?.includes(time));
@@ -207,11 +208,7 @@ const BabysittersPage = () => {
 	setOpenFilterDialog(false);
   };  
 
-  const displayBabysitters = filteredBabysitters.length > 0
-    ? filteredBabysitters.filter((babysitter) =>
-		babysitter.preferredArea.toLowerCase().includes(filters.area.toLowerCase())
-	  )
-    : babysitters;
+  const displayBabysitters = filteredBabysitters.length > 0 ? filteredBabysitters : babysitters;
 
   return (
     <>
