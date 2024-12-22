@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { FIREBASE_AUTH } from "./config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import Navbar from "./components/Navbar/Navbar";
+import Footer from "./components/Footer/Footer";
 import WelcomePage from "./components/WelcomePage/WelcomePage";
 import RegistrationForm from "./components/Register/RegistrationForm";
 import LoginForm from "./components/Login/LoginForm";
@@ -11,8 +13,7 @@ import BabysittersPage from "./components/BabysittersPage/BabysittersPage";
 import HowItWorksPage from "./components/HowItWorksPage/HowItWorksPage";
 import BabysitterApplicationForm from "./components/ApplicationForm/BabysitterApplicationForm";
 import MyApplicationsJobsPage from "./components/ApplicationAndJobs/MyApplicationsJobsPage";
-import Navbar from "./components/Navbar/Navbar";
-import Footer from "./components/Footer/Footer";
+import BabysitterApplicationDisplay from "./components/ApplicationDisplay/BabysitterApplicationDisplay";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -54,6 +55,7 @@ function App() {
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="/babysitter-application" element={user ? <BabysitterApplicationForm /> : <Navigate to="/login" />} />
         <Route path="/my-applications-and-jobs" element={user ? <MyApplicationsJobsPage /> : <Navigate to="/login" />} />
+		<Route path="/application/:userId" element={<BabysitterApplicationDisplay />} />
       </Routes>
       {!shouldHideNavbarAndFooter && <Footer />}
     </>
