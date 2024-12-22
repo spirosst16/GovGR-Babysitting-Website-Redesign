@@ -43,9 +43,11 @@ const DropdownButton = styled(Box)(({ theme }) => ({
   padding: '5px 10px',
   borderRadius: '25px',
   cursor: 'pointer',
-  transition: 'background-color 0.3s, color 0.3s',
+  transition: 'background-color 0.3s, color 0.3s, outline 0.3s',
+  outline: '2px solid #444444',
   '&:hover': {
     backgroundColor: '#ffffff',
+    outline: '2px solid #000',
     span: {
       color: '#000',
     },
@@ -54,6 +56,7 @@ const DropdownButton = styled(Box)(({ theme }) => ({
     color: '#444444',
   },
 }));
+
 
 const Navbar = () => {
   const [userPhoto, setUserPhoto] = useState(null);
@@ -158,9 +161,9 @@ const Navbar = () => {
                   component={Link}
                   to={to}
                   sx={{
-                    color: '#444444',
+                    color: location.pathname === to ? '#000' : '#444444',
                     fontWeight: 'bold',
-                    backgroundColor: location.pathname === to ? '#ffffff' : 'transparent', // Background white if on the page
+                    backgroundColor: location.pathname === to ? '#ffffff' : 'transparent',
                     borderRadius: '5px',
                     '&:hover': {
                       color: '#000',
