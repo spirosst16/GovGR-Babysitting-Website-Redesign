@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Rating,
-  Grid,
   Avatar,
 } from "@mui/material";
 import { useParams } from "react-router-dom";
@@ -14,12 +13,10 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import BabysitterImage from "../../assets/Babysitter-image.webp";
 
-// Styled components for the page
 const PageContainer = styled(Box)({
   backgroundColor: "#f4f4f4",
   minHeight: "100vh",
   padding: "40px 20px",
-  fontFamily: "'Poppins', sans-serif",
 });
 
 const ContentWrapper = styled(Container)({
@@ -30,51 +27,66 @@ const ContentWrapper = styled(Container)({
 
 const InfoSection = styled(Box)({
   display: "flex",
-  justifyContent: "space-between",
-  flexWrap: "wrap",
+  flexDirection: "column",
+  gap: "40px",
   marginBottom: "40px",
+  alignItems: "center",
+  backgroundColor: "#fff",
+  padding: "40px",
+  borderRadius: "10px",
+  boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
 });
 
 const ProfileSection = styled(Box)({
-  width: "100%",
-  maxWidth: "350px",
-  backgroundColor: "#fff",
-  padding: "30px",
-  borderRadius: "10px",
-  boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  marginBottom: "20px",
+});
+
+const ProfileInfo = styled(Box)({
   textAlign: "center",
-  transition: "transform 0.3s ease-in-out",
-  "&:hover": {
-    transform: "scale(1.05)",
-  },
+  marginTop: "20px",
 });
 
 const ApplicationSection = styled(Box)({
-  flex: 1,
-  backgroundColor: "#fff",
-  padding: "30px",
-  borderRadius: "10px",
-  boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
+  width: "100%",
+  display: "flex",
+  flexDirection: "column",
+  gap: "20px",
+  alignItems: "center",
 });
 
-const ScheduleGrid = styled(Box)({
-  display: "grid",
-  gridTemplateColumns: "repeat(7, 1fr)",
-  gap: "20px",
+const ScheduleSection = styled(Box)({
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "10px",
+  justifyContent: "space-between",
   marginTop: "30px",
 });
 
 const ScheduleItem = styled(Box)(({ available }) => ({
-  padding: "12px",
+  padding: "10px",
   backgroundColor: available ? "#5e62d1" : "#f4f4f4",
   color: available ? "#fff" : "#888",
   textAlign: "center",
   borderRadius: "8px",
-  transition: "background-color 0.3s ease",
-  "&:hover": {
-    backgroundColor: available ? "#4a54c1" : "#e0e0e0",
-  },
+  marginBottom: "5px",
 }));
+
+const ButtonStyle = styled(Button)({
+  fontSize: "0.9rem",
+  color: "#ffffff",
+  backgroundColor: "#5e62d1",
+  padding: "8px 16px",
+  marginRight: "8px",
+  marginBottom: "8px",
+  textTransform: "none",
+  borderRadius: "25px",
+  "&:hover": {
+    backgroundColor: "#5e62d1",
+  },
+});
 
 const BabysitterApplicationDisplay = () => {
   const { userId } = useParams();
@@ -84,7 +96,6 @@ const BabysitterApplicationDisplay = () => {
   useEffect(() => {
     const fetchBabysitterAndApplication = async () => {
       try {
-        // Fetch the babysitter data
         const babysitterRef = query(
           collection(FIREBASE_DB, "babysitters"),
           where("userId", "==", userId)
@@ -95,7 +106,6 @@ const BabysitterApplicationDisplay = () => {
           ...doc.data(),
         }))[0];
 
-        // Fetch the babysitter application data
         const applicationRef = query(
           collection(FIREBASE_DB, "babysitterApplications"),
           where("userId", "==", userId)
@@ -121,6 +131,19 @@ const BabysitterApplicationDisplay = () => {
   return (
     <PageContainer>
       <ContentWrapper>
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: "bold",
+            marginBottom: "40px",
+            marginTop: "20px",
+            textAlign: "center",
+            fontFamily: "'Poppins', sans-serif",
+          }}
+        >
+          Application Details
+        </Typography>
+
         <InfoSection>
           {/* Profile Section */}
           <ProfileSection>
@@ -134,54 +157,91 @@ const BabysitterApplicationDisplay = () => {
                 boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
               }}
             />
-            <Typography
-              variant="h6"
-              sx={{ marginTop: "20px", fontWeight: "bold" }}
-            >
-              {`${babysitter.firstName} ${babysitter.lastName}`}
-            </Typography>
-            <Typography sx={{ color: "#888", marginBottom: "10px" }}>
-              {babysitter.city}
-            </Typography>
-            <Rating
-              name={`rating-${babysitter.id}`}
-              value={babysitter.rating}
-              precision={0.5}
-              readOnly
-              size="large"
-            />
+            <ProfileInfo>
+              <Typography
+                variant="h5"
+                sx={{
+                  marginTop: "20px",
+                  fontWeight: "bold",
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                {`${babysitter.firstName} ${babysitter.lastName}`}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#888",
+                  marginBottom: "10px",
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                {babysitter.city}
+              </Typography>
+              <Rating
+                name={`rating-${babysitter.id}`}
+                value={babysitter.rating}
+                precision={0.5}
+                readOnly
+                size="large"
+              />
+            </ProfileInfo>
           </ProfileSection>
 
-          {/* Application Details Section */}
+          {/* Application Details */}
           <ApplicationSection>
-            <Typography variant="h5" sx={{ marginBottom: "20px" }}>
-              Application Details
-            </Typography>
             <Typography
               variant="h6"
-              sx={{ marginBottom: "10px", fontWeight: "bold" }}
+              sx={{
+                fontFamily: "'Poppins', sans-serif",
+              }}
             >
               Area: {application.area}
             </Typography>
-            <Typography variant="h6" sx={{ marginBottom: "10px" }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
               Job Type: {application.jobType}
             </Typography>
-            <Typography variant="h6" sx={{ marginBottom: "10px" }}>
+            <Typography
+              variant="h6"
+              sx={{
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
               Babysitting Place: {application.babysittingPlace.join(", ")}
             </Typography>
-            <Typography variant="h6" sx={{ marginBottom: "10px" }}>
-              Child Ages: {application.childAges.join(", ")}
+            <Typography
+              variant="h6"
+              sx={{
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
+              Child Ages:{" "}
+              <Box
+                sx={{ display: "flex", gap: "8px", justifyContent: "center" }}
+              >
+                {application.childAges.map((age, index) => (
+                  <ButtonStyle key={index}>{age}</ButtonStyle>
+                ))}
+              </Box>
             </Typography>
 
             {/* Availability Schedule */}
             <Typography
               variant="h6"
-              sx={{ marginBottom: "20px", fontWeight: "bold" }}
+              sx={{
+                fontWeight: "bold",
+                fontFamily: "'Poppins', sans-serif",
+                marginTop: "30px",
+              }}
             >
               Availability Schedule
             </Typography>
 
-            <ScheduleGrid>
+            <ScheduleSection>
               {[
                 "Monday",
                 "Tuesday",
@@ -191,13 +251,14 @@ const BabysitterApplicationDisplay = () => {
                 "Saturday",
                 "Sunday",
               ].map((day, index) => (
-                <Box key={index}>
+                <Box key={index} sx={{ width: "100%", flex: 1 }}>
                   <Typography
                     variant="subtitle1"
                     sx={{
                       textAlign: "center",
                       fontWeight: "bold",
-                      marginBottom: "10px",
+                      marginBottom: "20px",
+                      fontFamily: "'Poppins', sans-serif",
                     }}
                   >
                     {day}
@@ -210,17 +271,22 @@ const BabysitterApplicationDisplay = () => {
                           `${day} ${timeSlot}`
                         )}
                       >
-                        {timeSlot}
+                        <Typography
+                          sx={{
+                            fontFamily: "'Poppins', sans-serif",
+                          }}
+                        >
+                          {timeSlot}
+                        </Typography>
                       </ScheduleItem>
                     )
                   )}
                 </Box>
               ))}
-            </ScheduleGrid>
+            </ScheduleSection>
           </ApplicationSection>
         </InfoSection>
 
-        {/* Edit Button */}
         {babysitter.email === application.email && (
           <Box sx={{ textAlign: "center", marginTop: "30px" }}>
             <Button
@@ -234,6 +300,7 @@ const BabysitterApplicationDisplay = () => {
                 "&:hover": {
                   backgroundColor: "#4a54c1",
                 },
+                fontFamily: "'Poppins', sans-serif",
               }}
             >
               Edit Application
