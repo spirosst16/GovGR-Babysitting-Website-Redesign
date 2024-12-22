@@ -14,8 +14,6 @@ import { Link } from 'react-router-dom';
 import { styled } from "@mui/system";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
-import Navbar from "../Navbar/Navbar";
-import Footer from "../Footer/Footer";
 import BabysitterImage from "../../assets/Babysitter-image.webp";
 import { FIREBASE_AUTH } from "../../config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -123,8 +121,6 @@ const WelcomePage = () => {
 
   return (
     <>
-      <Navbar />
-
       <HeroSection>
         <Box style={{ maxWidth: "50%" }}>
           <Typography
@@ -304,7 +300,6 @@ const WelcomePage = () => {
           ))}
         </Box>
       </Container>
-      <Footer />
     </>
   );
 };

@@ -12,8 +12,6 @@ import {
 import { styled } from "@mui/system";
 import { collection, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
-import Navbar from "../Navbar/Navbar";
-import Footer from "../Footer/Footer";
 import '../../style.css';
 
 const BabysitterCard = styled(Card)({
@@ -103,8 +101,6 @@ const BabysittersPage = () => {
 
   return (
     <>
-      <Navbar />
-
       <Box
         style={{
 			backgroundColor: "#f4f4f4",
@@ -204,8 +200,6 @@ const BabysittersPage = () => {
           ))}
         </CardWrapper>
       </Box>
-
-      <Footer />
     </>
   );
 };

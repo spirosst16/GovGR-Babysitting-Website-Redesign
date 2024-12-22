@@ -15,23 +15,16 @@ import { Link } from 'react-router-dom';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import HistoryIcon from '@mui/icons-material/History';
 import DoneIcon from '@mui/icons-material/Done';
-import Navbar from '../Navbar/Navbar'; // Import Navbar component
 
-// Styled components
 const Container = styled(Box)({
   backgroundColor: '#f4f4f4',
   minHeight: '100vh',
   padding: '20px',
-  paddingTop: '120px', // Added padding to account for navbar
+  paddingTop: '120px',
 });
 
 const Header = styled(Box)({
-  backgroundColor: '#5e62d1',
-  padding: '40px',
   textAlign: 'center',
-  color: '#fff',
-  borderRadius: '10px',
-  boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.3)',
 });
 
 const TabContainer = styled(Box)({
@@ -234,10 +227,9 @@ const MyApplicationsJobs = () => {
 
   return (
     <>
-      <Navbar />
       <Container>
         <Header>
-          <Typography variant="h4" style={{ fontFamily: 'Poppins, sans-serif' }}>
+          <Typography variant="h4" style={{ fontFamily: 'Poppins, sans-serif', fontWeight: "600" }}>
             My Applications & Jobs
           </Typography>
           <Typography variant="h6" style={{ fontFamily: 'Poppins, sans-serif', marginTop: '10px' }}>

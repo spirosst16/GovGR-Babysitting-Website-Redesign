@@ -1,8 +1,6 @@
 import React from "react";
 import { Box, Typography, Card } from "@mui/material";
 import { styled } from "@mui/system";
-import Navbar from "../Navbar/Navbar";
-import Footer from "../Footer/Footer";
 import '../../style.css';
 
 const PageWrapper = styled(Box)({
@@ -97,8 +95,6 @@ const HowItWorksPage = () => {
 
   return (
     <>
-      <Navbar />
-
       <PageWrapper>
         <ContentWrapper>
           <Typography
@@ -147,8 +143,6 @@ const HowItWorksPage = () => {
             ))}
           </Box>
         </ContentWrapper>
-
-        <Footer />
       </PageWrapper>
     </>
   );
