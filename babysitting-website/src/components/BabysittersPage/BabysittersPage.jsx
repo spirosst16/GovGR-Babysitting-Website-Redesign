@@ -255,7 +255,7 @@ const BabysittersPage = () => {
             style={{ maxWidth: "500px" }}
           />
           <IconButton
-            onClick={() => setFilters({ ...filters })}
+            onClick={() => applyFilters()}
             style={{
               backgroundColor: "#5e62d1",
               color: "#fff",
