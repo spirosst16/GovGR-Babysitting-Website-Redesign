@@ -96,6 +96,8 @@ const BabysittingApplicationDisplay = () => {
   const [userRole, setUserRole] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [application, setApplication] = useState(null);
+  const [currentUserRole, setCurrentUserRole] = useState(null);
+  const [viewedUserRole, setViewedUserRole] = useState(null);
 
   useEffect(() => {
     const auth = getAuth();
@@ -167,6 +169,51 @@ const BabysittingApplicationDisplay = () => {
     fetchUserAndApplication();
   }, [userId]);
 
+  const fetchUserRole = async (userId, setRole) => {
+    let userData = null;
+    let role = null;
+
+    // Check in babysitters collection
+    const babysittersRef = query(
+      collection(FIREBASE_DB, "babysitters"),
+      where("userId", "==", userId)
+    );
+    const babysittersSnapshot = await getDocs(babysittersRef);
+    if (!babysittersSnapshot.empty) {
+      userData = babysittersSnapshot.docs[0].data();
+      role = "babysitter";
+    } else {
+      // Check in guardians collection
+      const guardiansRef = query(
+        collection(FIREBASE_DB, "guardians"),
+        where("userId", "==", userId)
+      );
+      const guardiansSnapshot = await getDocs(guardiansRef);
+      if (!guardiansSnapshot.empty) {
+        userData = guardiansSnapshot.docs[0].data();
+        role = "guardian";
+      }
+    }
+
+    if (setRole) setRole(role);
+    return { userData, role };
+  };
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchUserRole(user.uid, setCurrentUserRole);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    fetchUserRole(userId, setViewedUserRole);
+  }, [userId]);
+
   if (!user || !application) return null;
 
   if (
@@ -183,6 +230,12 @@ const BabysittingApplicationDisplay = () => {
       navigate("/");
     }
   }
+
+  const handleCreateAgreement = () => {
+    if (currentUser && user) {
+      navigate(`/agreement/${currentUser.uid}/${userId}`);
+    }
+  };
 
   return (
     <PageContainer>
@@ -394,6 +447,27 @@ const BabysittingApplicationDisplay = () => {
                     Edit Application
                   </Button>
                 </Box>
+              )}
+            {currentUserRole &&
+              viewedUserRole &&
+              currentUserRole !== viewedUserRole && (
+                <Button
+                  variant="contained"
+                  onClick={handleCreateAgreement}
+                  sx={{
+                    backgroundColor: "#5e62d1",
+                    fontSize: "1rem",
+                    borderRadius: "30px",
+                    padding: "12px 30px",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#4a54c1",
+                    },
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
+                >
+                  Create Agreement
+                </Button>
               )}
           </ApplicationSection>
         </InfoSection>
