@@ -10,6 +10,7 @@ import {
 import { useParams } from "react-router-dom";
 import { styled } from "@mui/system";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import { FIREBASE_DB } from "../../config/firebase";
 import DefaultUserImage from "../../assets/Babysitter-image.webp";
 
@@ -91,7 +92,14 @@ const ButtonStyle = styled(Button)({
 const BabysittingApplicationDisplay = () => {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [application, setApplication] = useState(null);
+
+  useEffect(() => {
+    const auth = getAuth();
+    const loggedInUser = auth.currentUser;
+    setCurrentUser(loggedInUser);
+  }, []);
 
   useEffect(() => {
     const fetchUserAndApplication = async () => {
@@ -207,7 +215,6 @@ const BabysittingApplicationDisplay = () => {
             </ProfileInfo>
           </ProfileSection>
 
-          {/* Application Details */}
           <ApplicationSection>
             <Typography
               variant="h6"
@@ -215,7 +222,12 @@ const BabysittingApplicationDisplay = () => {
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
-              Area: {application.area}
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                Area:
+              </Box>{" "}
+              <Box component="span" sx={{ fontWeight: "normal" }}>
+                {application.area}
+              </Box>
             </Typography>
             <Typography
               variant="h6"
@@ -223,7 +235,12 @@ const BabysittingApplicationDisplay = () => {
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
-              Job Type: {application.jobType}
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                Job Type:
+              </Box>{" "}
+              <Box component="span" sx={{ fontWeight: "normal" }}>
+                {application.jobType}
+              </Box>
             </Typography>
             <Typography
               variant="h6"
@@ -231,9 +248,49 @@ const BabysittingApplicationDisplay = () => {
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
-              Work Location: {application.babysittingPlace.join(", ")}
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                Work Location:
+              </Box>{" "}
+              <Box component="span" sx={{ fontWeight: "normal" }}>
+                {application.babysittingPlace.join(", ")}
+              </Box>
             </Typography>
-            {/* Availability Schedule */}
+            <Typography
+              variant="h6"
+              sx={{
+                fontFamily: "'Poppins', sans-serif",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Box
+                component="span"
+                sx={{
+                  fontWeight: "bold",
+                  whiteSpace: "nowrap",
+                  marginRight: "16px",
+                }}
+              >
+                Child Ages:
+              </Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: "8px",
+                  justifyContent: "flex-start",
+                  flexWrap: "wrap",
+                  flex: 1,
+                }}
+              >
+                {application.childAges
+                  .slice()
+                  .sort((a, b) => a - b)
+                  .map((age, index) => (
+                    <ButtonStyle key={index}>{age}</ButtonStyle>
+                  ))}
+              </Box>
+            </Typography>
             <Typography
               variant="h6"
               sx={{
@@ -288,29 +345,28 @@ const BabysittingApplicationDisplay = () => {
                 </Box>
               ))}
             </ScheduleSection>
+            {currentUser?.uid === application.userId && (
+              <Box sx={{ textAlign: "center", marginTop: "30px" }}>
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#5e62d1",
+                    fontSize: "1rem",
+                    borderRadius: "30px",
+                    padding: "12px 30px",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#4a54c1",
+                    },
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
+                >
+                  Edit Application
+                </Button>
+              </Box>
+            )}
           </ApplicationSection>
         </InfoSection>
-
-        {user.email === application.email && (
-          <Box sx={{ textAlign: "center", marginTop: "30px" }}>
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: "#5e62d1",
-                fontSize: "1.2rem",
-                borderRadius: "30px",
-                padding: "12px 30px",
-                textTransform: "none",
-                "&:hover": {
-                  backgroundColor: "#4a54c1",
-                },
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
-              Edit Application
-            </Button>
-          </Box>
-        )}
       </ContentWrapper>
     </PageContainer>
   );
