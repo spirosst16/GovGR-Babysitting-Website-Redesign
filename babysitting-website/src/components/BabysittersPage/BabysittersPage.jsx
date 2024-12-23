@@ -85,7 +85,7 @@ const FilterDialog = styled(Dialog)({
 
 const BabysittersPage = () => {
   const [babysitters, setBabysitters] = useState([]);
-  const [babysitterApplications, setBabysitterApplications] = useState([]);
+  const [babysittingApplications, setBabysittingApplications] = useState([]);
   const [filters, setFilters] = useState({
     area: "",
     availability: [],
@@ -142,7 +142,7 @@ const BabysittersPage = () => {
 
         const applicationsCollectionRef = collection(
           FIREBASE_DB,
-          "babysitterApplications"
+          "babysittingApplications"
         );
         const applicationSnapshot = await getDocs(applicationsCollectionRef);
         const applicationsList = applicationSnapshot.docs.map((doc) => ({

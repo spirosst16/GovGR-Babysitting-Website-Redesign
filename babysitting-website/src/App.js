@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { FIREBASE_AUTH } from "./config/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import Navbar from "./components/Navbar/Navbar";
@@ -11,7 +17,7 @@ import BabysitterInfoForm from "./components/InfoForm/BabysitterInfoForm";
 import GuardianInfoForm from "./components/InfoForm/GuardianInfoForm";
 import BabysittersPage from "./components/BabysittersPage/BabysittersPage";
 import HowItWorksPage from "./components/HowItWorksPage/HowItWorksPage";
-import BabysitterApplicationForm from "./components/ApplicationForm/BabysitterApplicationForm";
+import BabysittingApplicationForm from "./components/ApplicationForm/BabysittingApplicationForm";
 import MyApplicationsJobsPage from "./components/ApplicationAndJobs/MyApplicationsJobsPage";
 import BabysitterApplicationDisplay from "./components/ApplicationDisplay/BabysitterApplicationDisplay";
 
@@ -40,7 +46,9 @@ function App() {
     "/guardian-form",
   ];
 
-  const shouldHideNavbarAndFooter = hideNavbarAndFooterRoutes.includes(location.pathname);
+  const shouldHideNavbarAndFooter = hideNavbarAndFooterRoutes.includes(
+    location.pathname
+  );
 
   return (
     <>
@@ -49,13 +57,30 @@ function App() {
         <Route path="/" element={<WelcomePage />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegistrationForm />} />
-        <Route path="/babysitter-form" element={user ? <BabysitterInfoForm /> : <Navigate to="/login" />} />
-        <Route path="/guardian-form" element={user ? <GuardianInfoForm /> : <Navigate to="/login" />} />
+        <Route
+          path="/babysitter-form"
+          element={user ? <BabysitterInfoForm /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/guardian-form"
+          element={user ? <GuardianInfoForm /> : <Navigate to="/login" />}
+        />
         <Route path="/babysitters" element={<BabysittersPage />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
-        <Route path="/babysitter-application" element={user ? <BabysitterApplicationForm /> : <Navigate to="/login" />} />
-        <Route path="/my-applications-and-jobs" element={user ? <MyApplicationsJobsPage /> : <Navigate to="/login" />} />
-		<Route path="/application/:userId" element={<BabysitterApplicationDisplay />} />
+        <Route
+          path="/babysitting-application"
+          element={
+            user ? <BabysittingApplicationForm /> : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/my-applications-and-jobs"
+          element={user ? <MyApplicationsJobsPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/application/:userId"
+          element={<BabysitterApplicationDisplay />}
+        />
       </Routes>
       {!shouldHideNavbarAndFooter && <Footer />}
     </>
