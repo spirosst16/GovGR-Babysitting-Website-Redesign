@@ -6,10 +6,24 @@ import {
   Avatar,
   Button,
   TextField,
+  Grid,
+  FormControl,
+  FormLabel,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useParams } from "react-router-dom";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { FIREBASE_DB } from "../../config/firebase";
 import DefaultUserImage from "../../assets/Babysitter-image.webp";
@@ -67,29 +81,25 @@ const StyledButton = styled(Button)({
 });
 
 const AgreementPage = () => {
-  const { userId1, userId2 } = useParams(); // Extract sender and recipient user IDs
+  const { userId1, userId2 } = useParams();
   const [sender, setSender] = useState(null);
   const [recipient, setRecipient] = useState(null);
+  const [agreementId, setAgreementId] = useState(null);
   const [status, setStatus] = useState("");
+  const [formValues, setFormValues] = useState({
+    area: "",
+    weeklySchedule: [],
+    babysittingPlace: "",
+    startingDate: "",
+    endingDate: "",
+    additionalNotes: "",
+  });
 
-  // Fetch current authenticated user
-  useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("Current authenticated user: ", user);
-      }
-    });
-    return () => unsubscribe();
-  }, []);
-
-  // Fetch sender and recipient details
   useEffect(() => {
     const fetchUserData = async (userId, setUser) => {
       try {
         let userData = null;
 
-        // Check in babysitters collection
         const babysittersRef = query(
           collection(FIREBASE_DB, "babysitters"),
           where("userId", "==", userId)
@@ -101,7 +111,6 @@ const AgreementPage = () => {
             ...doc.data(),
           }))[0];
         } else {
-          // Check in guardians collection
           const guardiansRef = query(
             collection(FIREBASE_DB, "guardians"),
             where("userId", "==", userId)
@@ -126,14 +135,58 @@ const AgreementPage = () => {
     fetchUserData(userId2, setRecipient);
   }, [userId1, userId2]);
 
-  const handleSend = () => {
-    console.log("Agreement sent.");
-    setStatus("pending");
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      [name]: value,
+    }));
   };
 
-  const handleAccept = () => {
-    console.log("Agreement accepted.");
-    setStatus("accepted");
+  const handleSend = async () => {
+    try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+
+      if (!currentUser) {
+        alert("You must be logged in to send an agreement.");
+        return;
+      }
+
+      const agreementsRef = collection(FIREBASE_DB, "agreements");
+      const docRef = await addDoc(agreementsRef, {
+        senderId: userId1,
+        recipientId: userId2,
+        status: "pending",
+        createdAt: new Date(),
+        ...formValues,
+      });
+
+      setAgreementId(docRef.id);
+      setStatus("pending");
+      console.log("Agreement sent with ID:", docRef.id);
+    } catch (error) {
+      console.error("Error sending agreement:", error);
+      alert("Failed to send agreement. Please try again.");
+    }
+  };
+
+  const handleAccept = async () => {
+    try {
+      if (!agreementId) {
+        alert("No agreement to accept.");
+        return;
+      }
+
+      const agreementDocRef = doc(FIREBASE_DB, "agreements", agreementId);
+      await updateDoc(agreementDocRef, { status: "accepted" });
+
+      setStatus("accepted");
+      console.log("Agreement accepted.");
+    } catch (error) {
+      console.error("Error accepting agreement:", error);
+      alert("Failed to accept agreement. Please try again.");
+    }
   };
 
   const renderButton = () => {
@@ -194,6 +247,8 @@ const AgreementPage = () => {
             sx={{
               fontFamily: "'Poppins', sans-serif",
               fontWeight: "bold",
+              textAlign: "center",
+              marginBottom: "10px",
             }}
           >
             Agreement Details
@@ -201,24 +256,119 @@ const AgreementPage = () => {
           <TextField
             fullWidth
             label="Area"
+            name="area"
+            value={formValues.area}
+            onChange={handleInputChange}
             variant="outlined"
             sx={{ fontFamily: "'Poppins', sans-serif" }}
           />
-          <TextField
-            fullWidth
-            label="Weekly Schedule"
-            variant="outlined"
-            sx={{ fontFamily: "'Poppins', sans-serif" }}
-          />
-          <TextField
-            fullWidth
-            label="Babysitting Place"
-            variant="outlined"
-            sx={{ fontFamily: "'Poppins', sans-serif" }}
-          />
+          <Typography
+            variant="h6"
+            sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: "bold" }}
+          >
+            Weekly Schedule
+          </Typography>
+          <Grid container spacing={3}>
+            {[
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday",
+            ].map((day) => (
+              <Grid item xs={12} sm={6} md={3} key={day}>
+                <Typography variant="h6">{day}</Typography>
+                <FormGroup>
+                  {["Morning", "Afternoon", "Evening", "Night"].map((time) => (
+                    <FormControlLabel
+                      key={time}
+                      control={
+                        <Checkbox
+                          checked={formValues.weeklySchedule.includes(
+                            `${day} ${time}`
+                          )}
+                          onChange={(e) => {
+                            const updatedSchedule = e.target.checked
+                              ? [...formValues.weeklySchedule, `${day} ${time}`]
+                              : formValues.weeklySchedule.filter(
+                                  (slot) => slot !== `${day} ${time}`
+                                );
+                            setFormValues({
+                              ...formValues,
+                              weeklySchedule: updatedSchedule,
+                            });
+                          }}
+                        />
+                      }
+                      label={time}
+                    />
+                  ))}
+                </FormGroup>
+              </Grid>
+            ))}
+          </Grid>
+          <FormControl component="fieldset" sx={{ mb: 2 }}>
+            <FormLabel
+              component="legend"
+              sx={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              Babysitting Place
+            </FormLabel>
+            <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formValues.babysittingPlace.includes(
+                      "Family's House"
+                    )}
+                    onChange={(e) => {
+                      const newBabysittingPlace = e.target.checked
+                        ? [...formValues.babysittingPlace, "Family's House"]
+                        : formValues.babysittingPlace.filter(
+                            (place) => place !== "Family's House"
+                          );
+                      setFormValues({
+                        ...formValues,
+                        babysittingPlace: newBabysittingPlace,
+                      });
+                    }}
+                  />
+                }
+                label="Family's House"
+                sx={{ fontFamily: "'Poppins', sans-serif" }}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formValues.babysittingPlace.includes(
+                      "Babysitter's House"
+                    )}
+                    onChange={(e) => {
+                      const newBabysittingPlace = e.target.checked
+                        ? [...formValues.babysittingPlace, "Babysitter's House"]
+                        : formValues.babysittingPlace.filter(
+                            (place) => place !== "Babysitter's House"
+                          );
+                      setFormValues({
+                        ...formValues,
+                        babysittingPlace: newBabysittingPlace,
+                      });
+                    }}
+                  />
+                }
+                label="Babysitter's House"
+                sx={{ fontFamily: "'Poppins', sans-serif" }}
+              />
+            </Box>
+          </FormControl>
           <TextField
             fullWidth
             label="Starting Date"
+            name="startingDate"
+            value={formValues.startingDate}
+            onChange={handleInputChange}
             type="date"
             InputLabelProps={{ shrink: true }}
             sx={{ fontFamily: "'Poppins', sans-serif" }}
@@ -226,8 +376,22 @@ const AgreementPage = () => {
           <TextField
             fullWidth
             label="Ending Date"
+            name="endingDate"
+            value={formValues.endingDate}
+            onChange={handleInputChange}
             type="date"
             InputLabelProps={{ shrink: true }}
+            sx={{ fontFamily: "'Poppins', sans-serif" }}
+          />
+          <TextField
+            fullWidth
+            label="Additional Notes"
+            name="additionalNotes"
+            value={formValues.additionalNotes}
+            onChange={handleInputChange}
+            multiline
+            rows={4}
+            variant="outlined"
             sx={{ fontFamily: "'Poppins', sans-serif" }}
           />
         </DetailsSection>
