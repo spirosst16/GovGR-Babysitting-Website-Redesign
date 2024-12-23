@@ -11,7 +11,7 @@ import { useParams } from "react-router-dom";
 import { styled } from "@mui/system";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
-import BabysitterImage from "../../assets/Babysitter-image.webp";
+import DefaultUserImage from "../../assets/Babysitter-image.webp";
 
 const PageContainer = styled(Box)({
   backgroundColor: "#f4f4f4",
@@ -88,26 +88,46 @@ const ButtonStyle = styled(Button)({
   },
 });
 
-const BabysitterApplicationDisplay = () => {
+const BabysittingApplicationDisplay = () => {
   const { userId } = useParams();
-  const [babysitter, setBabysitter] = useState(null);
+  const [user, setUser] = useState(null);
   const [application, setApplication] = useState(null);
 
   useEffect(() => {
-    const fetchBabysitterAndApplication = async () => {
+    const fetchUserAndApplication = async () => {
       try {
-        const babysitterRef = query(
+        let userData = null;
+
+        // Check in "babysitters" collection
+        const babysittersRef = query(
           collection(FIREBASE_DB, "babysitters"),
           where("userId", "==", userId)
         );
-        const babysitterSnapshot = await getDocs(babysitterRef);
-        const babysitterData = babysitterSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))[0];
+        const babysittersSnapshot = await getDocs(babysittersRef);
+        if (!babysittersSnapshot.empty) {
+          userData = babysittersSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))[0];
+        } else {
+          // Check in "guardians" collection
+          const guardiansRef = query(
+            collection(FIREBASE_DB, "guardians"),
+            where("userId", "==", userId)
+          );
+          const guardiansSnapshot = await getDocs(guardiansRef);
+          if (!guardiansSnapshot.empty) {
+            userData = guardiansSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }))[0];
+          }
+        }
+
+        if (!userData) throw new Error("User not found");
 
         const applicationRef = query(
-          collection(FIREBASE_DB, "babysitterApplications"),
+          collection(FIREBASE_DB, "babysittingApplications"),
           where("userId", "==", userId)
         );
         const applicationSnapshot = await getDocs(applicationRef);
@@ -116,17 +136,17 @@ const BabysitterApplicationDisplay = () => {
           ...doc.data(),
         }))[0];
 
-        setBabysitter(babysitterData);
+        setUser(userData);
         setApplication(applicationData);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
     };
 
-    fetchBabysitterAndApplication();
+    fetchUserAndApplication();
   }, [userId]);
 
-  if (!babysitter || !application) return null;
+  if (!user || !application) return null;
 
   return (
     <PageContainer>
@@ -148,7 +168,7 @@ const BabysitterApplicationDisplay = () => {
           {/* Profile Section */}
           <ProfileSection>
             <Avatar
-              src={babysitter.photo || BabysitterImage}
+              src={user.photo || DefaultUserImage}
               sx={{
                 width: 140,
                 height: 140,
@@ -166,7 +186,7 @@ const BabysitterApplicationDisplay = () => {
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
-                {`${babysitter.firstName} ${babysitter.lastName}`}
+                {`${user.firstName} ${user.lastName}`}
               </Typography>
               <Typography
                 sx={{
@@ -175,11 +195,11 @@ const BabysitterApplicationDisplay = () => {
                   fontFamily: "'Poppins', sans-serif",
                 }}
               >
-                {babysitter.city}
+                {user.city}
               </Typography>
               <Rating
-                name={`rating-${babysitter.id}`}
-                value={babysitter.rating}
+                name={`rating-${user.id}`}
+                value={user.rating}
                 precision={0.5}
                 readOnly
                 size="large"
@@ -211,24 +231,8 @@ const BabysitterApplicationDisplay = () => {
                 fontFamily: "'Poppins', sans-serif",
               }}
             >
-              Babysitting Place: {application.babysittingPlace.join(", ")}
+              Work Location: {application.babysittingPlace.join(", ")}
             </Typography>
-            <Typography
-              variant="h6"
-              sx={{
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
-              Child Ages:{" "}
-              <Box
-                sx={{ display: "flex", gap: "8px", justifyContent: "center" }}
-              >
-                {application.childAges.map((age, index) => (
-                  <ButtonStyle key={index}>{age}</ButtonStyle>
-                ))}
-              </Box>
-            </Typography>
-
             {/* Availability Schedule */}
             <Typography
               variant="h6"
@@ -287,7 +291,7 @@ const BabysitterApplicationDisplay = () => {
           </ApplicationSection>
         </InfoSection>
 
-        {babysitter.email === application.email && (
+        {user.email === application.email && (
           <Box sx={{ textAlign: "center", marginTop: "30px" }}>
             <Button
               variant="contained"
@@ -312,4 +316,4 @@ const BabysitterApplicationDisplay = () => {
   );
 };
 
-export default BabysitterApplicationDisplay;
+export default BabysittingApplicationDisplay;
