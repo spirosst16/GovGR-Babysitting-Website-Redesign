@@ -267,7 +267,7 @@ const AgreementPage = () => {
 
         <DetailsSection>
           <Typography
-            variant="h6"
+            variant="h5"
             sx={{
               fontFamily: "'Poppins', sans-serif",
               fontWeight: "bold",
@@ -284,14 +284,16 @@ const AgreementPage = () => {
             value={formValues.area}
             onChange={handleInputChange}
             variant="outlined"
+            required
             sx={{ fontFamily: "'Poppins', sans-serif" }}
           />
-          <Typography
-            variant="h6"
-            sx={{ fontFamily: "'Poppins', sans-serif", fontWeight: "bold" }}
+
+          <FormLabel
+            component="legend"
+            sx={{ fontFamily: "'Poppins', sans-serif", fontSize: "20px" }}
           >
-            Weekly Schedule
-          </Typography>
+            Weekly Schedule *
+          </FormLabel>
           <Grid container spacing={3}>
             {[
               "Monday",
@@ -333,12 +335,13 @@ const AgreementPage = () => {
               </Grid>
             ))}
           </Grid>
+
           <FormControl component="fieldset" sx={{ mb: 2 }}>
             <FormLabel
               component="legend"
-              sx={{ fontFamily: "'Poppins', sans-serif" }}
+              sx={{ fontFamily: "'Poppins', sans-serif", fontSize: "20px" }}
             >
-              Babysitting Place
+              Babysitting Place *
             </FormLabel>
             <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
               <FormControlLabel
@@ -387,6 +390,7 @@ const AgreementPage = () => {
               />
             </Box>
           </FormControl>
+
           <TextField
             fullWidth
             label="Starting Date"
@@ -395,8 +399,10 @@ const AgreementPage = () => {
             onChange={handleInputChange}
             type="date"
             InputLabelProps={{ shrink: true }}
+            required
             sx={{ fontFamily: "'Poppins', sans-serif" }}
           />
+
           <TextField
             fullWidth
             label="Ending Date"
@@ -405,8 +411,10 @@ const AgreementPage = () => {
             onChange={handleInputChange}
             type="date"
             InputLabelProps={{ shrink: true }}
+            required
             sx={{ fontFamily: "'Poppins', sans-serif" }}
           />
+
           <TextField
             fullWidth
             label="Additional Notes"
