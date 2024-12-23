@@ -22,6 +22,7 @@ import BabysittingApplicationForm from "./components/ApplicationForm/Babysitting
 import MyApplicationsJobsPage from "./components/ApplicationAndJobs/MyApplicationsJobsPage";
 import BabysittingApplicationDisplay from "./components/ApplicationDisplay/BabysittingApplicationDisplay";
 import BabysittingApplicationEdit from "./components/ApplicationEdit/BabysittingApplicationEdit";
+import AgreementPage from "./components/AgreementPage/AgreementPage";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -87,6 +88,10 @@ function App() {
         <Route
           path="/edit-application/:userId"
           element={<BabysittingApplicationEdit />}
+        />
+        <Route
+          path="/agreement/:userId1/:userId2"
+          element={user ? <AgreementPage /> : <Navigate to="/login" />}
         />
       </Routes>
       {!shouldHideNavbarAndFooter && <Footer />}
