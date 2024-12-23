@@ -7,10 +7,10 @@ import {
   Rating,
   Avatar,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { FIREBASE_DB } from "../../config/firebase";
 import DefaultUserImage from "../../assets/Babysitter-image.webp";
 
@@ -77,19 +77,19 @@ const ScheduleItem = styled(Box)(({ available }) => ({
 
 const ButtonStyle = styled(Button)({
   fontSize: "0.9rem",
-  color: "#ffffff",
-  backgroundColor: "#5e62d1",
+  color: "#000",
+  backgroundColor: "#ffffff",
+  outline: "2px solid #5e62d1",
   padding: "8px 16px",
   marginRight: "8px",
   marginBottom: "8px",
   textTransform: "none",
   borderRadius: "25px",
-  "&:hover": {
-    backgroundColor: "#5e62d1",
-  },
+  cursor: "default",
 });
 
 const BabysittingApplicationDisplay = () => {
+  const navigate = useNavigate();
   const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
@@ -97,8 +97,11 @@ const BabysittingApplicationDisplay = () => {
 
   useEffect(() => {
     const auth = getAuth();
-    const loggedInUser = auth.currentUser;
-    setCurrentUser(loggedInUser);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -155,6 +158,13 @@ const BabysittingApplicationDisplay = () => {
   }, [userId]);
 
   if (!user || !application) return null;
+
+  if (
+    application.status === "temporary" &&
+    currentUser?.uid !== application.userId
+  ) {
+    return navigate("/");
+  }
 
   return (
     <PageContainer>
@@ -345,26 +355,28 @@ const BabysittingApplicationDisplay = () => {
                 </Box>
               ))}
             </ScheduleSection>
-            {currentUser?.uid === application.userId && (
-              <Box sx={{ textAlign: "center", marginTop: "30px" }}>
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#5e62d1",
-                    fontSize: "1rem",
-                    borderRadius: "30px",
-                    padding: "12px 30px",
-                    textTransform: "none",
-                    "&:hover": {
-                      backgroundColor: "#4a54c1",
-                    },
-                    fontFamily: "'Poppins', sans-serif",
-                  }}
-                >
-                  Edit Application
-                </Button>
-              </Box>
-            )}
+            {currentUser?.uid === application.userId &&
+              application.status === "temporary" && (
+                <Box sx={{ textAlign: "center", marginTop: "30px" }}>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate(`/edit-application/${userId}`)}
+                    sx={{
+                      backgroundColor: "#5e62d1",
+                      fontSize: "1rem",
+                      borderRadius: "30px",
+                      padding: "12px 30px",
+                      textTransform: "none",
+                      "&:hover": {
+                        backgroundColor: "#4a54c1",
+                      },
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
+                  >
+                    Edit Application
+                  </Button>
+                </Box>
+              )}
           </ApplicationSection>
         </InfoSection>
       </ContentWrapper>

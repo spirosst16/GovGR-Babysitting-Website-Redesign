@@ -21,6 +21,7 @@ import HowItWorksPage from "./components/HowItWorksPage/HowItWorksPage";
 import BabysittingApplicationForm from "./components/ApplicationForm/BabysittingApplicationForm";
 import MyApplicationsJobsPage from "./components/ApplicationAndJobs/MyApplicationsJobsPage";
 import BabysittingApplicationDisplay from "./components/ApplicationDisplay/BabysittingApplicationDisplay";
+import BabysittingApplicationEdit from "./components/ApplicationEdit/BabysittingApplicationEdit";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -82,6 +83,10 @@ function App() {
         <Route
           path="/application/:userId"
           element={<BabysittingApplicationDisplay />}
+        />
+        <Route
+          path="/edit-application/:userId"
+          element={<BabysittingApplicationEdit />}
         />
       </Routes>
       {!shouldHideNavbarAndFooter && <Footer />}
