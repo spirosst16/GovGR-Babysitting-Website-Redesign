@@ -94,12 +94,19 @@ const BabysittingApplicationDisplay = () => {
   const [user, setUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [application, setApplication] = useState(null);
 
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+      if (user) {
+        setCurrentUser(user);
+        setIsLoggedIn(true);
+      } else {
+        setCurrentUser(null);
+        setIsLoggedIn(false);
+      }
     });
 
     return () => unsubscribe();
@@ -166,10 +173,14 @@ const BabysittingApplicationDisplay = () => {
     application.status === "temporary" &&
     currentUser?.uid !== application.userId
   ) {
-    if (userRole === "guardian") {
-      navigate("/babysitters");
-    } else if (userRole === "babysitter") {
-      navigate("/babysitting-jobs");
+    if (isLoggedIn) {
+      if (userRole === "guardian") {
+        navigate("/babysitters");
+      } else if (userRole === "babysitter") {
+        navigate("/babysitting-jobs");
+      }
+    } else {
+      navigate("/");
     }
   }
 
