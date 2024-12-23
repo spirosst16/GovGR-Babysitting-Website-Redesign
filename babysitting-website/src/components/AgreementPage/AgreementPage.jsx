@@ -94,6 +94,13 @@ const AgreementPage = () => {
     endingDate: "",
     additionalNotes: "",
   });
+  const [errors, setErrors] = useState({
+    area: false,
+    weeklySchedule: false,
+    babysittingPlace: false,
+    startingDate: false,
+    endingDate: false,
+  });
 
   useEffect(() => {
     const fetchUserData = async (userId, setUser) => {
@@ -143,7 +150,25 @@ const AgreementPage = () => {
     }));
   };
 
+  const validateForm = () => {
+    let formErrors = {
+      area: !formValues.area,
+      weeklySchedule: formValues.weeklySchedule.length === 0,
+      babysittingPlace: formValues.babysittingPlace.length === 0,
+      startingDate: !formValues.startingDate,
+      endingDate: !formValues.endingDate,
+    };
+
+    setErrors(formErrors);
+    return Object.values(formErrors).every((error) => !error);
+  };
+
   const handleSend = async () => {
+    if (!validateForm()) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
     try {
       const auth = getAuth();
       const currentUser = auth.currentUser;
@@ -158,7 +183,6 @@ const AgreementPage = () => {
         senderId: userId1,
         recipientId: userId2,
         status: "pending",
-        createdAt: new Date(),
         ...formValues,
       });
 

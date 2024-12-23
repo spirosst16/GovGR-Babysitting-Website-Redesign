@@ -26,16 +26,16 @@ import AgreementPage from "./components/AgreementPage/AgreementPage";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (currentUser) => {
       if (currentUser) {
-        console.log("User logged in:", currentUser);
         setUser(currentUser);
       } else {
-        console.log("No user logged in");
         setUser(null);
       }
+      setLoading(false);
     });
     return unsubscribe;
   }, []);
@@ -52,6 +52,10 @@ function App() {
   const shouldHideNavbarAndFooter = hideNavbarAndFooterRoutes.includes(
     location.pathname
   );
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
@@ -87,7 +91,9 @@ function App() {
         />
         <Route
           path="/edit-application/:userId"
-          element={<BabysittingApplicationEdit />}
+          element={
+            user ? <BabysittingApplicationEdit /> : <Navigate to="/login" />
+          }
         />
         <Route
           path="/agreement/:userId1/:userId2"
