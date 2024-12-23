@@ -16,6 +16,7 @@ import LoginForm from "./components/Login/LoginForm";
 import BabysitterInfoForm from "./components/InfoForm/BabysitterInfoForm";
 import GuardianInfoForm from "./components/InfoForm/GuardianInfoForm";
 import BabysittersPage from "./components/BabysittersPage/BabysittersPage";
+import BabysittingJobsPage from "./components/BabysittingJobsPage/BabysittingJobsPage";
 import HowItWorksPage from "./components/HowItWorksPage/HowItWorksPage";
 import BabysittingApplicationForm from "./components/ApplicationForm/BabysittingApplicationForm";
 import MyApplicationsJobsPage from "./components/ApplicationAndJobs/MyApplicationsJobsPage";
@@ -66,6 +67,7 @@ function App() {
           element={user ? <GuardianInfoForm /> : <Navigate to="/login" />}
         />
         <Route path="/babysitters" element={<BabysittersPage />} />
+        <Route path="/babysitting-jobs" element={<BabysittingJobsPage />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route
           path="/babysitting-application"
