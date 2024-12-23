@@ -93,6 +93,7 @@ const BabysittingApplicationDisplay = () => {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const [application, setApplication] = useState(null);
 
   useEffect(() => {
@@ -120,6 +121,7 @@ const BabysittingApplicationDisplay = () => {
             id: doc.id,
             ...doc.data(),
           }))[0];
+          setUserRole("babysitter");
         } else {
           // Check in "guardians" collection
           const guardiansRef = query(
@@ -132,6 +134,7 @@ const BabysittingApplicationDisplay = () => {
               id: doc.id,
               ...doc.data(),
             }))[0];
+            setUserRole("guardian");
           }
         }
 
@@ -163,7 +166,11 @@ const BabysittingApplicationDisplay = () => {
     application.status === "temporary" &&
     currentUser?.uid !== application.userId
   ) {
-    return navigate("/");
+    if (userRole === "guardian") {
+      navigate("/babysitters");
+    } else if (userRole === "babysitter") {
+      navigate("/babysitting-jobs");
+    }
   }
 
   return (

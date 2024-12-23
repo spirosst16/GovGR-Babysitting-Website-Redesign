@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Container,
   TextField,
   Button,
   Typography,
   Box,
-  MenuItem,
   FormGroup,
   FormControlLabel,
   Radio,
@@ -27,7 +26,6 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
 import { FIREBASE_DB } from "../../config/firebase";
 import DefaultUserImage from "../../assets/Babysitter-image.webp";
 
@@ -65,14 +63,6 @@ const ProfileSection = styled(Box)({
 const ProfileInfo = styled(Box)({
   textAlign: "center",
   marginTop: "20px",
-});
-
-const ApplicationSection = styled(Box)({
-  width: "100%",
-  display: "flex",
-  flexDirection: "column",
-  gap: "20px",
-  alignItems: "center",
 });
 
 const EditApplicationForm = () => {
