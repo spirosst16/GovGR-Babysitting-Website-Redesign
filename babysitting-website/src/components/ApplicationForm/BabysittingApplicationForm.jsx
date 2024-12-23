@@ -91,7 +91,7 @@ const BabysittingApplicationForm = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e, status = "temporary") => {
     e.preventDefault();
 
     for (const key in formValues) {
@@ -120,6 +120,7 @@ const BabysittingApplicationForm = () => {
       await addDoc(babysittingCollectionRef, {
         ...formValues,
         userId: currentUser.uid,
+        status: status,
       });
 
       console.log("Document written successfully!");
@@ -1173,18 +1174,35 @@ const BabysittingApplicationForm = () => {
                   Next
                 </Button>
               ) : (
-                <Button
-                  onClick={handleSubmit}
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#5e62d1",
-                    "&:hover": {
-                      backgroundColor: "#4a4fbf",
-                    },
-                  }}
-                >
-                  Submit
-                </Button>
+                <>
+                  <Box sx={{ display: "flex", gap: 1 }}>
+                    <Button
+                      onClick={(e) => handleSubmit(e, "temporary")}
+                      variant="outlined"
+                      sx={{
+                        backgroundColor: "white",
+                        color: "#5e62d1",
+                        "&:hover": {
+                          backgroundColor: "#fffffe",
+                        },
+                      }}
+                    >
+                      Temporary Save
+                    </Button>
+                    <Button
+                      onClick={(e) => handleSubmit(e, "submitted")}
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "#5e62d1",
+                        "&:hover": {
+                          backgroundColor: "#4a4fbf",
+                        },
+                      }}
+                    >
+                      Final Submit
+                    </Button>
+                  </Box>
+                </>
               )}
             </Box>
           </Box>
