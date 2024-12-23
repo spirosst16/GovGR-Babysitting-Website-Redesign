@@ -190,9 +190,9 @@ const BabysittersPage = () => {
           .includes(filters.area.toLowerCase());
       const matchesAvailability =
         filters.availability.length === 0 ||
-        filters.availability.some((time) => {
-          return babysitter.availability?.includes(time);
-        });
+        filters.availability.some((time) =>
+          babysitter.availability?.includes(time)
+        );
       const matchesPlace =
         filters.babysittingPlace.length === 0 ||
         filters.babysittingPlace.some((place) =>
@@ -217,8 +217,22 @@ const BabysittersPage = () => {
     setOpenFilterDialog(false);
   };
 
-  const displayBabysitters =
-    filteredBabysitters.length > 0 ? filteredBabysitters : babysitters;
+  const hasFiltersApplied =
+    filters.area ||
+    filters.availability.length > 0 ||
+    filters.babysittingPlace.length > 0 ||
+    filters.childAges.length > 0 ||
+    filters.jobType;
+
+  let displayBabysitters;
+  if (hasFiltersApplied) {
+    displayBabysitters =
+      filteredBabysitters.length > 0
+        ? filteredBabysitters
+        : "No babysitters match the filters.";
+  } else {
+    displayBabysitters = babysitters;
+  }
 
   return (
     <>
@@ -389,50 +403,63 @@ const BabysittersPage = () => {
             marginTop: "10px",
           }}
         >
-          {displayBabysitters.map((babysitter) => (
-            <BabysitterCard key={babysitter.id}>
-              <AvatarWrapper src={babysitter.photo || ""} />
-              <CardContentWrapper>
-                <Typography
-                  variant="h6"
-                  style={{
-                    fontFamily: "Poppins, sans-serif",
-                    color: "#000",
-                    fontWeight: "600",
-                    marginBottom: "8px",
-                  }}
-                >
-                  {`${babysitter.firstName} ${babysitter.lastName}`}
-                </Typography>
-                <Typography
-                  style={{
-                    color: "#888",
-                    fontFamily: "Poppins, sans-serif",
-                    marginBottom: "10px",
-                    fontSize: "14px",
-                  }}
-                >
-                  {babysitter.preferredArea}
-                </Typography>
+          {Array.isArray(displayBabysitters) ? (
+            displayBabysitters.map((babysitter) => (
+              <BabysitterCard key={babysitter.id}>
+                <AvatarWrapper src={babysitter.photo || ""} />
+                <CardContentWrapper>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      fontFamily: "Poppins, sans-serif",
+                      color: "#000",
+                      fontWeight: "600",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    {`${babysitter.firstName} ${babysitter.lastName}`}
+                  </Typography>
+                  <Typography
+                    style={{
+                      color: "#888",
+                      fontFamily: "Poppins, sans-serif",
+                      marginBottom: "10px",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {babysitter.preferredArea}
+                  </Typography>
 
-                <Box
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <Rating
-                    name={`rating-${babysitter.id}`}
-                    value={babysitter.rating}
-                    precision={0.5}
-                    readOnly
-                    size="small"
-                  />
-                </Box>
-              </CardContentWrapper>
-            </BabysitterCard>
-          ))}
+                  <Box
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <Rating
+                      name={`rating-${babysitter.id}`}
+                      value={babysitter.rating}
+                      precision={0.5}
+                      readOnly
+                      size="small"
+                    />
+                  </Box>
+                </CardContentWrapper>
+              </BabysitterCard>
+            ))
+          ) : (
+            <Typography
+              style={{
+                fontFamily: "Poppins, sans-serif",
+                color: "#888",
+                fontStyle: "italic",
+                textAlign: "center",
+              }}
+            >
+              {displayBabysitters}
+            </Typography>
+          )}
         </Box>
         <Dialog
           open={openFilterDialog}

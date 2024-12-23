@@ -190,9 +190,9 @@ const BabysittingJobsPage = () => {
           .includes(filters.area.toLowerCase());
       const matchesAvailability =
         filters.availability.length === 0 ||
-        filters.availability.some((time) => {
-          return guardian.availability?.includes(time);
-        });
+        filters.availability.every((time) =>
+          guardian.availability?.includes(time)
+        );
       const matchesPlace =
         filters.babysittingPlace.length === 0 ||
         filters.babysittingPlace.some((place) =>
@@ -217,8 +217,22 @@ const BabysittingJobsPage = () => {
     setOpenFilterDialog(false);
   };
 
-  const displayGuardians =
-    filteredGuardians.length > 0 ? filteredGuardians : guardians;
+  const hasFiltersApplied =
+    filters.area ||
+    filters.availability.length > 0 ||
+    filters.babysittingPlace.length > 0 ||
+    filters.childAges.length > 0 ||
+    filters.jobType;
+
+  let displayGuardians;
+  if (hasFiltersApplied) {
+    displayGuardians =
+      filteredGuardians.length > 0
+        ? filteredGuardians
+        : "No guardian applications match the filters.";
+  } else {
+    displayGuardians = guardians;
+  }
 
   return (
     <>
@@ -389,50 +403,63 @@ const BabysittingJobsPage = () => {
             marginTop: "10px",
           }}
         >
-          {displayGuardians.map((guardian) => (
-            <GuardianCard key={guardian.id}>
-              <AvatarWrapper src={guardian.photo || ""} />
-              <CardContentWrapper>
-                <Typography
-                  variant="h6"
-                  style={{
-                    fontFamily: "Poppins, sans-serif",
-                    color: "#000",
-                    fontWeight: "600",
-                    marginBottom: "8px",
-                  }}
-                >
-                  {`${guardian.firstName} ${guardian.lastName}`}
-                </Typography>
-                <Typography
-                  style={{
-                    color: "#888",
-                    fontFamily: "Poppins, sans-serif",
-                    marginBottom: "10px",
-                    fontSize: "14px",
-                  }}
-                >
-                  {guardian.preferredArea}
-                </Typography>
+          {Array.isArray(displayGuardians) ? (
+            displayGuardians.map((guardian) => (
+              <GuardianCard key={guardian.id}>
+                <AvatarWrapper src={guardian.photo || ""} />
+                <CardContentWrapper>
+                  <Typography
+                    variant="h6"
+                    style={{
+                      fontFamily: "Poppins, sans-serif",
+                      color: "#000",
+                      fontWeight: "600",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    {`${guardian.firstName} ${guardian.lastName}`}
+                  </Typography>
+                  <Typography
+                    style={{
+                      color: "#888",
+                      fontFamily: "Poppins, sans-serif",
+                      marginBottom: "10px",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {guardian.preferredArea}
+                  </Typography>
 
-                <Box
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <Rating
-                    name={`rating-${guardian.id}`}
-                    value={guardian.rating}
-                    precision={0.5}
-                    readOnly
-                    size="small"
-                  />
-                </Box>
-              </CardContentWrapper>
-            </GuardianCard>
-          ))}
+                  <Box
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <Rating
+                      name={`rating-${guardian.id}`}
+                      value={guardian.rating}
+                      precision={0.5}
+                      readOnly
+                      size="small"
+                    />
+                  </Box>
+                </CardContentWrapper>
+              </GuardianCard>
+            ))
+          ) : (
+            <Typography
+              style={{
+                fontFamily: "Poppins, sans-serif",
+                color: "#888",
+                fontStyle: "italic",
+                textAlign: "center",
+              }}
+            >
+              {displayGuardians}
+            </Typography>
+          )}
         </Box>
         <Dialog
           open={openFilterDialog}
