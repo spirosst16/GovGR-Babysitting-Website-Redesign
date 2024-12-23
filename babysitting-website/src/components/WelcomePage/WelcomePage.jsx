@@ -8,16 +8,16 @@ import {
   Avatar,
   Button,
   Rating,
-  TextField
+  TextField,
 } from "@mui/material";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import { styled } from "@mui/system";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import BabysitterImage from "../../assets/Babysitter-image.webp";
 import { FIREBASE_AUTH } from "../../config/firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import '../../style.css';
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import "../../style.css";
 
 const HeroSection = styled(Box)({
   display: "flex",
@@ -55,6 +55,19 @@ const WelcomePage = () => {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState("");
   const [firstName, setFirstName] = useState("");
+
+  useEffect(() => {
+    const logoutUser = async () => {
+      try {
+        await signOut(FIREBASE_AUTH);
+        console.log("User logged out on Welcome Page");
+      } catch (error) {
+        console.error("Error logging out user on Welcome Page:", error);
+      }
+    };
+
+    logoutUser();
+  }, []);
 
   useEffect(() => {
     const fetchBabysitters = async () => {
@@ -144,8 +157,8 @@ const WelcomePage = () => {
           </Typography>
           <Button
             variant="contained"
-			component={Link}
-			to="/register"
+            component={Link}
+            to="/register"
             style={{
               backgroundColor: "#5e62d1",
               fontFamily: "Poppins, sans-serif",
@@ -180,46 +193,46 @@ const WelcomePage = () => {
           <CardWrapper>
             <Box display="flex" justifyContent="center" flexWrap="wrap">
               {babysitters
-			  	.sort((a, b) => b.rating - a.rating)
-      			.slice(0, 4)
-				.map((babysitter) => (
-                <BabysitterCard key={babysitter.id}>
-                  <CardContent style={{ textAlign: "center" }}>
-                    <Avatar
-                      src={babysitter.photo || ""}
-                      style={{
-                        margin: "10px auto",
-                        width: "80px",
-                        height: "80px",
-                      }}
-                    />
-                    <Typography
-                      variant="h6"
-                      style={{
-                        fontFamily: "Poppins, sans-serif",
-                        color: "#000",
-                      }}
-                    >
-                      {`${babysitter.firstName} ${babysitter.lastName}`}
-                    </Typography>
-                    <Typography
-                      style={{
-                        color: "#888",
-                        fontFamily: "Poppins, sans-serif",
-                      }}
-                    >
-                      {babysitter.city}
-                    </Typography>
-                    <Rating
+                .sort((a, b) => b.rating - a.rating)
+                .slice(0, 4)
+                .map((babysitter) => (
+                  <BabysitterCard key={babysitter.id}>
+                    <CardContent style={{ textAlign: "center" }}>
+                      <Avatar
+                        src={babysitter.photo || ""}
+                        style={{
+                          margin: "10px auto",
+                          width: "80px",
+                          height: "80px",
+                        }}
+                      />
+                      <Typography
+                        variant="h6"
+                        style={{
+                          fontFamily: "Poppins, sans-serif",
+                          color: "#000",
+                        }}
+                      >
+                        {`${babysitter.firstName} ${babysitter.lastName}`}
+                      </Typography>
+                      <Typography
+                        style={{
+                          color: "#888",
+                          fontFamily: "Poppins, sans-serif",
+                        }}
+                      >
+                        {babysitter.city}
+                      </Typography>
+                      <Rating
                         name={`rating-${babysitter.id}`}
                         value={babysitter.rating}
                         precision={0.5}
                         readOnly
                         size="large"
-                    />
-                  </CardContent>
-                </BabysitterCard>
-              ))}
+                      />
+                    </CardContent>
+                  </BabysitterCard>
+                ))}
             </Box>
           </CardWrapper>
         </>

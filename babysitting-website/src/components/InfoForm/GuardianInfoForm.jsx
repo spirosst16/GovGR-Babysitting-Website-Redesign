@@ -11,43 +11,43 @@ import {
   StepLabel,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { useNavigate, useLocation } from 'react-router-dom';
-import defaultProfile from '../../assets/default-profile.jpg';
-import { getAuth } from 'firebase/auth';
+import { useNavigate, useLocation } from "react-router-dom";
+import defaultProfile from "../../assets/default-profile.jpg";
+import { getAuth } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
-import '../../style.css';
+import "../../style.css";
 
 // Logo components
-const LogoContainer = styled('div')({
-  position: 'absolute',
-  top: '10px',
-  left: '20px',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '10px',
+const LogoContainer = styled("div")({
+  position: "absolute",
+  top: "10px",
+  left: "20px",
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
 });
 
-const Logo = styled('div')({
-  width: '50px',
-  height: '50px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  overflow: 'hidden'
+const Logo = styled("div")({
+  width: "50px",
+  height: "50px",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  overflow: "hidden",
 });
 
-const LogoImage = styled('img')({
-  width: '100%',
-  height: '100%',
-  objectFit: 'cover',
+const LogoImage = styled("img")({
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
 });
 
-const LogoText = styled('span')({
-  fontSize: '24px',
-  fontWeight: 'bold',
-  color: '#000000',
-  fontFamily: 'Poppins, sans-serif',
+const LogoText = styled("span")({
+  fontSize: "24px",
+  fontWeight: "bold",
+  color: "#000000",
+  fontFamily: "Poppins, sans-serif",
 });
 
 const ageGroups = [
@@ -77,8 +77,8 @@ const GuardianInfoForm = () => {
     childrenAgeGroups: [],
     childrenDescription: "",
     photo: "",
-	rating: 0,
-	reviews: []
+    rating: 0,
+    reviews: [],
   });
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -124,26 +124,25 @@ const GuardianInfoForm = () => {
     }
 
     try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
 
-		const auth = getAuth();
-		const currentUser = auth.currentUser;
-	
-		if (!currentUser) {
-		  alert("You must be logged in to submit the application.");
-		  return;
-		}
+      if (!currentUser) {
+        alert("You must be logged in to submit the application.");
+        return;
+      }
 
-		const guardiansCollectionRef = collection(FIREBASE_DB, "guardians");
+      const guardiansCollectionRef = collection(FIREBASE_DB, "guardians");
 
-		await addDoc(guardiansCollectionRef, {
-		...formValues,
-		userId: currentUser.uid,
-		});
+      await addDoc(guardiansCollectionRef, {
+        ...formValues,
+        userId: currentUser.uid,
+      });
 
       console.log("Document written successfully!");
       alert("Form submitted successfully!");
 
-	  navigate("/");
+      navigate("/babysitters");
 
       setFormValues({
         firstName: "",
@@ -160,8 +159,8 @@ const GuardianInfoForm = () => {
         childrenAgeGroups: [],
         childrenDescription: "",
         photo: "",
-		rating: 0,
-		reviews: []
+        rating: 0,
+        reviews: [],
       });
       setCurrentStep(0);
     } catch (error) {
@@ -174,14 +173,14 @@ const GuardianInfoForm = () => {
     <>
       <div
         style={{
-          position: 'relative',
-          minHeight: '100vh',
-          backgroundColor: '#f4f4f4',
-          backgroundAttachment: 'fixed',
-          backgroundSize: 'cover',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
+          position: "relative",
+          minHeight: "100vh",
+          backgroundColor: "#f4f4f4",
+          backgroundAttachment: "fixed",
+          backgroundSize: "cover",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
           margin: 0,
           padding: 0,
           fontFamily: "Poppins, sans-serif",
@@ -189,7 +188,10 @@ const GuardianInfoForm = () => {
       >
         <LogoContainer>
           <Logo>
-            <LogoImage src={require('../../assets/baby-picture.png')} alt="Baby" />
+            <LogoImage
+              src={require("../../assets/baby-picture.png")}
+              alt="Baby"
+            />
           </Logo>
           <LogoText>Babysitters</LogoText>
         </LogoContainer>
@@ -199,14 +201,14 @@ const GuardianInfoForm = () => {
             activeStep={currentStep}
             alternativeLabel
             sx={{
-              '.MuiStepIcon-root': {
-                color: '#5e62d1',
+              ".MuiStepIcon-root": {
+                color: "#5e62d1",
               },
-              '.MuiStepIcon-root.Mui-active': {
-                color: '#5e62d1',
+              ".MuiStepIcon-root.Mui-active": {
+                color: "#5e62d1",
               },
-              '.MuiStepIcon-root.Mui-completed': {
-                color: '#5e62d1',
+              ".MuiStepIcon-root.Mui-completed": {
+                color: "#5e62d1",
               },
             }}
           >
@@ -222,12 +224,12 @@ const GuardianInfoForm = () => {
             onSubmit={handleSubmit}
             noValidate
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
+              display: "flex",
+              flexDirection: "column",
               gap: 2,
-              backgroundColor: 'white',
+              backgroundColor: "white",
               padding: 3,
-              borderRadius: '8px',
+              borderRadius: "8px",
               boxShadow: 3,
               fontFamily: "Poppins, sans-serif",
               marginTop: 3,
@@ -326,18 +328,18 @@ const GuardianInfoForm = () => {
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
                   <TextField
-					label="E-Mail"
-					name="email"
-					type="email"
-					value={formValues.email || ""}
-					onChange={handleChange}
-					required
-					fullWidth
-					InputProps={{
-						readOnly: true,
-					}}
-					sx={{ flex: "1 1 calc(50% - 16px)" }}
-					/>
+                    label="E-Mail"
+                    name="email"
+                    type="email"
+                    value={formValues.email || ""}
+                    onChange={handleChange}
+                    required
+                    fullWidth
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    sx={{ flex: "1 1 calc(50% - 16px)" }}
+                  />
                   <TextField
                     label="Phone"
                     name="phone"
@@ -375,43 +377,46 @@ const GuardianInfoForm = () => {
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
                   <TextField
-					select
-					label="Children Age Groups"
-					name="childrenAgeGroups"
-					value={formValues.childrenAgeGroups}
-					onChange={(e) =>
-						setFormValues({
-						...formValues,
-						childrenAgeGroups: typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value,
-						})
-					}
-					SelectProps={{
-						multiple: true,
-						MenuProps: {
-						PaperProps: {
-							style: {
-							marginTop: '10px',
-							},
-						},
-						},
-					}}
-					fullWidth
-					sx={{ mb: 2 }}
-					>
-					{ageGroups.map((ageGroup, index) => (
-						<MenuItem
-						key={index}
-						value={ageGroup}
-						sx={{
-							"&:hover": {
-							backgroundColor: "#f0f0f0",
-							},
-						}}
-						>
-						{ageGroup}
-						</MenuItem>
-					))}
-				  </TextField>
+                    select
+                    label="Children Age Groups"
+                    name="childrenAgeGroups"
+                    value={formValues.childrenAgeGroups}
+                    onChange={(e) =>
+                      setFormValues({
+                        ...formValues,
+                        childrenAgeGroups:
+                          typeof e.target.value === "string"
+                            ? e.target.value.split(",")
+                            : e.target.value,
+                      })
+                    }
+                    SelectProps={{
+                      multiple: true,
+                      MenuProps: {
+                        PaperProps: {
+                          style: {
+                            marginTop: "10px",
+                          },
+                        },
+                      },
+                    }}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  >
+                    {ageGroups.map((ageGroup, index) => (
+                      <MenuItem
+                        key={index}
+                        value={ageGroup}
+                        sx={{
+                          "&:hover": {
+                            backgroundColor: "#f0f0f0",
+                          },
+                        }}
+                      >
+                        {ageGroup}
+                      </MenuItem>
+                    ))}
+                  </TextField>
                   <TextField
                     label="Children Description & Special Needs"
                     name="childrenDescription"
@@ -440,111 +445,111 @@ const GuardianInfoForm = () => {
                   Upload Photo
                 </Typography>
                 <Box
-					sx={{
-					position: 'relative',
-					width: '240px',
-					height: '240px',
-					backgroundColor: 'white',
-					borderRadius: '50%',
-					border: '2px dashed white',
-					display: 'flex',
-					justifyContent: 'center',
-					alignItems: 'center',
-					margin: '0 auto',
-					}}
-				>
-					<img
-					src={formValues.photo || defaultProfile}
-					alt="Profile"
-					style={{
-						width: '200px',
-						height: '200px',
-						objectFit: 'cover',
-						borderRadius: '50%',
-						border: '2px solid white',
-						backgroundColor: 'white',
-					}}
-					/>
+                  sx={{
+                    position: "relative",
+                    width: "240px",
+                    height: "240px",
+                    backgroundColor: "white",
+                    borderRadius: "50%",
+                    border: "2px dashed white",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    margin: "0 auto",
+                  }}
+                >
+                  <img
+                    src={formValues.photo || defaultProfile}
+                    alt="Profile"
+                    style={{
+                      width: "200px",
+                      height: "200px",
+                      objectFit: "cover",
+                      borderRadius: "50%",
+                      border: "2px solid white",
+                      backgroundColor: "white",
+                    }}
+                  />
 
-					<Button
-					component="label"
-					sx={{
-						position: 'absolute',
-						bottom: '10px',
-						right: '10px',
-						width: '50px',
-						height: '50px',
-						backgroundColor: '#5e62d1',
-						color: 'white',
-						borderRadius: '100%',
-						fontSize: '24px',
-						fontWeight: 'bold',
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-						boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
-					}}
-					>
-					+
-					<input
-						type="file"
-						hidden
-						accept="image/*"
-						onChange={handleFileChange}
-					/>
-					</Button>
-				</Box>
+                  <Button
+                    component="label"
+                    sx={{
+                      position: "absolute",
+                      bottom: "10px",
+                      right: "10px",
+                      width: "50px",
+                      height: "50px",
+                      backgroundColor: "#5e62d1",
+                      color: "white",
+                      borderRadius: "100%",
+                      fontSize: "24px",
+                      fontWeight: "bold",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+                    }}
+                  >
+                    +
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </Button>
+                </Box>
               </div>
             )}
 
             <Box
-			sx={{
-				display: 'flex',
-				justifyContent: 'space-between',
-				alignItems: 'center',
-			}}
-			>
-			<Button
-				onClick={handleBack}
-				variant="contained"
-				sx={{
-					backgroundColor: '#5e62d1',
-					'&:hover': {
-						backgroundColor: '#4a4fbf',
-					},
-				}}
-				disabled={currentStep === 0}
-			>
-				Back
-			</Button>
-			{currentStep < steps.length - 1 ? (
-				<Button
-				onClick={handleNext}
-				variant="contained"
-				sx={{
-					backgroundColor: '#5e62d1',
-					'&:hover': {
-						backgroundColor: '#4a4fbf',
-					},
-				}}
-				>
-				Next
-				</Button>
-			) : (
-				<Button
-				onClick={handleSubmit}
-				variant="contained"
-				sx={{
-					backgroundColor: '#5e62d1',
-					'&:hover': {
-						backgroundColor: '#4a4fbf',
-					},
-				}}
-				>
-				Submit
-				</Button>
-			)}
-			</Box>
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Button
+                onClick={handleBack}
+                variant="contained"
+                sx={{
+                  backgroundColor: "#5e62d1",
+                  "&:hover": {
+                    backgroundColor: "#4a4fbf",
+                  },
+                }}
+                disabled={currentStep === 0}
+              >
+                Back
+              </Button>
+              {currentStep < steps.length - 1 ? (
+                <Button
+                  onClick={handleNext}
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#5e62d1",
+                    "&:hover": {
+                      backgroundColor: "#4a4fbf",
+                    },
+                  }}
+                >
+                  Next
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSubmit}
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#5e62d1",
+                    "&:hover": {
+                      backgroundColor: "#4a4fbf",
+                    },
+                  }}
+                >
+                  Submit
+                </Button>
+              )}
+            </Box>
           </Box>
         </Container>
       </div>
