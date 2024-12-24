@@ -24,14 +24,24 @@ const Container = styled(Box)({
   minHeight: "100vh",
   padding: "20px",
   paddingTop: "100px",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
 });
 
 const Header = styled(Box)({
+  width: "100%",
+  margin: "0 auto",
   textAlign: "center",
+  marginBottom: "20px",
 });
 
 const TabContainer = styled(Box)({
   margin: "20px 0",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-start",
+  paddingLeft: "10%",
 });
 
 const ApplicationCard = styled(Card)({
@@ -331,7 +341,6 @@ const MyApplicationsJobs = () => {
           onChange={handleTabChange}
           indicatorColor="primary"
           textColor="primary"
-          centered
         >
           <Tab label="Agreements" icon={<WorkOutlineIcon />} />
           <Tab label="Applications" icon={<DoneIcon />} />
