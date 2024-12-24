@@ -5,7 +5,6 @@ import {
   Button,
   Typography,
   Box,
-  MenuItem,
   Stepper,
   Step,
   StepLabel,
@@ -53,6 +52,44 @@ const LogoText = styled("span")({
   fontWeight: "bold",
   color: "#000000",
   fontFamily: "Poppins, sans-serif",
+});
+
+const StyledTextField = styled(TextField)({
+  fontFamily: "'Poppins', sans-serif",
+  color: "#5e62d1",
+  "& .MuiInputBase-input": {
+    fontFamily: "'Poppins', sans-serif",
+  },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "#ccc",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#5e62d1",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#5e62d1",
+  },
+});
+
+const StyledRadio = styled(Radio)({
+  "&.Mui-checked": {
+    color: "#5e62d1",
+  },
+});
+
+const StyledCheckbox = styled(Checkbox)({
+  "&.Mui-checked": {
+    color: "#5e62d1",
+  },
+});
+
+const StyledButton = styled(Button)({
+  fontFamily: "'Poppins', sans-serif",
+  fontSize: "1rem",
+  textTransform: "none",
+  borderRadius: "30px",
 });
 
 const BabysittingApplicationForm = () => {
@@ -223,7 +260,7 @@ const BabysittingApplicationForm = () => {
 
                 <FormControl component="fieldset" fullWidth sx={{ mb: 2 }}>
                   <FormLabel component="legend">Preferred Area</FormLabel>
-                  <TextField
+                  <StyledTextField
                     label="Preferred Area"
                     name="area"
                     value={formValues.area}
@@ -245,7 +282,16 @@ const BabysittingApplicationForm = () => {
 
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                   <FormControl component="fieldset" sx={{ mb: 2 }}>
-                    <FormLabel component="legend">Job Type</FormLabel>
+                    <FormLabel
+                      component="legend"
+                      sx={{
+                        "&.Mui-focused": {
+                          color: "#5e62d1",
+                        },
+                      }}
+                    >
+                      Job Type
+                    </FormLabel>
                     <RadioGroup
                       name="jobType"
                       value={formValues.jobType}
@@ -254,23 +300,32 @@ const BabysittingApplicationForm = () => {
                     >
                       <FormControlLabel
                         value="Part-time"
-                        control={<Radio />}
+                        control={<StyledRadio />}
                         label="Part-time"
                       />
                       <FormControlLabel
                         value="Full-time"
-                        control={<Radio />}
+                        control={<StyledRadio />}
                         label="Full-time"
                       />
                     </RadioGroup>
                   </FormControl>
 
                   <FormControl component="fieldset" sx={{ mb: 2 }}>
-                    <FormLabel component="legend">Babysitting Place</FormLabel>
+                    <FormLabel
+                      component="legend"
+                      sx={{
+                        "&.Mui-focused": {
+                          color: "#5e62d1",
+                        },
+                      }}
+                    >
+                      Babysitting Place
+                    </FormLabel>
                     <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.babysittingPlace.includes(
                               "Family's House"
                             )}
@@ -295,7 +350,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.babysittingPlace.includes(
                               "Babysitter's House"
                             )}
@@ -321,11 +376,20 @@ const BabysittingApplicationForm = () => {
                     </Box>
                   </FormControl>
                   <FormControl component="fieldset" sx={{ mb: 2 }}>
-                    <FormLabel component="legend">Child Age Range</FormLabel>
+                    <FormLabel
+                      component="legend"
+                      sx={{
+                        "&.Mui-focused": {
+                          color: "#5e62d1",
+                        },
+                      }}
+                    >
+                      Child Age Range
+                    </FormLabel>
                     <FormGroup>
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.childAges.includes("0-1")}
                             onChange={(e) => {
                               const newChildAges = e.target.checked
@@ -344,7 +408,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.childAges.includes("2-3")}
                             onChange={(e) => {
                               const newChildAges = e.target.checked
@@ -363,7 +427,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.childAges.includes("4-5")}
                             onChange={(e) => {
                               const newChildAges = e.target.checked
@@ -382,7 +446,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.childAges.includes("6-12")}
                             onChange={(e) => {
                               const newChildAges = e.target.checked
@@ -401,7 +465,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.childAges.includes("13-17")}
                             onChange={(e) => {
                               const newChildAges = e.target.checked
@@ -440,11 +504,18 @@ const BabysittingApplicationForm = () => {
 
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6} md={3}>
-                    <Typography variant="h6">Monday</Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      Monday
+                    </Typography>
                     <FormGroup>
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Monday Morning"
                             )}
@@ -465,7 +536,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Monday Afternoon"
                             )}
@@ -489,7 +560,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Monday Evening"
                             )}
@@ -511,7 +582,7 @@ const BabysittingApplicationForm = () => {
                     </FormGroup>
                     <FormControlLabel
                       control={
-                        <Checkbox
+                        <StyledCheckbox
                           checked={formValues.availability.includes(
                             "Monday Night"
                           )}
@@ -531,11 +602,18 @@ const BabysittingApplicationForm = () => {
                       label="Night"
                     />
 
-                    <Typography variant="h6">Tuesday</Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      Tuesday
+                    </Typography>
                     <FormGroup>
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Tuesday Morning"
                             )}
@@ -559,7 +637,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Tuesday Afternoon"
                             )}
@@ -583,7 +661,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Tuesday Evening"
                             )}
@@ -607,7 +685,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Tuesday Night"
                             )}
@@ -630,11 +708,18 @@ const BabysittingApplicationForm = () => {
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={3}>
-                    <Typography variant="h6">Wednesday</Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      Wednesday
+                    </Typography>
                     <FormGroup>
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Wednesday Morning"
                             )}
@@ -658,7 +743,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Wednesday Afternoon"
                             )}
@@ -682,7 +767,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Wednesday Evening"
                             )}
@@ -706,7 +791,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Wednesday Night"
                             )}
@@ -730,11 +815,18 @@ const BabysittingApplicationForm = () => {
                       />
                     </FormGroup>
 
-                    <Typography variant="h6">Thursday</Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      Thursday
+                    </Typography>
                     <FormGroup>
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Thursday Morning"
                             )}
@@ -758,7 +850,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Thursday Afternoon"
                             )}
@@ -782,7 +874,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Thursday Evening"
                             )}
@@ -806,7 +898,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Thursday Night"
                             )}
@@ -829,11 +921,18 @@ const BabysittingApplicationForm = () => {
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={3}>
-                    <Typography variant="h6">Friday</Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      Friday
+                    </Typography>
                     <FormGroup>
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Friday Morning"
                             )}
@@ -854,7 +953,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Friday Afternoon"
                             )}
@@ -878,7 +977,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Friday Evening"
                             )}
@@ -899,7 +998,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Friday Night"
                             )}
@@ -920,11 +1019,18 @@ const BabysittingApplicationForm = () => {
                       />
                     </FormGroup>
 
-                    <Typography variant="h6">Saturday</Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      Saturday
+                    </Typography>
                     <FormGroup>
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Saturday Morning"
                             )}
@@ -948,7 +1054,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Saturday Afternoon"
                             )}
@@ -972,7 +1078,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Saturday Evening"
                             )}
@@ -996,7 +1102,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Saturday Night"
                             )}
@@ -1019,11 +1125,18 @@ const BabysittingApplicationForm = () => {
                   </Grid>
 
                   <Grid item xs={12} sm={6} md={3}>
-                    <Typography variant="h6">Sunday</Typography>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      Sunday
+                    </Typography>
                     <FormGroup>
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Sunday Morning"
                             )}
@@ -1044,7 +1157,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Sunday Afternoon"
                             )}
@@ -1068,7 +1181,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Sunday Evening"
                             )}
@@ -1089,7 +1202,7 @@ const BabysittingApplicationForm = () => {
                       />
                       <FormControlLabel
                         control={
-                          <Checkbox
+                          <StyledCheckbox
                             checked={formValues.availability.includes(
                               "Sunday Night"
                             )}
@@ -1127,15 +1240,41 @@ const BabysittingApplicationForm = () => {
                 >
                   Review & Submit
                 </Typography>
-                <Typography variant="h6">Area: {formValues.area}</Typography>
-                <Typography variant="h6">
-                  Job Type: {formValues.jobType}
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontFamily: "Poppins, sans-serif",
+                  }}
+                >
+                  <span style={{ fontWeight: "bold" }}>Area:</span>{" "}
+                  {formValues.area}
                 </Typography>
-                <Typography variant="h6">
-                  Babysitting Place: {formValues.babysittingPlace}
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontFamily: "Poppins, sans-serif",
+                  }}
+                >
+                  <span style={{ fontWeight: "bold" }}>Job Type:</span>{" "}
+                  {formValues.jobType}
                 </Typography>
-                <Typography variant="h6">
-                  Availability: {formValues.availability.join(", ")}
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontFamily: "Poppins, sans-serif",
+                  }}
+                >
+                  <span style={{ fontWeight: "bold" }}>Babysitting Place:</span>{" "}
+                  {formValues.babysittingPlace}
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontFamily: "Poppins, sans-serif",
+                  }}
+                >
+                  <span style={{ fontWeight: "bold" }}>Availability:</span>{" "}
+                  {formValues.availability.join(", ")}
                 </Typography>
               </div>
             )}
@@ -1147,7 +1286,7 @@ const BabysittingApplicationForm = () => {
                 alignItems: "center",
               }}
             >
-              <Button
+              <StyledButton
                 onClick={handleBack}
                 variant="contained"
                 sx={{
@@ -1159,9 +1298,9 @@ const BabysittingApplicationForm = () => {
                 disabled={currentStep === 0}
               >
                 Back
-              </Button>
+              </StyledButton>
               {currentStep < steps.length - 1 ? (
-                <Button
+                <StyledButton
                   onClick={handleNext}
                   variant="contained"
                   sx={{
@@ -1172,14 +1311,16 @@ const BabysittingApplicationForm = () => {
                   }}
                 >
                   Next
-                </Button>
+                </StyledButton>
               ) : (
                 <>
                   <Box sx={{ display: "flex", gap: 1 }}>
                     <Button
                       onClick={(e) => handleSubmit(e, "temporary")}
-                      variant="outlined"
+                      variant="contained"
                       sx={{
+                        borderRadius: "30px",
+                        outline: "1px solid #5e62d1",
                         backgroundColor: "white",
                         color: "#5e62d1",
                         "&:hover": {
@@ -1193,6 +1334,7 @@ const BabysittingApplicationForm = () => {
                       onClick={(e) => handleSubmit(e, "submitted")}
                       variant="contained"
                       sx={{
+                        borderRadius: "30px",
                         backgroundColor: "#5e62d1",
                         "&:hover": {
                           backgroundColor: "#4a4fbf",
