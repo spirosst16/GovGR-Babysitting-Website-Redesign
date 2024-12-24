@@ -75,12 +75,12 @@ const StyledTextField = styled(TextField)({
     "& fieldset": {
       borderColor: "#ccc",
     },
-    "&:hover fieldset": {
-      borderColor: "#5e62d1",
-    },
     "&.Mui-focused fieldset": {
       borderColor: "#5e62d1",
     },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#5e62d1",
   },
 });
 
