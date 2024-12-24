@@ -1,5 +1,16 @@
 import React from "react";
-import { Box, Typography, Card } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
+  Card,
+  CardContent,
+  Tabs,
+  Tab,
+  CircularProgress,
+} from '@mui/material';
+import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
 import '../../style.css';
 
@@ -18,6 +29,10 @@ const ContentWrapper = styled(Box)({
   flexDirection: "column",
   alignItems: "center",
   paddingBottom: "30px",
+});
+
+const TabContainer = styled(Box)({
+  margin: '20px 0',
 });
 
 const StepCard = styled(Card)({
@@ -47,41 +62,45 @@ const StepNumber = styled(Box)({
 });
 
 const HowItWorksPage = () => {
-  const steps = [
+
+  const [currentTab, setCurrentTab] = React.useState(0);
+  
+    const handleTabChange = (event, newValue) => {
+      setCurrentTab(newValue);
+    };
+
+  const stepsParent = [
     {
       title: "Create Your Profile",
       description: [
-        "Sign up as a parent or babysitter by filling out your basic information.",
-        "Parents: Highlight your childcare needs and preferences.",
-        "Babysitters: Showcase your experience, certifications, and availability.",
+        "Sign up as a parent by filling out your basic information.",
+        "Highlight your childcare needs and preferences.",
       ],
     },
     {
       title: "Search and Filter",
       description: [
-        "Parents can browse babysitters using filters like location, availability, ratings, and skills.",
-        "Babysitters can search for families that align with their expertise.",
+        "You can browse babysitters using filters like location,",
+        "availability, babysitting place, child age group expertise and job type.",
       ],
     },
     {
       title: "Match and Connect",
       description: [
         "Send personalized messages to start a conversation.",
-        "Schedule interviews to find the perfect fit for your family or services.",
+        "Schedule interviews to find the perfect fit for your family",
       ],
     },
     {
       title: "Book and Confirm",
       description: [
         "Once you're confident, book services directly through the platform.",
-        "Babysitters: Confirm the booking and prepare for your session.",
       ],
     },
     {
       title: "Secure Payments",
       description: [
-        "Parents: Pay securely via our integrated system—no cash needed.",
-        "Babysitters: Receive the payment amount and the necessary payment details directly to your account.",
+        "Pay securely via our integrated system—no cash needed.",
       ],
     },
     {
@@ -89,29 +108,63 @@ const HowItWorksPage = () => {
       description: [
         "Parents: Share your feedback on babysitters and rate them, so other families",
         "will choose more effectively their babysitter.",
-        "Babysitters: Review your experience and collaboration with the family to build trust in the community.",
       ],
     },
+    
   ];
 
-  return (
-    <>
+  const stepsBabysitter = [
+    {
+      title: "Create Your Profile",
+      description: [
+        "Sign up as a babysitter by filling out your basic information.",
+        "Showcase your experience, certifications, and availability.",
+      ],
+    },
+    {
+      title: "Search and Filter",
+      description: [
+        "Search for families that align with your expertise.",
+      ],
+    },
+    {
+      title: "Match and Connect",
+      description: [
+        "Send personalized messages to start a conversation with the parent of your choice.",
+        "Schedule interviews to find the perfect fit for your services.",
+      ],
+    },
+    {
+      title: "Book and Confirm",
+      description: [
+        "Once you're confident, book services directly through",
+        "the platform and prepare for your session.",
+      ],
+    },
+    {
+      title: "Secure Payments",
+      description: [
+        "Receive the payment amount and the necessary payment details directly to your account.",
+      ],
+    },
+    {
+      title: "Leave Reviews",
+      description: [
+        "Review your experience and collaboration with the family to build trust in the community.",
+      ],
+    },
+    
+  ];
+
+  const renderTabContent = () => {
+    if (currentTab === 0) {
+	  return (
+      <>
       <PageWrapper>
         <ContentWrapper>
-          <Typography
-            variant="h4"
-            style={{
-              textAlign: "center",
-              margin: "100px 0 50px",
-              fontFamily: "Poppins, sans-serif",
-			  fontWeight: "600",
-            }}
-          >
-            How It Works
-          </Typography>
 
           <Box display="flex" flexDirection="column" alignItems="center">
-            {steps.map((step, index) => (
+            {stepsParent.map((step, index) => (
               <StepCard key={index} style={{ width: "100%" }}>
                 <Box display="flex" alignItems="flex-start">
                   <StepNumber>{index + 1}</StepNumber>
@@ -143,6 +196,99 @@ const HowItWorksPage = () => {
               </StepCard>
             ))}
           </Box>
+          </ContentWrapper>
+      </PageWrapper>
+    </>
+	  );
+
+    } else {
+      return (
+        <>
+      <PageWrapper>
+        <ContentWrapper>
+
+          <Box display="flex" flexDirection="column" alignItems="center">
+            {stepsBabysitter.map((step, index) => (
+              <StepCard key={index} style={{ width: "100%" }}>
+                <Box display="flex" alignItems="flex-start">
+                  <StepNumber>{index + 1}</StepNumber>
+                  <Box>
+                    <Typography
+                      variant="h6"
+                      style={{
+                        fontWeight: "bold",
+                        marginBottom: "15px",
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      {step.title}
+                    </Typography>
+                    {step.description.map((detail, i) => (
+                      <Typography
+                        key={i}
+                        style={{
+                          fontFamily: "Poppins, sans-serif",
+                          color: "#666",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        {detail}
+                      </Typography>
+                    ))}
+                  </Box>
+                </Box>
+              </StepCard>
+            ))}
+          </Box>
+          </ContentWrapper>
+      </PageWrapper>
+    </>
+      );
+    }
+  };
+
+  return (
+    <>
+      <PageWrapper>
+        <ContentWrapper>
+          <Typography
+            variant="h4"
+            style={{
+              textAlign: "center",
+              margin: "100px 0 50px",
+              fontFamily: "Poppins, sans-serif",
+			  fontWeight: "600",
+            }}
+          >
+            How It Works
+          </Typography>
+
+          <TabContainer>
+  <Tabs
+    value={currentTab}
+    onChange={handleTabChange}
+    centered
+    TabIndicatorProps={{
+      style: {
+        backgroundColor: '#5e62d1', // Sets the indicator color
+      },
+    }}
+    sx={{
+      '& .MuiTab-root': {
+        color: '#5e62d1', // Inactive tab text color
+      },
+      '& .Mui-selected': {
+        color: '#5e62d1', // Active tab text color
+      },
+    }}
+  >
+    <Tab label="Parents" />
+    <Tab label="Babysitters" />
+  </Tabs>
+</TabContainer>
+
+          
+          {renderTabContent()}
         </ContentWrapper>
       </PageWrapper>
     </>
