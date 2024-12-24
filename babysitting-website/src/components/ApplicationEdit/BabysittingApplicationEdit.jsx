@@ -65,6 +65,35 @@ const ProfileInfo = styled(Box)({
   marginTop: "20px",
 });
 
+const StyledTextField = styled(TextField)({
+  fontFamily: "'Poppins', sans-serif",
+  color: "#5e62d1",
+  "& .MuiInputBase-input": {
+    fontFamily: "'Poppins', sans-serif",
+  },
+  "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+    borderColor: "#5e62d1",
+  },
+});
+
+const StyledRadio = styled(Radio)({
+  "&.Mui-checked": {
+    color: "#5e62d1",
+  },
+});
+
+const StyledCheckbox = styled(Checkbox)({
+  "&.Mui-checked": {
+    color: "#5e62d1",
+  },
+});
+
+const StyledButton = styled(Button)({
+  fontFamily: "'Poppins', sans-serif",
+  fontSize: "1rem",
+  textTransform: "none",
+});
+
 const EditApplicationForm = () => {
   const [formValues, setFormValues] = useState({
     area: "",
@@ -261,83 +290,95 @@ const EditApplicationForm = () => {
               />
             </ProfileInfo>
           </ProfileSection>
-          <FormControl component="fieldset" fullWidth sx={{ mb: 2 }}>
-            <FormLabel component="legend">Preferred Area</FormLabel>
-            <TextField
-              label="Preferred Area"
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <FormLabel sx={{ mb: 1 }}>Preferred Area</FormLabel>
+            <StyledTextField
               name="area"
               value={formValues.area}
-              onChange={handleChange}
+              onChange={(e) =>
+                setFormValues({ ...formValues, area: e.target.value })
+              }
               required
               fullWidth
-              sx={{ mb: 2, mt: 1 }}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              InputLabelProps={{
-                shrink: false,
-                style: {
-                  visibility:
-                    formValues.area || isFocused ? "hidden" : "visible",
-                },
-              }}
             />
           </FormControl>
 
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <FormControl component="fieldset" sx={{ mb: 2 }}>
-              <FormLabel component="legend">Job Type</FormLabel>
+              <FormLabel
+                component="legend"
+                sx={{
+                  "&.Mui-focused": {
+                    color: "#5e62d1",
+                  },
+                }}
+              >
+                Job Type
+              </FormLabel>
               <RadioGroup
                 name="jobType"
                 value={formValues.jobType}
-                onChange={handleChange}
+                onChange={(e) =>
+                  setFormValues({ ...formValues, jobType: e.target.value })
+                }
                 sx={{ display: "flex", flexDirection: "row" }}
               >
                 <FormControlLabel
                   value="Part-time"
-                  control={<Radio />}
+                  control={<StyledRadio />}
                   label="Part-time"
+                  sx={{ fontFamily: "'Poppins', sans-serif" }}
                 />
                 <FormControlLabel
                   value="Full-time"
-                  control={<Radio />}
+                  control={<StyledRadio />}
                   label="Full-time"
+                  sx={{ fontFamily: "'Poppins', sans-serif" }}
                 />
               </RadioGroup>
             </FormControl>
 
             <FormControl component="fieldset" sx={{ mb: 2 }}>
-              <FormLabel component="legend">Babysitting Place</FormLabel>
+              <FormLabel
+                component="legend"
+                sx={{
+                  "&.Mui-focused": {
+                    color: "#5e62d1",
+                  },
+                }}
+              >
+                Babysitting Place
+              </FormLabel>
               <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
                 <FormControlLabel
                   control={
-                    <Checkbox
+                    <StyledCheckbox
                       checked={formValues.babysittingPlace.includes(
                         "Family's House"
                       )}
                       onChange={(e) => {
-                        const newBabysittingPlace = e.target.checked
+                        const updated = e.target.checked
                           ? [...formValues.babysittingPlace, "Family's House"]
                           : formValues.babysittingPlace.filter(
                               (place) => place !== "Family's House"
                             );
                         setFormValues({
                           ...formValues,
-                          babysittingPlace: newBabysittingPlace,
+                          babysittingPlace: updated,
                         });
                       }}
-                      value="Family's House"
                     />
                   }
                   label="Family's House"
                 />
                 <FormControlLabel
                   control={
-                    <Checkbox
+                    <StyledCheckbox
                       checked={formValues.babysittingPlace.includes(
                         "Babysitter's House"
                       )}
                       onChange={(e) => {
-                        const newBabysittingPlace = e.target.checked
+                        const updated = e.target.checked
                           ? [
                               ...formValues.babysittingPlace,
                               "Babysitter's House",
@@ -347,10 +388,9 @@ const EditApplicationForm = () => {
                             );
                         setFormValues({
                           ...formValues,
-                          babysittingPlace: newBabysittingPlace,
+                          babysittingPlace: updated,
                         });
                       }}
-                      value="Babysitter's House"
                     />
                   }
                   label="Babysitter's House"
@@ -358,11 +398,20 @@ const EditApplicationForm = () => {
               </Box>
             </FormControl>
             <FormControl component="fieldset" sx={{ mb: 2 }}>
-              <FormLabel component="legend">Child Age Range</FormLabel>
+              <FormLabel
+                component="legend"
+                sx={{
+                  "&.Mui-focused": {
+                    color: "#5e62d1",
+                  },
+                }}
+              >
+                Child Age Range
+              </FormLabel>
               <FormGroup>
                 <FormControlLabel
                   control={
-                    <Checkbox
+                    <StyledCheckbox
                       checked={formValues.childAges.includes("0-1")}
                       onChange={(e) => {
                         const newChildAges = e.target.checked
@@ -379,7 +428,7 @@ const EditApplicationForm = () => {
                 />
                 <FormControlLabel
                   control={
-                    <Checkbox
+                    <StyledCheckbox
                       checked={formValues.childAges.includes("2-3")}
                       onChange={(e) => {
                         const newChildAges = e.target.checked
@@ -396,7 +445,7 @@ const EditApplicationForm = () => {
                 />
                 <FormControlLabel
                   control={
-                    <Checkbox
+                    <StyledCheckbox
                       checked={formValues.childAges.includes("4-5")}
                       onChange={(e) => {
                         const newChildAges = e.target.checked
@@ -413,7 +462,7 @@ const EditApplicationForm = () => {
                 />
                 <FormControlLabel
                   control={
-                    <Checkbox
+                    <StyledCheckbox
                       checked={formValues.childAges.includes("6-12")}
                       onChange={(e) => {
                         const newChildAges = e.target.checked
@@ -432,7 +481,7 @@ const EditApplicationForm = () => {
                 />
                 <FormControlLabel
                   control={
-                    <Checkbox
+                    <StyledCheckbox
                       checked={formValues.childAges.includes("13-17")}
                       onChange={(e) => {
                         const newChildAges = e.target.checked
@@ -476,13 +525,18 @@ const EditApplicationForm = () => {
               "Sunday",
             ].map((day) => (
               <Grid item xs={12} sm={6} md={3} key={day}>
-                <Typography variant="h6">{day}</Typography>
+                <Typography
+                  variant="h6"
+                  sx={{ fontFamily: "Poppins, sans-serif" }}
+                >
+                  {day}
+                </Typography>
                 <FormGroup>
                   {["Morning", "Afternoon", "Evening", "Night"].map((time) => (
                     <FormControlLabel
                       key={time}
                       control={
-                        <Checkbox
+                        <StyledCheckbox
                           checked={formValues.availability.includes(
                             `${day} ${time}`
                           )}
@@ -514,31 +568,34 @@ const EditApplicationForm = () => {
               alignItems: "center",
             }}
           >
-            <Button
+            <StyledButton
               onClick={handleTemporarySave}
-              variant="outlined"
+              variant="contained"
               sx={{
                 backgroundColor: "white",
                 color: "#5e62d1",
+                outline: "1px solid #5e62d1",
+                borderRadius: "30px",
                 "&:hover": {
                   backgroundColor: "#fffffe",
                 },
               }}
             >
               Temporary Save
-            </Button>
-            <Button
+            </StyledButton>
+            <StyledButton
               onClick={handleFinalSubmission}
               variant="contained"
               sx={{
                 backgroundColor: "#5e62d1",
+                borderRadius: "30px",
                 "&:hover": {
                   backgroundColor: "#4a4fbf",
                 },
               }}
             >
               Final Submit
-            </Button>
+            </StyledButton>
           </Box>
         </InfoSection>
       </ContentWrapper>
