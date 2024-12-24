@@ -147,10 +147,12 @@ const BabysittingJobsPage = () => {
           "babysittingApplications"
         );
         const applicationSnapshot = await getDocs(applicationsCollectionRef);
-        const applicationsList = applicationSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const applicationsList = applicationSnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter((app) => app.status === "submitted");
 
         const combinedData = guardiansList
           .filter((guardian) =>
