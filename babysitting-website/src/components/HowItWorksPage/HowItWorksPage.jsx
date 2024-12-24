@@ -9,10 +9,10 @@ import {
   Tabs,
   Tab,
   CircularProgress,
-} from '@mui/material';
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
-import '../../style.css';
+import "../../style.css";
 
 const PageWrapper = styled(Box)({
   backgroundColor: "#f4f4f4",
@@ -32,7 +32,7 @@ const ContentWrapper = styled(Box)({
 });
 
 const TabContainer = styled(Box)({
-  margin: '20px 0',
+  margin: "20px 0",
 });
 
 const StepCard = styled(Card)({
@@ -62,12 +62,11 @@ const StepNumber = styled(Box)({
 });
 
 const HowItWorksPage = () => {
-
   const [currentTab, setCurrentTab] = React.useState(0);
-  
-    const handleTabChange = (event, newValue) => {
-      setCurrentTab(newValue);
-    };
+
+  const handleTabChange = (event, newValue) => {
+    setCurrentTab(newValue);
+  };
 
   const stepsParent = [
     {
@@ -99,9 +98,7 @@ const HowItWorksPage = () => {
     },
     {
       title: "Secure Payments",
-      description: [
-        "Pay securely via our integrated system—no cash needed.",
-      ],
+      description: ["Pay securely via our integrated system—no cash needed."],
     },
     {
       title: "Leave Reviews",
@@ -110,7 +107,6 @@ const HowItWorksPage = () => {
         "will choose more effectively their babysitter.",
       ],
     },
-    
   ];
 
   const stepsBabysitter = [
@@ -123,9 +119,7 @@ const HowItWorksPage = () => {
     },
     {
       title: "Search and Filter",
-      description: [
-        "Search for families that align with your expertise.",
-      ],
+      description: ["Search for families that align with your expertise."],
     },
     {
       title: "Match and Connect",
@@ -153,96 +147,92 @@ const HowItWorksPage = () => {
         "Review your experience and collaboration with the family to build trust in the community.",
       ],
     },
-    
   ];
 
   const renderTabContent = () => {
     if (currentTab === 0) {
-	  return (
-      <>
-      <PageWrapper>
-        <ContentWrapper>
-
-          <Box display="flex" flexDirection="column" alignItems="center">
-            {stepsParent.map((step, index) => (
-              <StepCard key={index} style={{ width: "100%" }}>
-                <Box display="flex" alignItems="flex-start">
-                  <StepNumber>{index + 1}</StepNumber>
-                  <Box>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        fontWeight: "bold",
-                        marginBottom: "15px",
-                        fontFamily: "Poppins, sans-serif",
-                      }}
-                    >
-                      {step.title}
-                    </Typography>
-                    {step.description.map((detail, i) => (
-                      <Typography
-                        key={i}
-                        style={{
-                          fontFamily: "Poppins, sans-serif",
-                          color: "#666",
-                          marginBottom: "10px",
-                        }}
-                      >
-                        {detail}
-                      </Typography>
-                    ))}
-                  </Box>
-                </Box>
-              </StepCard>
-            ))}
-          </Box>
-          </ContentWrapper>
-      </PageWrapper>
-    </>
-	  );
-
+      return (
+        <>
+          <PageWrapper>
+            <ContentWrapper>
+              <Box display="flex" flexDirection="column" alignItems="center">
+                {stepsParent.map((step, index) => (
+                  <StepCard key={index} style={{ width: "100%" }}>
+                    <Box display="flex" alignItems="flex-start">
+                      <StepNumber>{index + 1}</StepNumber>
+                      <Box>
+                        <Typography
+                          variant="h6"
+                          style={{
+                            fontWeight: "bold",
+                            marginBottom: "15px",
+                            fontFamily: "Poppins, sans-serif",
+                          }}
+                        >
+                          {step.title}
+                        </Typography>
+                        {step.description.map((detail, i) => (
+                          <Typography
+                            key={i}
+                            style={{
+                              fontFamily: "Poppins, sans-serif",
+                              color: "#666",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            {detail}
+                          </Typography>
+                        ))}
+                      </Box>
+                    </Box>
+                  </StepCard>
+                ))}
+              </Box>
+            </ContentWrapper>
+          </PageWrapper>
+        </>
+      );
     } else {
       return (
         <>
-      <PageWrapper>
-        <ContentWrapper>
-
-          <Box display="flex" flexDirection="column" alignItems="center">
-            {stepsBabysitter.map((step, index) => (
-              <StepCard key={index} style={{ width: "100%" }}>
-                <Box display="flex" alignItems="flex-start">
-                  <StepNumber>{index + 1}</StepNumber>
-                  <Box>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        fontWeight: "bold",
-                        marginBottom: "15px",
-                        fontFamily: "Poppins, sans-serif",
-                      }}
-                    >
-                      {step.title}
-                    </Typography>
-                    {step.description.map((detail, i) => (
-                      <Typography
-                        key={i}
-                        style={{
-                          fontFamily: "Poppins, sans-serif",
-                          color: "#666",
-                          marginBottom: "10px",
-                        }}
-                      >
-                        {detail}
-                      </Typography>
-                    ))}
-                  </Box>
-                </Box>
-              </StepCard>
-            ))}
-          </Box>
-          </ContentWrapper>
-      </PageWrapper>
-    </>
+          <PageWrapper>
+            <ContentWrapper>
+              <Box display="flex" flexDirection="column" alignItems="center">
+                {stepsBabysitter.map((step, index) => (
+                  <StepCard key={index} style={{ width: "100%" }}>
+                    <Box display="flex" alignItems="flex-start">
+                      <StepNumber>{index + 1}</StepNumber>
+                      <Box>
+                        <Typography
+                          variant="h6"
+                          style={{
+                            fontWeight: "bold",
+                            marginBottom: "15px",
+                            fontFamily: "Poppins, sans-serif",
+                          }}
+                        >
+                          {step.title}
+                        </Typography>
+                        {step.description.map((detail, i) => (
+                          <Typography
+                            key={i}
+                            style={{
+                              fontFamily: "Poppins, sans-serif",
+                              color: "#666",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            {detail}
+                          </Typography>
+                        ))}
+                      </Box>
+                    </Box>
+                  </StepCard>
+                ))}
+              </Box>
+            </ContentWrapper>
+          </PageWrapper>
+        </>
       );
     }
   };
@@ -257,37 +247,36 @@ const HowItWorksPage = () => {
               textAlign: "center",
               margin: "100px 0 50px",
               fontFamily: "Poppins, sans-serif",
-			  fontWeight: "600",
+              fontWeight: "600",
             }}
           >
             How It Works
           </Typography>
 
           <TabContainer>
-  <Tabs
-    value={currentTab}
-    onChange={handleTabChange}
-    centered
-    TabIndicatorProps={{
-      style: {
-        backgroundColor: '#5e62d1', // Sets the indicator color
-      },
-    }}
-    sx={{
-      '& .MuiTab-root': {
-        color: '#5e62d1', // Inactive tab text color
-      },
-      '& .Mui-selected': {
-        color: '#5e62d1', // Active tab text color
-      },
-    }}
-  >
-    <Tab label="Parents" />
-    <Tab label="Babysitters" />
-  </Tabs>
-</TabContainer>
+            <Tabs
+              value={currentTab}
+              onChange={handleTabChange}
+              centered
+              TabIndicatorProps={{
+                style: {
+                  backgroundColor: "#5e62d1",
+                },
+              }}
+              sx={{
+                "& .MuiTab-root": {
+                  color: "#5e62d1",
+                },
+                "& .Mui-selected": {
+                  color: "#5e62d1",
+                },
+              }}
+            >
+              <Tab label="Parents" />
+              <Tab label="Babysitters" />
+            </Tabs>
+          </TabContainer>
 
-          
           {renderTabContent()}
         </ContentWrapper>
       </PageWrapper>
