@@ -9,7 +9,14 @@ import {
 } from "@mui/material";
 import { useParams, useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { FIREBASE_DB } from "../../config/firebase";
 import DefaultUserImage from "../../assets/Babysitter-image.webp";
@@ -234,6 +241,21 @@ const BabysittingApplicationDisplay = () => {
   const handleCreateAgreement = () => {
     if (currentUser && user) {
       navigate(`/agreement/${currentUser.uid}/${userId}`);
+    }
+  };
+
+  const handleDeleteApplication = async () => {
+    try {
+      const applicationDocRef = doc(
+        FIREBASE_DB,
+        "babysittingApplications",
+        application.id
+      );
+      await deleteDoc(applicationDocRef);
+      navigate("/my-applications-and-jobs");
+    } catch (error) {
+      console.error("Error deleting application: ", error);
+      alert("Failed to delete the application. Please try again.");
     }
   };
 
@@ -469,6 +491,27 @@ const BabysittingApplicationDisplay = () => {
                   Create Agreement
                 </Button>
               )}
+            {currentUser?.uid === application.userId && (
+              <Box sx={{ textAlign: "center", marginTop: "30px" }}>
+                <Button
+                  variant="contained"
+                  onClick={handleDeleteApplication}
+                  sx={{
+                    backgroundColor: "#d32f2f",
+                    fontSize: "1rem",
+                    borderRadius: "30px",
+                    padding: "12px 30px",
+                    textTransform: "none",
+                    "&:hover": {
+                      backgroundColor: "#b71c1c",
+                    },
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
+                >
+                  Delete Application
+                </Button>
+              </Box>
+            )}
           </ApplicationSection>
         </InfoSection>
       </ContentWrapper>
