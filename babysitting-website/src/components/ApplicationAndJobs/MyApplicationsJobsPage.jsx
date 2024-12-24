@@ -9,6 +9,7 @@ import {
   Tabs,
   Tab,
   CircularProgress,
+  Avatar,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
@@ -104,6 +105,36 @@ const MyApplicationsJobs = () => {
     return () => unsubscribe();
   }, []);
 
+  const fetchUserData = async (userId) => {
+    try {
+      let userData = null;
+
+      const babysittersRef = query(
+        collection(FIREBASE_DB, "babysitters"),
+        where("userId", "==", userId)
+      );
+      const babysittersSnapshot = await getDocs(babysittersRef);
+      if (!babysittersSnapshot.empty) {
+        userData = babysittersSnapshot.docs[0].data();
+      } else {
+        const guardiansRef = query(
+          collection(FIREBASE_DB, "guardians"),
+          where("userId", "==", userId)
+        );
+        const guardiansSnapshot = await getDocs(guardiansRef);
+        if (!guardiansSnapshot.empty) {
+          userData = guardiansSnapshot.docs[0].data();
+        }
+      }
+
+      if (!userData) throw new Error(`User with ID ${userId} not found`);
+      return userData;
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       if (!userId) return;
@@ -123,10 +154,21 @@ const MyApplicationsJobs = () => {
           getDocs(applicationsRef),
         ]);
 
-        const fetchedAgreements = agreementsSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const fetchedAgreements = await Promise.all(
+          agreementsSnap.docs.map(async (doc) => {
+            const agreement = doc.data();
+            const otherUserId =
+              agreement.senderId === userId
+                ? agreement.recipientId
+                : agreement.senderId;
+            const otherUser = await fetchUserData(otherUserId);
+            return {
+              id: doc.id,
+              ...agreement,
+              otherUser,
+            };
+          })
+        );
 
         const fetchedApplications = applicationsSnap.docs.map((doc) => ({
           id: doc.id,
@@ -172,7 +214,23 @@ const MyApplicationsJobs = () => {
                 <ApplicationCard>
                   <CardContent>
                     <CardHeader>
-                      <Typography variant="h6">{agreement.area}</Typography>
+                      <Box display="flex" alignItems="center">
+                        {agreement.otherUser && (
+                          <>
+                            <Avatar
+                              src={agreement.otherUser.photo || ""}
+                              alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                              style={{
+                                marginRight: "10px",
+                                marginBottom: "10px",
+                              }}
+                            />
+                            <Typography variant="h6">
+                              {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                            </Typography>
+                          </>
+                        )}
+                      </Box>
                       <StatusChip status={agreement.status}>
                         {agreement.status}
                       </StatusChip>
@@ -275,7 +333,7 @@ const MyApplicationsJobs = () => {
           textColor="primary"
           centered
         >
-          <Tab label="Active Agreements" icon={<WorkOutlineIcon />} />
+          <Tab label="Agreements" icon={<WorkOutlineIcon />} />
           <Tab label="Applications" icon={<DoneIcon />} />
           <Tab label="History" icon={<HistoryIcon />} />
         </Tabs>
