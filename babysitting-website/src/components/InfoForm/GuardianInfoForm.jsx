@@ -50,6 +50,32 @@ const LogoText = styled("span")({
   fontFamily: "Poppins, sans-serif",
 });
 
+const StyledTextField = styled(TextField)({
+  fontFamily: "'Poppins', sans-serif",
+  color: "#5e62d1",
+  "& .MuiInputBase-input": {
+    fontFamily: "'Poppins', sans-serif",
+  },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "#ccc",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#5e62d1",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#5e62d1",
+  },
+});
+
+const StyledButton = styled(Button)({
+  fontFamily: "'Poppins', sans-serif",
+  fontSize: "1rem",
+  textTransform: "none",
+  borderRadius: "30px",
+});
+
 const ageGroups = [
   "Infant (0-2 years)",
   "Toddler (3-5 years)",
@@ -91,6 +117,36 @@ const GuardianInfoForm = () => {
   };
 
   const handleNext = () => {
+    const requiredFields = {
+      0: [
+        "firstName",
+        "lastName",
+        "gender",
+        "dateOfBirth",
+        "street",
+        "number",
+        "city",
+        "postal",
+        "email",
+        "phone",
+      ],
+      1: ["numberOfChildren", "childrenAgeGroups", "childrenDescription"],
+      2: ["photo"],
+    };
+
+    const missingFields = requiredFields[currentStep].filter(
+      (field) =>
+        !formValues[field] ||
+        (Array.isArray(formValues[field]) && formValues[field].length === 0)
+    );
+
+    if (missingFields.length > 0) {
+      alert(
+        `Please fill out the following fields: ${missingFields.join(", ")}`
+      );
+      return;
+    }
+
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
@@ -249,7 +305,7 @@ const GuardianInfoForm = () => {
                   Personal Information
                 </Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                  <TextField
+                  <StyledTextField
                     label="First Name"
                     name="firstName"
                     value={formValues.firstName}
@@ -258,7 +314,7 @@ const GuardianInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="Last Name"
                     name="lastName"
                     value={formValues.lastName}
@@ -267,7 +323,7 @@ const GuardianInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     select
                     label="Gender"
                     name="gender"
@@ -279,8 +335,8 @@ const GuardianInfoForm = () => {
                   >
                     <MenuItem value="Male">Male</MenuItem>
                     <MenuItem value="Female">Female</MenuItem>
-                  </TextField>
-                  <TextField
+                  </StyledTextField>
+                  <StyledTextField
                     label="Date of Birth"
                     name="dateOfBirth"
                     type="date"
@@ -291,7 +347,7 @@ const GuardianInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="Street"
                     name="street"
                     value={formValues.street}
@@ -300,7 +356,7 @@ const GuardianInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="No."
                     name="number"
                     value={formValues.number}
@@ -309,7 +365,7 @@ const GuardianInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="City"
                     name="city"
                     value={formValues.city}
@@ -318,7 +374,7 @@ const GuardianInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="Postal"
                     name="postal"
                     value={formValues.postal}
@@ -327,7 +383,7 @@ const GuardianInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="E-Mail"
                     name="email"
                     type="email"
@@ -340,7 +396,7 @@ const GuardianInfoForm = () => {
                     }}
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="Phone"
                     name="phone"
                     value={formValues.phone}
@@ -367,7 +423,7 @@ const GuardianInfoForm = () => {
                   Child Info & Needs
                 </Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                  <TextField
+                  <StyledTextField
                     label="Number of Children"
                     name="numberOfChildren"
                     value={formValues.numberOfChildren}
@@ -376,7 +432,7 @@ const GuardianInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     select
                     label="Children Age Groups"
                     name="childrenAgeGroups"
@@ -416,8 +472,8 @@ const GuardianInfoForm = () => {
                         {ageGroup}
                       </MenuItem>
                     ))}
-                  </TextField>
-                  <TextField
+                  </StyledTextField>
+                  <StyledTextField
                     label="Children Description & Special Needs"
                     name="childrenDescription"
                     value={formValues.childrenDescription}
@@ -477,8 +533,8 @@ const GuardianInfoForm = () => {
                       position: "absolute",
                       bottom: "10px",
                       right: "10px",
-                      width: "50px",
-                      height: "50px",
+                      width: "60px",
+                      height: "60px",
                       backgroundColor: "#5e62d1",
                       color: "white",
                       borderRadius: "100%",
@@ -509,7 +565,7 @@ const GuardianInfoForm = () => {
                 alignItems: "center",
               }}
             >
-              <Button
+              <StyledButton
                 onClick={handleBack}
                 variant="contained"
                 sx={{
@@ -521,9 +577,9 @@ const GuardianInfoForm = () => {
                 disabled={currentStep === 0}
               >
                 Back
-              </Button>
+              </StyledButton>
               {currentStep < steps.length - 1 ? (
-                <Button
+                <StyledButton
                   onClick={handleNext}
                   variant="contained"
                   sx={{
@@ -534,9 +590,9 @@ const GuardianInfoForm = () => {
                   }}
                 >
                   Next
-                </Button>
+                </StyledButton>
               ) : (
-                <Button
+                <StyledButton
                   onClick={handleSubmit}
                   variant="contained"
                   sx={{
@@ -547,7 +603,7 @@ const GuardianInfoForm = () => {
                   }}
                 >
                   Submit
-                </Button>
+                </StyledButton>
               )}
             </Box>
           </Box>
