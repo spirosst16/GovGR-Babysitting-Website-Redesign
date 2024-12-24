@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Container,
   TextField,
@@ -74,6 +74,7 @@ const EditApplicationForm = () => {
     childAges: [],
   });
 
+  const navigate = useNavigate();
   const [isFocused, setIsFocused] = useState(false);
   const { userId } = useParams();
   const [user, setUser] = useState(null);
@@ -196,6 +197,7 @@ const EditApplicationForm = () => {
       setFormValues(newApplicationData);
 
       alert("Application submitted!");
+      navigate(`/application/${userId}`);
     } catch (error) {
       console.error("Error submitting form:", error);
       alert("Error submitting form. Please try again.");
