@@ -81,6 +81,23 @@ const StyledButton = styled(Button)({
   },
 });
 
+const ScheduleSection = styled(Box)({
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "10px",
+  justifyContent: "space-between",
+  marginTop: "30px",
+});
+
+const ScheduleItem = styled(Box)(({ available }) => ({
+  padding: "10px",
+  backgroundColor: available ? "#5e62d1" : "#f4f4f4",
+  color: available ? "#fff" : "#888",
+  textAlign: "center",
+  borderRadius: "8px",
+  marginBottom: "5px",
+}));
+
 const AgreementPage = () => {
   const { userId1, userId2 } = useParams();
   const [sender, setSender] = useState(null);
@@ -549,9 +566,49 @@ const AgreementPage = () => {
               <Box component="span" sx={{ fontWeight: "bold" }}>
                 Weekly Schedule:
               </Box>{" "}
-              <Box component="span" sx={{ fontWeight: "normal" }}>
-                {formValues.weeklySchedule.join(", ")}
-              </Box>
+              <ScheduleSection>
+                {[
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday",
+                ].map((day, index) => (
+                  <Box key={index} sx={{ width: "100%", flex: 1 }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        textAlign: "center",
+                        fontWeight: "bold",
+                        marginBottom: "20px",
+                        fontFamily: "'Poppins', sans-serif",
+                      }}
+                    >
+                      {day}
+                    </Typography>
+                    {["Morning", "Afternoon", "Evening", "Night"].map(
+                      (timeSlot, idx) => (
+                        <ScheduleItem
+                          key={idx}
+                          available={formValues.weeklySchedule.includes(
+                            `${day} ${timeSlot}`
+                          )}
+                        >
+                          <Typography
+                            sx={{
+                              fontFamily: "'Poppins', sans-serif",
+                            }}
+                          >
+                            {timeSlot}
+                          </Typography>
+                        </ScheduleItem>
+                      )
+                    )}
+                  </Box>
+                ))}
+              </ScheduleSection>
             </Typography>
 
             <Typography
