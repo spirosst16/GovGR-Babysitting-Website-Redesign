@@ -265,10 +265,10 @@ const HowItWorksPage = () => {
               }}
               sx={{
                 "& .MuiTab-root": {
-                  color: "#5e62d1",
+                  color: "#5e62d1 !important",
                 },
                 "& .Mui-selected": {
-                  color: "#5e62d1",
+                  color: "#5e62d1 !important",
                 },
               }}
             >
