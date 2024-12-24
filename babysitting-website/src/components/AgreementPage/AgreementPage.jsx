@@ -25,6 +25,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { deleteDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import DefaultUserImage from "../../assets/Babysitter-image.webp";
 
@@ -89,7 +90,7 @@ const AgreementPage = () => {
   const [formValues, setFormValues] = useState({
     area: "",
     weeklySchedule: [],
-    babysittingPlace: "",
+    babysittingPlace: [],
     startingDate: "",
     endingDate: "",
     additionalNotes: "",
@@ -101,6 +102,11 @@ const AgreementPage = () => {
     startingDate: false,
     endingDate: false,
   });
+  const isEditable = () => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    return currentUser?.uid === userId1 && status === "";
+  };
 
   useEffect(() => {
     const fetchUserData = async (userId, setUser) => {
@@ -137,6 +143,38 @@ const AgreementPage = () => {
         console.error("Error fetching user data:", error);
       }
     };
+
+    const fetchAgreementData = async () => {
+      try {
+        const agreementsRef = collection(FIREBASE_DB, "agreements");
+        const q = query(
+          agreementsRef,
+          where("senderId", "==", userId1),
+          where("recipientId", "==", userId2)
+        );
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          querySnapshot.forEach((doc) => {
+            const agreementData = doc.data();
+            setAgreementId(doc.id);
+            setFormValues({
+              area: agreementData.area,
+              weeklySchedule: agreementData.weeklySchedule,
+              babysittingPlace: agreementData.babysittingPlace,
+              startingDate: agreementData.startingDate,
+              endingDate: agreementData.endingDate,
+              additionalNotes: agreementData.additionalNotes,
+            });
+            setStatus(agreementData.status);
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching agreement data:", error);
+      }
+    };
+
+    fetchAgreementData();
 
     fetchUserData(userId1, setSender);
     fetchUserData(userId2, setRecipient);
@@ -195,6 +233,25 @@ const AgreementPage = () => {
     }
   };
 
+  const handleUnsend = async () => {
+    try {
+      if (!agreementId) {
+        alert("No agreement to unsend.");
+        return;
+      }
+
+      const agreementDocRef = doc(FIREBASE_DB, "agreements", agreementId);
+      await deleteDoc(agreementDocRef);
+
+      setAgreementId(null);
+      setStatus("");
+      console.log("Agreement unsent and deleted.");
+    } catch (error) {
+      console.error("Error unsending agreement:", error);
+      alert("Failed to unsend agreement. Please try again.");
+    }
+  };
+
   const handleAccept = async () => {
     try {
       if (!agreementId) {
@@ -214,11 +271,34 @@ const AgreementPage = () => {
   };
 
   const renderButton = () => {
-    if (status === "") {
-      return <StyledButton onClick={handleSend}>Send</StyledButton>;
-    }
-    if (status === "pending") {
-      return <StyledButton onClick={handleAccept}>Accept</StyledButton>;
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) return null;
+
+    if (currentUser.uid === userId1) {
+      if (status === "pending") {
+        return (
+          <Box>
+            <StyledButton onClick={handleUnsend}>Unsend</StyledButton>
+          </Box>
+        );
+      }
+      if (status === "") {
+        return (
+          <Box>
+            <StyledButton onClick={handleSend}>Send</StyledButton>
+          </Box>
+        );
+      }
+    } else if (currentUser.uid === userId2) {
+      if (status === "pending") {
+        return (
+          <Box>
+            <StyledButton onClick={handleAccept}>Accept</StyledButton>
+          </Box>
+        );
+      }
     }
     return null;
   };
@@ -265,168 +345,264 @@ const AgreementPage = () => {
           </AvatarSection>
         </UserSection>
 
-        <DetailsSection>
-          <Typography
-            variant="h5"
-            sx={{
-              fontFamily: "'Poppins', sans-serif",
-              fontWeight: "bold",
-              textAlign: "center",
-              marginBottom: "10px",
-            }}
-          >
-            Agreement Details
-          </Typography>
-          <TextField
-            fullWidth
-            label="Area"
-            name="area"
-            value={formValues.area}
-            onChange={handleInputChange}
-            variant="outlined"
-            required
-            sx={{ fontFamily: "'Poppins', sans-serif" }}
-          />
+        {isEditable() ? (
+          <DetailsSection>
+            <Typography
+              variant="h5"
+              sx={{
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: "bold",
+                textAlign: "center",
+                marginBottom: "10px",
+              }}
+            >
+              Agreement Details
+            </Typography>
+            <TextField
+              fullWidth
+              label="Area"
+              name="area"
+              value={formValues.area}
+              onChange={handleInputChange}
+              variant="outlined"
+              required
+              sx={{ fontFamily: "'Poppins', sans-serif" }}
+            />
 
-          <FormLabel
-            component="legend"
-            sx={{ fontFamily: "'Poppins', sans-serif", fontSize: "20px" }}
-          >
-            Weekly Schedule *
-          </FormLabel>
-          <Grid container spacing={3}>
-            {[
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday",
-              "Sunday",
-            ].map((day) => (
-              <Grid item xs={12} sm={6} md={3} key={day}>
-                <Typography variant="h6">{day}</Typography>
-                <FormGroup>
-                  {["Morning", "Afternoon", "Evening", "Night"].map((time) => (
-                    <FormControlLabel
-                      key={time}
-                      control={
-                        <Checkbox
-                          checked={formValues.weeklySchedule.includes(
-                            `${day} ${time}`
-                          )}
-                          onChange={(e) => {
-                            const updatedSchedule = e.target.checked
-                              ? [...formValues.weeklySchedule, `${day} ${time}`]
-                              : formValues.weeklySchedule.filter(
-                                  (slot) => slot !== `${day} ${time}`
-                                );
-                            setFormValues({
-                              ...formValues,
-                              weeklySchedule: updatedSchedule,
-                            });
-                          }}
-                        />
-                      }
-                      label={time}
-                    />
-                  ))}
-                </FormGroup>
-              </Grid>
-            ))}
-          </Grid>
-
-          <FormControl component="fieldset" sx={{ mb: 2 }}>
             <FormLabel
               component="legend"
               sx={{ fontFamily: "'Poppins', sans-serif", fontSize: "20px" }}
             >
-              Babysitting Place *
+              Weekly Schedule *
             </FormLabel>
-            <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formValues.babysittingPlace.includes(
-                      "Family's House"
+            <Grid container spacing={3}>
+              {[
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday",
+              ].map((day) => (
+                <Grid item xs={12} sm={6} md={3} key={day}>
+                  <Typography variant="h6">{day}</Typography>
+                  <FormGroup>
+                    {["Morning", "Afternoon", "Evening", "Night"].map(
+                      (time) => (
+                        <FormControlLabel
+                          key={time}
+                          control={
+                            <Checkbox
+                              checked={formValues.weeklySchedule.includes(
+                                `${day} ${time}`
+                              )}
+                              onChange={(e) => {
+                                const updatedSchedule = e.target.checked
+                                  ? [
+                                      ...formValues.weeklySchedule,
+                                      `${day} ${time}`,
+                                    ]
+                                  : formValues.weeklySchedule.filter(
+                                      (slot) => slot !== `${day} ${time}`
+                                    );
+                                setFormValues({
+                                  ...formValues,
+                                  weeklySchedule: updatedSchedule,
+                                });
+                              }}
+                            />
+                          }
+                          label={time}
+                        />
+                      )
                     )}
-                    onChange={(e) => {
-                      const newBabysittingPlace = e.target.checked
-                        ? [...formValues.babysittingPlace, "Family's House"]
-                        : formValues.babysittingPlace.filter(
-                            (place) => place !== "Family's House"
-                          );
-                      setFormValues({
-                        ...formValues,
-                        babysittingPlace: newBabysittingPlace,
-                      });
-                    }}
-                  />
-                }
-                label="Family's House"
-                sx={{ fontFamily: "'Poppins', sans-serif" }}
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={formValues.babysittingPlace.includes(
-                      "Babysitter's House"
-                    )}
-                    onChange={(e) => {
-                      const newBabysittingPlace = e.target.checked
-                        ? [...formValues.babysittingPlace, "Babysitter's House"]
-                        : formValues.babysittingPlace.filter(
-                            (place) => place !== "Babysitter's House"
-                          );
-                      setFormValues({
-                        ...formValues,
-                        babysittingPlace: newBabysittingPlace,
-                      });
-                    }}
-                  />
-                }
-                label="Babysitter's House"
-                sx={{ fontFamily: "'Poppins', sans-serif" }}
-              />
-            </Box>
-          </FormControl>
+                  </FormGroup>
+                </Grid>
+              ))}
+            </Grid>
 
-          <TextField
-            fullWidth
-            label="Starting Date"
-            name="startingDate"
-            value={formValues.startingDate}
-            onChange={handleInputChange}
-            type="date"
-            InputLabelProps={{ shrink: true }}
-            required
-            sx={{ fontFamily: "'Poppins', sans-serif" }}
-          />
+            <FormControl component="fieldset" sx={{ mb: 2 }}>
+              <FormLabel
+                component="legend"
+                sx={{ fontFamily: "'Poppins', sans-serif", fontSize: "20px" }}
+              >
+                Babysitting Place *
+              </FormLabel>
+              <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={formValues.babysittingPlace.includes(
+                        "Family's House"
+                      )}
+                      onChange={(e) => {
+                        const newBabysittingPlace = e.target.checked
+                          ? [...formValues.babysittingPlace, "Family's House"]
+                          : formValues.babysittingPlace.filter(
+                              (place) => place !== "Family's House"
+                            );
+                        setFormValues({
+                          ...formValues,
+                          babysittingPlace: newBabysittingPlace,
+                        });
+                      }}
+                    />
+                  }
+                  label="Family's House"
+                  sx={{ fontFamily: "'Poppins', sans-serif" }}
+                />
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={formValues.babysittingPlace.includes(
+                        "Babysitter's House"
+                      )}
+                      onChange={(e) => {
+                        const newBabysittingPlace = e.target.checked
+                          ? [
+                              ...formValues.babysittingPlace,
+                              "Babysitter's House",
+                            ]
+                          : formValues.babysittingPlace.filter(
+                              (place) => place !== "Babysitter's House"
+                            );
+                        setFormValues({
+                          ...formValues,
+                          babysittingPlace: newBabysittingPlace,
+                        });
+                      }}
+                    />
+                  }
+                  label="Babysitter's House"
+                  sx={{ fontFamily: "'Poppins', sans-serif" }}
+                />
+              </Box>
+            </FormControl>
 
-          <TextField
-            fullWidth
-            label="Ending Date"
-            name="endingDate"
-            value={formValues.endingDate}
-            onChange={handleInputChange}
-            type="date"
-            InputLabelProps={{ shrink: true }}
-            required
-            sx={{ fontFamily: "'Poppins', sans-serif" }}
-          />
+            <TextField
+              fullWidth
+              label="Starting Date"
+              name="startingDate"
+              value={formValues.startingDate}
+              onChange={handleInputChange}
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              required
+              sx={{ fontFamily: "'Poppins', sans-serif" }}
+            />
 
-          <TextField
-            fullWidth
-            label="Additional Notes"
-            name="additionalNotes"
-            value={formValues.additionalNotes}
-            onChange={handleInputChange}
-            multiline
-            rows={4}
-            variant="outlined"
-            sx={{ fontFamily: "'Poppins', sans-serif" }}
-          />
-        </DetailsSection>
+            <TextField
+              fullWidth
+              label="Ending Date"
+              name="endingDate"
+              value={formValues.endingDate}
+              onChange={handleInputChange}
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              required
+              sx={{ fontFamily: "'Poppins', sans-serif" }}
+            />
+
+            <TextField
+              fullWidth
+              label="Additional Notes"
+              name="additionalNotes"
+              value={formValues.additionalNotes}
+              onChange={handleInputChange}
+              multiline
+              rows={4}
+              variant="outlined"
+              sx={{ fontFamily: "'Poppins', sans-serif" }}
+            />
+          </DetailsSection>
+        ) : (
+          <DetailsSection>
+            <Typography
+              variant="h5"
+              sx={{
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: "bold",
+                textAlign: "center",
+                marginBottom: "10px",
+              }}
+            >
+              Agreement Details
+            </Typography>
+
+            <Typography
+              variant="h6"
+              sx={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                Area:
+              </Box>{" "}
+              <Box component="span" sx={{ fontWeight: "normal" }}>
+                {formValues.area}
+              </Box>
+            </Typography>
+
+            <Typography
+              variant="h6"
+              sx={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                Weekly Schedule:
+              </Box>{" "}
+              <Box component="span" sx={{ fontWeight: "normal" }}>
+                {formValues.weeklySchedule.join(", ")}
+              </Box>
+            </Typography>
+
+            <Typography
+              variant="h6"
+              sx={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                Babysitting Place:
+              </Box>{" "}
+              <Box component="span" sx={{ fontWeight: "normal" }}>
+                {formValues.babysittingPlace.join(", ")}
+              </Box>
+            </Typography>
+
+            <Typography
+              variant="h6"
+              sx={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                Starting Date:
+              </Box>{" "}
+              <Box component="span" sx={{ fontWeight: "normal" }}>
+                {formValues.startingDate}
+              </Box>
+            </Typography>
+
+            <Typography
+              variant="h6"
+              sx={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                Ending Date:
+              </Box>{" "}
+              <Box component="span" sx={{ fontWeight: "normal" }}>
+                {formValues.endingDate}
+              </Box>
+            </Typography>
+
+            <Typography
+              variant="h6"
+              sx={{ fontFamily: "'Poppins', sans-serif" }}
+            >
+              <Box component="span" sx={{ fontWeight: "bold" }}>
+                Additional Notes:
+              </Box>{" "}
+              <Box component="span" sx={{ fontWeight: "normal" }}>
+                {formValues.additionalNotes}
+              </Box>
+            </Typography>
+          </DetailsSection>
+        )}
 
         <Box sx={{ textAlign: "center", marginTop: "20px" }}>
           {renderButton()}
