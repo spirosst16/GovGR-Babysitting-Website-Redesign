@@ -98,12 +98,12 @@ const HowItWorksPage = () => {
     },
     {
       title: "Secure Payments",
-      description: ["Pay securely via our integrated system—no cash needed."],
+      description: ["Pay securely via our integrated system — no cash needed."],
     },
     {
       title: "Leave Reviews",
       description: [
-        "Parents: Share your feedback on babysitters and rate them, so other families",
+        "Share your feedback on babysitters and rate them, so other families",
         "will choose more effectively their babysitter.",
       ],
     },
@@ -272,8 +272,14 @@ const HowItWorksPage = () => {
                 },
               }}
             >
-              <Tab label="Parents" />
-              <Tab label="Babysitters" />
+              <Tab
+                label="Guardians"
+                sx={{ fontSize: "1.4rem", textTransform: "none" }}
+              />
+              <Tab
+                label="Babysitters"
+                sx={{ fontSize: "1.4rem", textTransform: "none" }}
+              />
             </Tabs>
           </TabContainer>
 
