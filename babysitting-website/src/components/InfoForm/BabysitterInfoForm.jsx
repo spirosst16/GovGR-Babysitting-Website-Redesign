@@ -16,6 +16,8 @@ import defaultProfile from "../../assets/default-profile.jpg";
 import { getAuth } from "firebase/auth";
 import { collection, addDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
+import UploadIcon from "@mui/icons-material/Upload";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import "../../style.css";
 
 // Logo components
@@ -48,6 +50,32 @@ const LogoText = styled("span")({
   fontWeight: "bold",
   color: "#000000",
   fontFamily: "Poppins, sans-serif",
+});
+
+const StyledTextField = styled(TextField)({
+  fontFamily: "'Poppins', sans-serif",
+  color: "#5e62d1",
+  "& .MuiInputBase-input": {
+    fontFamily: "'Poppins', sans-serif",
+  },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "#ccc",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#5e62d1",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#5e62d1",
+  },
+});
+
+const StyledButton = styled(Button)({
+  fontFamily: "'Poppins', sans-serif",
+  fontSize: "1rem",
+  textTransform: "none",
+  borderRadius: "30px",
 });
 
 const languages = [
@@ -315,7 +343,7 @@ const BabysitterInfoForm = () => {
                   Personal Information
                 </Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-                  <TextField
+                  <StyledTextField
                     label="First Name"
                     name="firstName"
                     value={formValues.firstName}
@@ -324,7 +352,7 @@ const BabysitterInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="Last Name"
                     name="lastName"
                     value={formValues.lastName}
@@ -333,7 +361,7 @@ const BabysitterInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     select
                     label="Gender"
                     name="gender"
@@ -345,8 +373,8 @@ const BabysitterInfoForm = () => {
                   >
                     <MenuItem value="Male">Male</MenuItem>
                     <MenuItem value="Female">Female</MenuItem>
-                  </TextField>
-                  <TextField
+                  </StyledTextField>
+                  <StyledTextField
                     label="Date of Birth"
                     name="dateOfBirth"
                     type="date"
@@ -357,7 +385,7 @@ const BabysitterInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="Street"
                     name="street"
                     value={formValues.street}
@@ -366,7 +394,7 @@ const BabysitterInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="No."
                     name="number"
                     value={formValues.number}
@@ -375,7 +403,7 @@ const BabysitterInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="City"
                     name="city"
                     value={formValues.city}
@@ -384,7 +412,7 @@ const BabysitterInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="Postal"
                     name="postal"
                     value={formValues.postal}
@@ -393,7 +421,7 @@ const BabysitterInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="E-Mail"
                     name="email"
                     type="email"
@@ -406,7 +434,7 @@ const BabysitterInfoForm = () => {
                     }}
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <TextField
+                  <StyledTextField
                     label="Phone"
                     name="phone"
                     type="tel"
@@ -433,125 +461,48 @@ const BabysitterInfoForm = () => {
                 >
                   Experience & Education
                 </Typography>
-                <TextField
-                  label="Experience"
-                  name="experience"
-                  value={formValues.experience}
-                  onChange={handleChange}
-                  required
-                  fullWidth
-                  multiline
-                  rows={4}
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  label="Education"
-                  name="education"
-                  value={formValues.education}
-                  onChange={handleChange}
-                  required
-                  fullWidth
-                  multiline
-                  rows={4}
-                  sx={{ mb: 2 }}
-                />
-                <TextField
-                  select
-                  label="Known Languages"
-                  name="knownLanguages"
-                  value={formValues.knownLanguages}
-                  onChange={(e) =>
-                    setFormValues({
-                      ...formValues,
-                      knownLanguages: e.target.value,
-                    })
-                  }
-                  SelectProps={{
-                    multiple: true,
-                    MenuProps: {
-                      PaperProps: {
-                        style: {
-                          maxHeight: 190,
-                          marginTop: "10px",
-                        },
-                      },
-                      anchorOrigin: {
-                        vertical: "bottom",
-                        horizontal: "left",
-                      },
-                      transformOrigin: {
-                        vertical: "top",
-                        horizontal: "left",
-                      },
-                    },
+                <Box
+                  sx={{
+                    mb: 2,
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 2,
                   }}
-                  fullWidth
-                  sx={{ mb: 2 }}
                 >
-                  {languages.map((language) => (
-                    <MenuItem
-                      key={language}
-                      value={language}
+                  <StyledTextField
+                    label="Experience"
+                    name="experience"
+                    value={formValues.experience}
+                    onChange={handleChange}
+                    required
+                    fullWidth
+                    multiline
+                    rows={4}
+                    sx={{ mb: 2 }}
+                  />
+                  <Box
+                    sx={{
+                      mb: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Button
+                      component="label"
+                      variant="outlined"
+                      startIcon={<UploadIcon />}
                       sx={{
+                        color: "#5e62d1",
+                        borderColor: "#5e62d1",
+                        textTransform: "none",
                         "&:hover": {
-                          backgroundColor: "#f0f0f0",
+                          borderColor: "#4a4fbf",
+                          backgroundColor: "rgba(94, 98, 209, 0.1)",
                         },
                       }}
                     >
-                      {language}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <TextField
-                  select
-                  label="Childcare Activities"
-                  name="childcareActivities"
-                  value={formValues.childcareActivities}
-                  onChange={(e) =>
-                    setFormValues({
-                      ...formValues,
-                      childcareActivities: e.target.value,
-                    })
-                  }
-                  SelectProps={{
-                    multiple: true,
-                    MenuProps: {
-                      PaperProps: {
-                        style: {
-                          maxHeight: 115,
-                          marginTop: "10px",
-                        },
-                      },
-                    },
-                  }}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                >
-                  {childcareActivities.map((activity) => (
-                    <MenuItem key={activity} value={activity}>
-                      {activity}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <Box sx={{ mb: 2 }}>
-                  <Box>
-                    <Button component="label" sx={{ mt: 1, mb: 1 }}>
-                      Upload Education Proof
-                      <input
-                        type="file"
-                        hidden
-                        onChange={handleFileUpload("educationProofUploaded")}
-                      />
-                    </Button>
-                    {formValues.educationProofUploaded && (
-                      <Typography variant="body2" color="green">
-                        Uploaded
-                      </Typography>
-                    )}
-                  </Box>
-                  <Box>
-                    <Button component="label" sx={{ mt: 1, mb: 1 }}>
-                      Upload Letters of Recommendation
+                      Upload Recommendation Letters
                       <input
                         type="file"
                         hidden
@@ -561,28 +512,193 @@ const BabysitterInfoForm = () => {
                       />
                     </Button>
                     {formValues.recommendationLettersUploaded && (
-                      <Typography variant="body2" color="green">
-                        Uploaded
-                      </Typography>
+                      <CheckCircleIcon sx={{ color: "green", fontSize: 30 }} />
                     )}
                   </Box>
-                  <Box>
-                    <Button component="label" sx={{ mt: 1, mb: 1 }}>
-                      Upload First Aid Certificate
-                      <input
-                        type="file"
-                        hidden
-                        onChange={handleFileUpload(
-                          "firstAidCertificateUploaded"
-                        )}
-                      />
-                    </Button>
-                    {formValues.firstAidCertificateUploaded && (
-                      <Typography variant="body2" color="green">
-                        Uploaded
-                      </Typography>
-                    )}
+                </Box>
+                <Box
+                  sx={{
+                    mb: 2,
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 2,
+                  }}
+                >
+                  <StyledTextField
+                    label="Education"
+                    name="education"
+                    value={formValues.education}
+                    onChange={handleChange}
+                    required
+                    fullWidth
+                    multiline
+                    rows={4}
+                    sx={{ flex: 2 }}
+                  />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      flex: 1,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        mb: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <Button
+                        component="label"
+                        variant="outlined"
+                        startIcon={<UploadIcon />}
+                        sx={{
+                          color: "#5e62d1",
+                          borderColor: "#5e62d1",
+                          textTransform: "none",
+                          padding: "14px",
+                          "&:hover": {
+                            borderColor: "#4a4fbf",
+                            backgroundColor: "rgba(94, 98, 209, 0.1)",
+                          },
+                        }}
+                      >
+                        Upload Education Proof
+                        <input
+                          type="file"
+                          hidden
+                          onChange={handleFileUpload("educationProofUploaded")}
+                        />
+                      </Button>
+                      {formValues.educationProofUploaded && (
+                        <CheckCircleIcon
+                          sx={{ color: "green", fontSize: 30 }}
+                        />
+                      )}
+                    </Box>
+                    <Box
+                      sx={{
+                        mb: 2,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <Button
+                        component="label"
+                        variant="outlined"
+                        startIcon={<UploadIcon />}
+                        sx={{
+                          color: "#5e62d1",
+                          borderColor: "#5e62d1",
+                          textTransform: "none",
+                          padding: "14px",
+                          "&:hover": {
+                            borderColor: "#4a4fbf",
+                            backgroundColor: "rgba(94, 98, 209, 0.1)",
+                          },
+                        }}
+                      >
+                        Upload First Aid Certificate
+                        <input
+                          type="file"
+                          hidden
+                          onChange={handleFileUpload(
+                            "firstAidCertificateUploaded"
+                          )}
+                        />
+                      </Button>
+                      {formValues.firstAidCertificateUploaded && (
+                        <CheckCircleIcon
+                          sx={{ color: "green", fontSize: 30 }}
+                        />
+                      )}
+                    </Box>
                   </Box>
+                </Box>
+                <Box
+                  sx={{ mb: 2, display: "flex", alignItems: "center", gap: 2 }}
+                >
+                  <StyledTextField
+                    select
+                    label="Known Languages"
+                    name="knownLanguages"
+                    value={formValues.knownLanguages}
+                    onChange={(e) =>
+                      setFormValues({
+                        ...formValues,
+                        knownLanguages: e.target.value,
+                      })
+                    }
+                    SelectProps={{
+                      multiple: true,
+                      MenuProps: {
+                        PaperProps: {
+                          style: {
+                            maxHeight: 190,
+                            marginTop: "10px",
+                          },
+                        },
+                        anchorOrigin: {
+                          vertical: "bottom",
+                          horizontal: "left",
+                        },
+                        transformOrigin: {
+                          vertical: "top",
+                          horizontal: "left",
+                        },
+                      },
+                    }}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  >
+                    {languages.map((language) => (
+                      <MenuItem
+                        key={language}
+                        value={language}
+                        sx={{
+                          "&:hover": {
+                            backgroundColor: "#f0f0f0",
+                          },
+                        }}
+                      >
+                        {language}
+                      </MenuItem>
+                    ))}
+                  </StyledTextField>
+                  <StyledTextField
+                    select
+                    label="Childcare Activities"
+                    name="childcareActivities"
+                    value={formValues.childcareActivities}
+                    onChange={(e) =>
+                      setFormValues({
+                        ...formValues,
+                        childcareActivities: e.target.value,
+                      })
+                    }
+                    SelectProps={{
+                      multiple: true,
+                      MenuProps: {
+                        PaperProps: {
+                          style: {
+                            maxHeight: 115,
+                            marginTop: "10px",
+                          },
+                        },
+                      },
+                    }}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                  >
+                    {childcareActivities.map((activity) => (
+                      <MenuItem key={activity} value={activity}>
+                        {activity}
+                      </MenuItem>
+                    ))}
+                  </StyledTextField>
                 </Box>
               </div>
             )}
@@ -609,7 +725,7 @@ const BabysitterInfoForm = () => {
                     gap: 3,
                   }}
                 >
-                  <TextField
+                  <StyledTextField
                     label="Bio"
                     name="bio"
                     value={formValues.bio}
@@ -653,8 +769,8 @@ const BabysitterInfoForm = () => {
                         position: "absolute",
                         bottom: "10px",
                         right: "10px",
-                        width: "50px",
-                        height: "50px",
+                        width: "60px",
+                        height: "60px",
                         backgroundColor: "#5e62d1",
                         color: "white",
                         borderRadius: "100%",
@@ -686,7 +802,7 @@ const BabysitterInfoForm = () => {
                 alignItems: "center",
               }}
             >
-              <Button
+              <StyledButton
                 onClick={handleBack}
                 variant="contained"
                 sx={{
@@ -698,9 +814,9 @@ const BabysitterInfoForm = () => {
                 disabled={currentStep === 0}
               >
                 Back
-              </Button>
+              </StyledButton>
               {currentStep < steps.length - 1 ? (
-                <Button
+                <StyledButton
                   onClick={handleNext}
                   variant="contained"
                   sx={{
@@ -711,9 +827,9 @@ const BabysitterInfoForm = () => {
                   }}
                 >
                   Next
-                </Button>
+                </StyledButton>
               ) : (
-                <Button
+                <StyledButton
                   onClick={handleSubmit}
                   variant="contained"
                   sx={{
@@ -724,7 +840,7 @@ const BabysitterInfoForm = () => {
                   }}
                 >
                   Submit
-                </Button>
+                </StyledButton>
               )}
             </Box>
           </Box>
