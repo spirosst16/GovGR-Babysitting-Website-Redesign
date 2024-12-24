@@ -668,7 +668,7 @@ const BabysittersPage = () => {
             fontWeight: "600",
             fontSize: "16px",
           }}
-          onClick={() => (window.location.href = "/my-applications-and-jobs")}
+          onClick={() => (window.location.href = "/babysitting-application")}
         >
           Create an application now
         </Button>
