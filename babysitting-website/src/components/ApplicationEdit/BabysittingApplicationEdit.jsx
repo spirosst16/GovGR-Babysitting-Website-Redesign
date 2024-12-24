@@ -71,8 +71,16 @@ const StyledTextField = styled(TextField)({
   "& .MuiInputBase-input": {
     fontFamily: "'Poppins', sans-serif",
   },
-  "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
-    borderColor: "#5e62d1",
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "#ccc",
+    },
+    "&:hover fieldset": {
+      borderColor: "#5e62d1",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#5e62d1",
+    },
   },
 });
 

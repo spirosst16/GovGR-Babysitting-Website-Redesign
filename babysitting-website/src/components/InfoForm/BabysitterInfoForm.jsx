@@ -97,6 +97,9 @@ const BabysitterInfoForm = () => {
     childcareActivities: [],
     bio: "",
     photo: "",
+    educationProofUploaded: false,
+    recommendationLettersUploaded: false,
+    firstAidCertificateUploaded: false,
     rating: 0,
     reviews: [],
   });
@@ -115,9 +118,37 @@ const BabysitterInfoForm = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+    const requiredFields = {
+      0: [
+        "firstName",
+        "lastName",
+        "gender",
+        "dateOfBirth",
+        "street",
+        "number",
+        "city",
+        "postal",
+        "email",
+        "phone",
+      ],
+      1: ["experience", "education", "knownLanguages", "childcareActivities"],
+      2: ["bio", "photo"],
+    };
+
+    const missingFields = requiredFields[currentStep].filter(
+      (field) =>
+        !formValues[field] ||
+        (Array.isArray(formValues[field]) && formValues[field].length === 0)
+    );
+
+    if (missingFields.length > 0) {
+      alert(
+        `Please fill out the following fields: ${missingFields.join(", ")}`
+      );
+      return;
     }
+
+    setCurrentStep(currentStep + 1);
   };
 
   const handleBack = () => {
@@ -184,6 +215,9 @@ const BabysitterInfoForm = () => {
         childcareActivities: [],
         bio: "",
         photo: "",
+        educationProofUploaded: false,
+        recommendationLettersUploaded: false,
+        firstAidCertificateUploaded: false,
         rating: 0,
         reviews: [],
       });
@@ -192,6 +226,13 @@ const BabysitterInfoForm = () => {
       console.error("Error adding document: ", error);
       alert("Error submitting form. Please try again.");
     }
+  };
+
+  const handleFileUpload = (fieldName) => () => {
+    setFormValues((prev) => ({
+      ...prev,
+      [fieldName]: true,
+    }));
   };
 
   return (
@@ -492,6 +533,57 @@ const BabysitterInfoForm = () => {
                     </MenuItem>
                   ))}
                 </TextField>
+                <Box sx={{ mb: 2 }}>
+                  <Box>
+                    <Button component="label" sx={{ mt: 1, mb: 1 }}>
+                      Upload Education Proof
+                      <input
+                        type="file"
+                        hidden
+                        onChange={handleFileUpload("educationProofUploaded")}
+                      />
+                    </Button>
+                    {formValues.educationProofUploaded && (
+                      <Typography variant="body2" color="green">
+                        Uploaded
+                      </Typography>
+                    )}
+                  </Box>
+                  <Box>
+                    <Button component="label" sx={{ mt: 1, mb: 1 }}>
+                      Upload Letters of Recommendation
+                      <input
+                        type="file"
+                        hidden
+                        onChange={handleFileUpload(
+                          "recommendationLettersUploaded"
+                        )}
+                      />
+                    </Button>
+                    {formValues.recommendationLettersUploaded && (
+                      <Typography variant="body2" color="green">
+                        Uploaded
+                      </Typography>
+                    )}
+                  </Box>
+                  <Box>
+                    <Button component="label" sx={{ mt: 1, mb: 1 }}>
+                      Upload First Aid Certificate
+                      <input
+                        type="file"
+                        hidden
+                        onChange={handleFileUpload(
+                          "firstAidCertificateUploaded"
+                        )}
+                      />
+                    </Button>
+                    {formValues.firstAidCertificateUploaded && (
+                      <Typography variant="body2" color="green">
+                        Uploaded
+                      </Typography>
+                    )}
+                  </Box>
+                </Box>
               </div>
             )}
 
