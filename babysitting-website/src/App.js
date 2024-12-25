@@ -23,6 +23,7 @@ import MyApplicationsJobsPage from "./components/ApplicationAndJobs/MyApplicatio
 import BabysittingApplicationDisplay from "./components/ApplicationDisplay/BabysittingApplicationDisplay";
 import BabysittingApplicationEdit from "./components/ApplicationEdit/BabysittingApplicationEdit";
 import AgreementPage from "./components/AgreementPage/AgreementPage";
+import ChatPage from "./components/ChatPage/ChatPage";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -99,8 +100,13 @@ function App() {
           path="/agreement/:userId1/:userId2"
           element={user ? <AgreementPage /> : <Navigate to="/login" />}
         />
+        <Route
+          path="/messages"
+          element={user ? <ChatPage /> : <Navigate to="/login" />}
+        />
       </Routes>
-      {!shouldHideNavbarAndFooter && <Footer />}
+      {!shouldHideNavbarAndFooter &&
+        !location.pathname.includes("/messages") && <Footer />}
     </>
   );
 }
