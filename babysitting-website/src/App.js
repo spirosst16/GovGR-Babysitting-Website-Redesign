@@ -101,12 +101,13 @@ function App() {
           element={user ? <AgreementPage /> : <Navigate to="/login" />}
         />
         <Route
-          path="/messages"
+          path="/chats/:chatId"
           element={user ? <ChatPage /> : <Navigate to="/login" />}
         />
       </Routes>
-      {!shouldHideNavbarAndFooter &&
-        !location.pathname.includes("/messages") && <Footer />}
+      {!shouldHideNavbarAndFooter && !location.pathname.includes("/chats") && (
+        <Footer />
+      )}
     </>
   );
 }

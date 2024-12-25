@@ -19,6 +19,9 @@ import {
   where,
   onSnapshot,
   getDocs,
+  getDoc,
+  doc,
+  setDoc,
   addDoc,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
@@ -103,6 +106,24 @@ const ChatPage = () => {
     }
   }, [currentUser]);
 
+  useEffect(() => {
+    if (selectedUser && currentUser) {
+      const chatId = [currentUser.uid, selectedUser.id].sort().join("_");
+
+      const messagesRef = collection(FIREBASE_DB, `chats/${chatId}/messages`);
+
+      const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
+        const newMessages = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setMessages(newMessages);
+      });
+
+      return () => unsubscribe();
+    }
+  }, [selectedUser, currentUser]);
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
       // Reset the user list if the search query is empty
@@ -164,13 +185,31 @@ const ChatPage = () => {
       const chatId = [currentUser.uid, selectedUser.id].sort().join("_");
       const messagesRef = collection(FIREBASE_DB, `chats/${chatId}/messages`);
 
-      await addDoc(messagesRef, {
-        text: newMessage,
-        senderId: currentUser.uid,
-        timestamp: new Date().getTime(),
-      });
+      try {
+        console.log("Sending message:", newMessage);
 
-      setNewMessage("");
+        const chatDocRef = doc(FIREBASE_DB, "chats", chatId);
+        const chatDoc = await getDoc(chatDocRef);
+
+        if (!chatDoc.exists()) {
+          await setDoc(chatDocRef, {
+            createdAt: new Date().getTime(),
+            participants: [currentUser.uid, selectedUser.id],
+          });
+        }
+
+        await addDoc(messagesRef, {
+          text: newMessage,
+          senderId: currentUser.uid,
+          timestamp: new Date().getTime(),
+        });
+
+        setNewMessage("");
+      } catch (error) {
+        console.error("Error sending message:", error);
+      }
+    } else {
+      console.log("No message or user selected.");
     }
   };
 
