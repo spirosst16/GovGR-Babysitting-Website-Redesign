@@ -343,10 +343,7 @@ const BabysittingJobsPage = () => {
               "& .MuiOutlinedInput-root": {
                 borderRadius: "25px",
                 "& fieldset": {
-                  borderColor: "rgba(0, 0, 0, 0.23)",
-                },
-                "&:hover fieldset": {
-                  borderColor: "rgba(0, 0, 0, 0.23)",
+                  borderColor: "#ccc",
                 },
                 "&.Mui-focused fieldset": {
                   borderColor: "#5e62d1",
@@ -360,19 +357,31 @@ const BabysittingJobsPage = () => {
               },
             }}
           />
-          <IconButton
-            onClick={() => applyFilters()}
-            style={{
-              backgroundColor: "#5e62d1",
-              color: "#fff",
-              padding: "10px",
-              borderRadius: "50%",
-            }}
-          >
-            <SearchIcon />
-          </IconButton>
 
-          <Tooltip title="Apply Filters" arrow>
+          <Tooltip title="Search" arrow>
+            <IconButton
+              onClick={() => applyFilters()}
+              style={{
+                backgroundColor: "#5e62d1",
+                color: "#fff",
+                padding: "10px",
+                borderRadius: "50%",
+                transition: "transform 0.2s, background-color 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#4248a6";
+                e.currentTarget.style.transform = "scale(1.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#5e62d1";
+                e.currentTarget.style.transform = "scale(1)";
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Filters" arrow>
             <IconButton
               onClick={() => setOpenFilterDialog(true)}
               style={{
@@ -380,6 +389,15 @@ const BabysittingJobsPage = () => {
                 color: "#fff",
                 padding: "10px",
                 borderRadius: "50%",
+                transition: "transform 0.2s, background-color 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#4248a6";
+                e.currentTarget.style.transform = "scale(1.1)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#5e62d1";
+                e.currentTarget.style.transform = "scale(1)";
               }}
             >
               <FilterAltIcon />
@@ -530,7 +548,9 @@ const BabysittingJobsPage = () => {
           onClose={() => setOpenFilterDialog(false)}
           maxWidth="md"
         >
-          <DialogTitle>Apply Filters</DialogTitle>
+          <DialogTitle sx={{ fontFamily: "Poppins, sans-serif" }}>
+            Apply Filters
+          </DialogTitle>
           <DialogContent>
             {[
               {
@@ -571,7 +591,7 @@ const BabysittingJobsPage = () => {
               return (
                 <FormControl
                   fullWidth
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 2, mt: 1 }}
                   key={index}
                   variant="outlined"
                 >
@@ -588,6 +608,7 @@ const BabysittingJobsPage = () => {
                     value={value}
                     onChange={onChange}
                     multiple={multiple}
+                    label={label}
                     renderValue={(selected) =>
                       Array.isArray(selected) ? selected.join(", ") : selected
                     }
@@ -605,15 +626,17 @@ const BabysittingJobsPage = () => {
                   >
                     {options.map((option) => (
                       <MenuItem key={option} value={option}>
-                        <Checkbox
-                          checked={value.includes(option)}
-                          sx={{
-                            color: "#5e62d1",
-                            "&.Mui-checked": {
+                        {multiple && (
+                          <Checkbox
+                            checked={value.includes(option)}
+                            sx={{
                               color: "#5e62d1",
-                            },
-                          }}
-                        />
+                              "&.Mui-checked": {
+                                color: "#5e62d1",
+                              },
+                            }}
+                          />
+                        )}
                         <ListItemText primary={option} />
                       </MenuItem>
                     ))}
