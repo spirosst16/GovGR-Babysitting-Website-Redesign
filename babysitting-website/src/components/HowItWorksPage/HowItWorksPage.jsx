@@ -12,6 +12,10 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Link from "@mui/material/Link";
+import Stack from "@mui/material/Stack";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import "../../style.css";
 
 const PageWrapper = styled(Box)({
@@ -22,6 +26,11 @@ const PageWrapper = styled(Box)({
   display: "flex",
   flexDirection: "column",
 });
+
+function handleClick(event) {
+  event.preventDefault();
+  console.info("You clicked a breadcrumb.");
+}
 
 const ContentWrapper = styled(Box)({
   flex: "1",
@@ -60,6 +69,47 @@ const StepNumber = styled(Box)({
   marginRight: "20px",
   flexShrink: 0,
 });
+
+const CustomSeparator = () => {
+  const breadcrumbs = [
+    <Link
+      underline="hover"
+      key="1"
+      color="inherit"
+      href="/babysitters"
+      onClick={useNavigate("/babysitters")}
+      sx={{
+        "&:hover": {
+          color: "#5e62d1",
+          fontWeight: "700",
+        },
+      }}
+    >
+      Home
+    </Link>,
+    <Link underline="none" key="2" color="inherit">
+      How It Works
+    </Link>,
+  ];
+
+  return (
+    <Stack
+      sx={{
+        position: "absolute",
+        top: "80px",
+        left: "70px",
+        alignItems: "flex-start",
+      }}
+    >
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+      >
+        {breadcrumbs}
+      </Breadcrumbs>
+    </Stack>
+  );
+};
 
 const HowItWorksPage = () => {
   const [currentTab, setCurrentTab] = React.useState(0);
@@ -241,6 +291,7 @@ const HowItWorksPage = () => {
     <>
       <PageWrapper>
         <ContentWrapper>
+          <CustomSeparator />
           <Typography
             variant="h4"
             style={{
