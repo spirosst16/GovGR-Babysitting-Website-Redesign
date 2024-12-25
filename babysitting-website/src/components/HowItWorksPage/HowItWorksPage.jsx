@@ -83,11 +83,19 @@ const CustomSeparator = () => {
           color: "#5e62d1",
           fontWeight: "700",
         },
+        fontFamily: "Poppins, sans-serif",
       }}
     >
       Home
     </Link>,
-    <Link underline="none" key="2" color="inherit">
+    <Link
+      underline="none"
+      key="2"
+      color="inherit"
+      sx={{
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
       How It Works
     </Link>,
   ];

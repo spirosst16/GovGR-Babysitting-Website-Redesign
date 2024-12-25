@@ -29,6 +29,10 @@ import { collection, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Link from "@mui/material/Link";
+import Stack from "@mui/material/Stack";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import "../../style.css";
 
 const GuardianCard = styled(Card)({
@@ -83,6 +87,55 @@ const FilterBox = styled(Box)({
 const FilterDialog = styled(Dialog)({
   padding: "20px",
 });
+
+const CustomSeparator = () => {
+  const breadcrumbs = [
+    <Link
+      underline="hover"
+      key="1"
+      color="inherit"
+      href="/babysitters"
+      onClick={useNavigate("/babysitters")}
+      sx={{
+        "&:hover": {
+          color: "#5e62d1",
+          fontWeight: "700",
+        },
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Home
+    </Link>,
+    <Link
+      underline="none"
+      key="2"
+      color="inherit"
+      sx={{
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Babysitting Jobs
+    </Link>,
+  ];
+
+  return (
+    <Stack
+      sx={{
+        position: "absolute",
+        top: "80px",
+        left: "70px",
+        alignItems: "flex-start",
+      }}
+    >
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+      >
+        {breadcrumbs}
+      </Breadcrumbs>
+    </Stack>
+  );
+};
 
 const BabysittingJobsPage = () => {
   const [guardians, setGuardians] = useState([]);
@@ -240,6 +293,7 @@ const BabysittingJobsPage = () => {
 
   return (
     <>
+      <CustomSeparator />
       <Box
         style={{
           backgroundColor: "#f4f4f4",
