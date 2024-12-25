@@ -24,6 +24,8 @@ import BabysittingApplicationDisplay from "./components/ApplicationDisplay/Babys
 import BabysittingApplicationEdit from "./components/ApplicationEdit/BabysittingApplicationEdit";
 import AgreementPage from "./components/AgreementPage/AgreementPage";
 import ChatPage from "./components/ChatPage/ChatPage";
+import ProfilePage from "./components/Profile/BabysitterProfile"
+
 
 function App() {
   const [user, setUser] = useState(null);
@@ -103,6 +105,12 @@ function App() {
         <Route
           path="/chats/:chatId"
           element={user ? <ChatPage /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/profile"
+          element={
+            user ? <ProfilePage /> : <Navigate to="/login" />
+          }
         />
       </Routes>
       {!shouldHideNavbarAndFooter && !location.pathname.includes("/chats") && (
