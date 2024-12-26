@@ -108,7 +108,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (selectedUser && currentUser) {
-      const chatId = [currentUser.uid, selectedUser.id].sort().join("_");
+      const chatId = [currentUser.uid, selectedUser.userId].sort().join("-");
 
       const messagesRef = collection(FIREBASE_DB, `chats/${chatId}/messages`);
 
@@ -126,7 +126,6 @@ const ChatPage = () => {
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
-      // Reset the user list if the search query is empty
       const babysittersRef = collection(FIREBASE_DB, "babysitters");
       const guardiansRef = collection(FIREBASE_DB, "guardians");
 
@@ -182,7 +181,7 @@ const ChatPage = () => {
 
   const sendMessage = async () => {
     if (newMessage.trim() && currentUser && selectedUser) {
-      const chatId = [currentUser.uid, selectedUser.id].sort().join("_");
+      const chatId = [currentUser.uid, selectedUser.userId].sort().join("-");
       const messagesRef = collection(FIREBASE_DB, `chats/${chatId}/messages`);
 
       try {
@@ -192,12 +191,18 @@ const ChatPage = () => {
         const chatDoc = await getDoc(chatDocRef);
 
         if (!chatDoc.exists()) {
+          if (!currentUser || !selectedUser) {
+            console.error("Current user or selected user is not defined.");
+            return;
+          }
+
           await setDoc(chatDocRef, {
             createdAt: new Date().getTime(),
-            participants: [currentUser.uid, selectedUser.id],
+            participants: [currentUser.uid, selectedUser.userId],
           });
         }
 
+        // Now send the message
         await addDoc(messagesRef, {
           text: newMessage,
           senderId: currentUser.uid,
@@ -255,9 +260,9 @@ const ChatPage = () => {
           <List>
             {userList.map((user) => (
               <ListItem
-                button
+                button="true"
                 key={user.id}
-                selected={selectedUser?.id === user.id}
+                selected={selectedUser?.userId === user.userId}
                 onClick={() => setSelectedUser(user)}
               >
                 <ListItemAvatar>
@@ -273,9 +278,9 @@ const ChatPage = () => {
         </UserListContainer>
         <MessageListContainer>
           <Messages>
-            {messages.map((message, index) => (
+            {messages.map((message) => (
               <Box
-                key={index}
+                key={message.id}
                 display="flex"
                 justifyContent={
                   message.senderId === currentUser.uid
