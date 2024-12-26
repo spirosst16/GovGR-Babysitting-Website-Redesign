@@ -23,6 +23,8 @@ import {
   doc,
   setDoc,
   addDoc,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import SearchIcon from "@mui/icons-material/Search";
@@ -84,12 +86,10 @@ const ChatPage = () => {
       const fetchUsers = async () => {
         const babysittersRef = collection(FIREBASE_DB, "babysitters");
         const guardiansRef = collection(FIREBASE_DB, "guardians");
-
         const [babysittersSnapshot, guardiansSnapshot] = await Promise.all([
           getDocs(query(babysittersRef)),
           getDocs(query(guardiansRef)),
         ]);
-
         const babysitters = babysittersSnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
@@ -98,8 +98,30 @@ const ChatPage = () => {
           id: doc.id,
           ...doc.data(),
         }));
-
-        setUserList([...babysitters, ...guardians]);
+        let users = [...babysitters, ...guardians];
+        const usersWithLastMessage = await Promise.all(
+          users.map(async (user) => {
+            const chatId = [currentUser.uid, user.userId].sort().join("-");
+            const messagesRef = collection(
+              FIREBASE_DB,
+              `chats/${chatId}/messages`
+            );
+            const lastMessageQuery = query(
+              messagesRef,
+              orderBy("timestamp", "desc"),
+              limit(1)
+            );
+            const lastMessageSnapshot = await getDocs(lastMessageQuery);
+            const lastMessage = lastMessageSnapshot.docs[0]?.data() || {
+              timestamp: 0,
+            };
+            return { ...user, lastMessageTimestamp: lastMessage.timestamp };
+          })
+        );
+        usersWithLastMessage.sort(
+          (a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp
+        );
+        setUserList(usersWithLastMessage);
       };
 
       fetchUsers();
@@ -111,8 +133,12 @@ const ChatPage = () => {
       const chatId = [currentUser.uid, selectedUser.userId].sort().join("-");
 
       const messagesRef = collection(FIREBASE_DB, `chats/${chatId}/messages`);
+      const orderedMessagesQuery = query(
+        messagesRef,
+        orderBy("timestamp", "asc")
+      );
 
-      const unsubscribe = onSnapshot(messagesRef, (snapshot) => {
+      const unsubscribe = onSnapshot(orderedMessagesQuery, (snapshot) => {
         const newMessages = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
