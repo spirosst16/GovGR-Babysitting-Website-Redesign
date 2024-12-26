@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import SendIcon from "@mui/icons-material/Send";
 import {
   collection,
   query,
@@ -401,18 +402,28 @@ const ChatPage = () => {
               variant="outlined"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  sendMessage();
+                }
+              }}
               placeholder="Type your message"
+              sx={{ borderRadius: "10px" }}
             />
-            <Button
-              variant="contained"
+            <IconButton
               onClick={sendMessage}
               sx={{
-                backgroundColor: "#5e62d1",
-                "&:hover": { backgroundColor: "#4a54c1" },
+                color: "#5e62d1",
+                padding: "10px",
+                transition: "all 0.3s ease-in-out",
+                "&:hover": {
+                  color: "#4a54c1",
+                  transform: "scale(1.1)",
+                },
               }}
             >
-              Send
-            </Button>
+              <SendIcon />
+            </IconButton>
           </InputContainer>
         </MessageListContainer>
       </Box>
