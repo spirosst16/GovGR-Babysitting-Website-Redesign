@@ -114,7 +114,7 @@ const ProfilePage = () => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          padding: "100px",
+          padding: "50px",
           backgroundColor: "#f4f4f4",
         }}
       >
@@ -123,6 +123,7 @@ const ProfilePage = () => {
           sx={{
             fontFamily: "Poppins, sans-serif",
             fontWeight: "600",
+            marginTop: "50px",
           }}
         >
           Profile
@@ -134,7 +135,6 @@ const ProfilePage = () => {
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          padding: "10px",
           backgroundColor: "#f4f4f4",
         }}
       >
@@ -147,8 +147,6 @@ const ProfilePage = () => {
             borderRadius: "10px",
             boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
             marginLeft: "250px",
-            // width: "10px", // Set the width
-            // height: "20px", // Set the height
           }}
         >
           {/* Profile Picture */}
@@ -157,15 +155,14 @@ const ProfilePage = () => {
               src={profileData.photo}
               alt={profileData.name}
               sx={{
-                width: 100,
-                height: 100,
+                width: 140,
+                height: 140,
                 margin: "0 auto",
                 marginBottom: "10px",
-                border: "2px solid #5e62d1",
               }}
             />
             <Typography
-              sx={{ fontFamily: "Poppins, sans-serif" }}
+              sx={{ fontFamily: "Poppins, sans-serif", fontWeight: "bold" }}
               variant="h6"
             >{`${profileData.firstName} ${profileData.lastName}`}</Typography>
             <Rating
@@ -179,7 +176,11 @@ const ProfilePage = () => {
           <Box>
             <Typography
               variant="body1"
-              sx={{ marginLeft: "100px", fontFamily: "Poppins, sans-serif" }}
+              sx={{
+                marginLeft: "100px",
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "bold",
+              }}
             >
               Area:
             </Typography>
@@ -196,7 +197,11 @@ const ProfilePage = () => {
             />
 
             <Typography
-              sx={{ marginLeft: "100px", fontFamily: "Poppins, sans-serif" }}
+              sx={{
+                marginLeft: "100px",
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "bold",
+              }}
               variant="body1"
             >
               Bio:
@@ -217,7 +222,11 @@ const ProfilePage = () => {
             />
 
             <Typography
-              sx={{ marginLeft: "100px", fontFamily: "Poppins, sans-serif" }}
+              sx={{
+                marginLeft: "100px",
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "bold",
+              }}
               variant="body1"
             >
               Experience:
@@ -237,7 +246,11 @@ const ProfilePage = () => {
             />
 
             <Typography
-              sx={{ marginLeft: "100px", fontFamily: "Poppins, sans-serif" }}
+              sx={{
+                marginLeft: "100px",
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "bold",
+              }}
               variant="body1"
             >
               Level of Education:
@@ -262,7 +275,11 @@ const ProfilePage = () => {
               }}
             >
               <Typography
-                sx={{ marginLeft: "100px", fontFamily: "Poppins, sans-serif" }}
+                sx={{
+                  marginLeft: "100px",
+                  fontFamily: "Poppins, sans-serif",
+                  fontWeight: "bold",
+                }}
                 variant="body1"
               >
                 First Aid Certification
@@ -271,7 +288,11 @@ const ProfilePage = () => {
             </Box>
 
             <Typography
-              sx={{ marginLeft: "100px", fontFamily: "Poppins, sans-serif" }}
+              sx={{
+                marginLeft: "100px",
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "bold",
+              }}
               variant="body1"
             >
               Known Languages:
@@ -288,11 +309,11 @@ const ProfilePage = () => {
               {profileData.knownLanguages?.map((lang, index) => (
                 <Chip
                   sx={{
-                    backgroundColor: "#5e62d1",
-                    color: "white",
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #5e62d1",
                     fontFamily: "Poppins, sans-serif",
                     "& .MuiChip-label": {
-                      color: "white",
+                      color: "#000",
                     },
                   }}
                   key={index}
@@ -303,7 +324,11 @@ const ProfilePage = () => {
             </Box>
 
             <Typography
-              sx={{ marginLeft: "100px", fontFamily: "Poppins, sans-serif" }}
+              sx={{
+                marginLeft: "100px",
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "bold",
+              }}
               variant="body1"
             >
               Childcare Activities:
@@ -320,11 +345,11 @@ const ProfilePage = () => {
               {profileData.childcareActivities?.map((activity, index) => (
                 <Chip
                   sx={{
-                    backgroundColor: "#5e62d1",
-                    color: "white",
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #5e62d1",
                     fontFamily: "Poppins, sans-serif",
                     "& .MuiChip-label": {
-                      color: "white",
+                      color: "#000",
                     },
                   }}
                   key={index}
@@ -340,6 +365,9 @@ const ProfilePage = () => {
                   fontFamily: "Poppins, sans-serif",
                   color: "#5e62d1",
                   borderColor: "#5e62d1",
+                  borderRadius: "30px",
+                  fontSize: "1rem",
+                  textTransform: "none",
                   "&:hover": {
                     borderColor: "#3c3fad",
                     color: "#3c3fad",
@@ -353,6 +381,9 @@ const ProfilePage = () => {
                 sx={{
                   color: "#ffffff",
                   backgroundColor: "#5e62d1",
+                  borderRadius: "30px",
+                  textTransform: "none",
+                  fontSize: "1rem",
                   fontFamily: "Poppins, sans-serif",
                   "&:hover": {
                     backgroundColor: "#3c3fad",
