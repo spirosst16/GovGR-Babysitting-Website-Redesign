@@ -136,6 +136,7 @@ const ProfilePage = () => {
           display: "flex",
           justifyContent: "space-between",
           backgroundColor: "#f4f4f4",
+          pb: 4,
         }}
       >
         {/* Left Section - Profile Form */}
