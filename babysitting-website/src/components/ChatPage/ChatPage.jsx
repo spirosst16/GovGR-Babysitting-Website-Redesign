@@ -161,9 +161,6 @@ const ChatPage = () => {
 
   const handleSearch = async () => {
     const searchQueryLower = searchQuery.trim().toLowerCase();
-    if (!searchQueryLower) {
-      return;
-    }
 
     const babysittersRef = collection(FIREBASE_DB, "babysitters");
     const guardiansRef = collection(FIREBASE_DB, "guardians");
@@ -172,24 +169,55 @@ const ChatPage = () => {
       getDocs(query(babysittersRef)),
       getDocs(query(guardiansRef)),
     ]);
-    const babysitters = babysittersSnapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter(
-        (user) =>
-          user.userId !== currentUser.uid &&
-          (user.firstName.toLowerCase().includes(searchQueryLower) ||
-            user.lastName.toLowerCase().includes(searchQueryLower))
+
+    const babysitters = babysittersSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    const guardians = guardiansSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    let usersToDisplay = [];
+
+    if (searchQueryLower) {
+      const isCurrentUserBabysitter = babysitters.some(
+        (user) => user.userId === currentUser.uid
       );
-    const guardians = guardiansSnapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter(
-        (user) =>
-          user.userId !== currentUser.uid &&
-          (user.firstName.toLowerCase().includes(searchQueryLower) ||
-            user.lastName.toLowerCase().includes(searchQueryLower))
+      const isCurrentUserGuardian = guardians.some(
+        (user) => user.userId === currentUser.uid
       );
 
-    setUserList([...babysitters, ...guardians]);
+      if (isCurrentUserBabysitter) {
+        usersToDisplay = guardians.filter(
+          (user) =>
+            user.userId !== currentUser.uid &&
+            (user.firstName.toLowerCase().includes(searchQueryLower) ||
+              user.lastName.toLowerCase().includes(searchQueryLower))
+        );
+      } else if (isCurrentUserGuardian) {
+        usersToDisplay = babysitters.filter(
+          (user) =>
+            user.userId !== currentUser.uid &&
+            (user.firstName.toLowerCase().includes(searchQueryLower) ||
+              user.lastName.toLowerCase().includes(searchQueryLower))
+        );
+      }
+    }
+
+    if (selectedUser) {
+      const selectedUserIndex = usersToDisplay.findIndex(
+        (user) => user.userId === selectedUser.userId
+      );
+      if (selectedUserIndex !== -1) {
+        usersToDisplay.splice(selectedUserIndex, 1);
+      }
+      usersToDisplay.unshift(selectedUser);
+    }
+
+    setUserList(usersToDisplay);
   };
 
   const sendMessage = async () => {
