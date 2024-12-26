@@ -210,6 +210,11 @@ const Navbar = () => {
               label: "My Applications & Jobs",
               requiresLogin: true,
             },
+            {
+              to: "/chats",
+              label: "Messages",
+              requiresLogin: true,
+            },
           ].map(
             ({ to, label, requiresLogin }) =>
               (!requiresLogin || isLoggedIn) && (
