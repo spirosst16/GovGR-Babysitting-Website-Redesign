@@ -264,6 +264,12 @@ const ChatPage = () => {
                 key={user.id}
                 selected={selectedUser?.userId === user.userId}
                 onClick={() => setSelectedUser(user)}
+                sx={{
+                  backgroundColor:
+                    selectedUser?.userId === user.userId
+                      ? "#d1d4f6"
+                      : "inherit",
+                }}
               >
                 <ListItemAvatar>
                   <Avatar src={user.photo || DefaultUserImage} />
