@@ -26,6 +26,7 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
+import { format } from "date-fns";
 import { getAuth } from "firebase/auth";
 import SearchIcon from "@mui/icons-material/Search";
 import { FIREBASE_DB } from "../../config/firebase";
@@ -99,29 +100,37 @@ const ChatPage = () => {
           ...doc.data(),
         }));
         let users = [...babysitters, ...guardians];
-        const usersWithLastMessage = await Promise.all(
+        const usersWithMessages = await Promise.all(
           users.map(async (user) => {
             const chatId = [currentUser.uid, user.userId].sort().join("-");
             const messagesRef = collection(
               FIREBASE_DB,
               `chats/${chatId}/messages`
             );
-            const lastMessageQuery = query(
-              messagesRef,
-              orderBy("timestamp", "desc"),
-              limit(1)
-            );
-            const lastMessageSnapshot = await getDocs(lastMessageQuery);
-            const lastMessage = lastMessageSnapshot.docs[0]?.data() || {
-              timestamp: 0,
-            };
-            return { ...user, lastMessageTimestamp: lastMessage.timestamp };
+            const messagesSnapshot = await getDocs(messagesRef);
+            if (!messagesSnapshot.empty) {
+              const lastMessageQuery = query(
+                messagesRef,
+                orderBy("timestamp", "desc"),
+                limit(1)
+              );
+              const lastMessageSnapshot = await getDocs(lastMessageQuery);
+              const lastMessage = lastMessageSnapshot.docs[0]?.data() || {
+                timestamp: 0,
+              };
+              return { ...user, lastMessageTimestamp: lastMessage.timestamp };
+            }
+            return null;
           })
         );
-        usersWithLastMessage.sort(
+        const filteredUsers = usersWithMessages.filter((user) => user !== null);
+        filteredUsers.sort(
           (a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp
         );
-        setUserList(usersWithLastMessage);
+        setUserList(filteredUsers);
+        if (filteredUsers.length > 0) {
+          setSelectedUser(filteredUsers[0]);
+        }
       };
 
       fetchUsers();
@@ -151,25 +160,8 @@ const ChatPage = () => {
   }, [selectedUser, currentUser]);
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) {
-      const babysittersRef = collection(FIREBASE_DB, "babysitters");
-      const guardiansRef = collection(FIREBASE_DB, "guardians");
-
-      const [babysittersSnapshot, guardiansSnapshot] = await Promise.all([
-        getDocs(query(babysittersRef)),
-        getDocs(query(guardiansRef)),
-      ]);
-
-      const babysitters = babysittersSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      const guardians = guardiansSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setUserList([...babysitters, ...guardians]);
+    const searchQueryLower = searchQuery.trim().toLowerCase();
+    if (!searchQueryLower) {
       return;
     }
 
@@ -177,30 +169,25 @@ const ChatPage = () => {
     const guardiansRef = collection(FIREBASE_DB, "guardians");
 
     const [babysittersSnapshot, guardiansSnapshot] = await Promise.all([
-      getDocs(
-        query(
-          babysittersRef,
-          where("firstName", ">=", searchQuery),
-          where("firstName", "<=", searchQuery + "\uf8ff")
-        )
-      ),
-      getDocs(
-        query(
-          guardiansRef,
-          where("firstName", ">=", searchQuery),
-          where("firstName", "<=", searchQuery + "\uf8ff")
-        )
-      ),
+      getDocs(query(babysittersRef)),
+      getDocs(query(guardiansRef)),
     ]);
-
-    const babysitters = babysittersSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    const guardians = guardiansSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const babysitters = babysittersSnapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter(
+        (user) =>
+          user.userId !== currentUser.uid &&
+          (user.firstName.toLowerCase().includes(searchQueryLower) ||
+            user.lastName.toLowerCase().includes(searchQueryLower))
+      );
+    const guardians = guardiansSnapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter(
+        (user) =>
+          user.userId !== currentUser.uid &&
+          (user.firstName.toLowerCase().includes(searchQueryLower) ||
+            user.lastName.toLowerCase().includes(searchQueryLower))
+      );
 
     setUserList([...babysitters, ...guardians]);
   };
@@ -310,33 +297,75 @@ const ChatPage = () => {
         </UserListContainer>
         <MessageListContainer>
           <Messages>
-            {messages.map((message) => (
+            {messages.length === 0 && selectedUser ? (
               <Box
-                key={message.id}
                 display="flex"
-                justifyContent={
-                  message.senderId === currentUser.uid
-                    ? "flex-end"
-                    : "flex-start"
-                }
-                marginBottom="10px"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                height="100%"
+                textAlign="center"
               >
-                <Typography
-                  sx={{
-                    backgroundColor:
-                      message.senderId === currentUser.uid ? "#5e62d1" : "#ddd",
-                    color:
-                      message.senderId === currentUser.uid ? "#fff" : "#000",
-                    padding: "10px",
-                    borderRadius: "10px",
-                    maxWidth: "70%",
-                    wordWrap: "break-word",
-                  }}
-                >
-                  {message.text}
+                <Avatar
+                  src={selectedUser.photo}
+                  sx={{ width: 120, height: 120, mb: 2 }}
+                />
+                <Typography variant="h6">
+                  {selectedUser.firstName} {selectedUser.lastName}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
+                  No messages yet. Start the conversation!
                 </Typography>
               </Box>
-            ))}
+            ) : (
+              messages.map((message) => (
+                <Box
+                  key={message.id}
+                  display="flex"
+                  justifyContent={
+                    message.senderId === currentUser.uid
+                      ? "flex-end"
+                      : "flex-start"
+                  }
+                  marginBottom="10px"
+                >
+                  {" "}
+                  <Box
+                    sx={{
+                      backgroundColor:
+                        message.senderId === currentUser.uid
+                          ? "#5e62d1"
+                          : "#ddd",
+                      color:
+                        message.senderId === currentUser.uid ? "#fff" : "#000",
+                      padding: "10px",
+                      borderRadius: "10px",
+                      maxWidth: "70%",
+                      wordWrap: "break-word",
+                    }}
+                  >
+                    {" "}
+                    <Typography>{message.text}</Typography>{" "}
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        marginTop: "2px",
+                        color:
+                          message.senderId === currentUser.uid
+                            ? "#d3d3d3"
+                            : "555",
+                      }}
+                    >
+                      {" "}
+                      {format(
+                        new Date(message.timestamp),
+                        "dd/MM/yyyy hh:mm a"
+                      )}{" "}
+                    </Typography>{" "}
+                  </Box>{" "}
+                </Box>
+              ))
+            )}
           </Messages>
           <InputContainer>
             <TextField
