@@ -26,7 +26,6 @@ const Container = styled(Box)({
   paddingTop: "100px",
   display: "flex",
   flexDirection: "column",
-  alignItems: "flex-start",
 });
 
 const Header = styled(Box)({
@@ -40,8 +39,7 @@ const TabContainer = styled(Box)({
   margin: "20px 0",
   display: "flex",
   flexDirection: "column",
-  alignItems: "flex-start",
-  paddingLeft: "10%",
+  alignItems: "center",
 });
 
 const ApplicationCard = styled(Card)({
@@ -150,22 +148,32 @@ const MyApplicationsJobs = () => {
       if (!userId) return;
       setIsLoading(true);
       try {
-        const agreementsRef = query(
+        const senderAgreementsRef = query(
           collection(FIREBASE_DB, "agreements"),
           where("senderId", "==", userId)
         );
+        const recipientAgreementsRef = query(
+          collection(FIREBASE_DB, "agreements"),
+          where("recipientId", "==", userId)
+        );
+
         const applicationsRef = query(
           collection(FIREBASE_DB, "babysittingApplications"),
           where("userId", "==", userId)
         );
 
-        const [agreementsSnap, applicationsSnap] = await Promise.all([
-          getDocs(agreementsRef),
-          getDocs(applicationsRef),
-        ]);
+        const [senderSnap, recipientSnap, applicationsSnap] = await Promise.all(
+          [
+            getDocs(senderAgreementsRef),
+            getDocs(recipientAgreementsRef),
+            getDocs(applicationsRef),
+          ]
+        );
+
+        const agreementsSnap = [...senderSnap.docs, ...recipientSnap.docs];
 
         const fetchedAgreements = await Promise.all(
-          agreementsSnap.docs.map(async (doc) => {
+          agreementsSnap.map(async (doc) => {
             const agreement = doc.data();
             const otherUserId =
               agreement.senderId === userId
@@ -217,7 +225,7 @@ const MyApplicationsJobs = () => {
 
     if (currentTab === 0) {
       return (
-        <Grid container spacing={3}>
+        <Grid container spacing={3} justifyContent="center" alignItems="center">
           {agreements.length > 0 ? (
             agreements.map((agreement) => (
               <Grid item xs={12} sm={6} md={4} key={agreement.id}>
@@ -231,7 +239,6 @@ const MyApplicationsJobs = () => {
                               src={agreement.otherUser.photo || ""}
                               alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
                               style={{
-                                marginRight: "10px",
                                 marginBottom: "10px",
                               }}
                             />
@@ -269,7 +276,7 @@ const MyApplicationsJobs = () => {
       );
     } else if (currentTab === 1) {
       return (
-        <Grid container spacing={3}>
+        <Grid container spacing={3} justifyContent="center" alignItems="center">
           {applications.length > 0 ? (
             applications.map((application) => (
               <Grid item xs={12} sm={6} md={4} key={application.id}>
