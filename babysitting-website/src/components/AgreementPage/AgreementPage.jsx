@@ -12,9 +12,10 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  CircularProgress,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   collection,
   query,
@@ -100,10 +101,12 @@ const ScheduleItem = styled(Box)(({ available }) => ({
 
 const AgreementPage = () => {
   const { userId1, userId2 } = useParams();
+  const navigate = useNavigate();
   const [sender, setSender] = useState(null);
   const [recipient, setRecipient] = useState(null);
   const [agreementId, setAgreementId] = useState(null);
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     area: "",
     weeklySchedule: [],
@@ -162,6 +165,7 @@ const AgreementPage = () => {
     };
 
     const fetchAgreementData = async () => {
+      setLoading(true);
       try {
         const agreementsRef = collection(FIREBASE_DB, "agreements");
         const q = query(
@@ -185,9 +189,13 @@ const AgreementPage = () => {
             });
             setStatus(agreementData.status);
           });
+        } else {
+          navigate(`/agreement/${userId2}/${userId1}`);
         }
       } catch (error) {
         console.error("Error fetching agreement data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -319,6 +327,22 @@ const AgreementPage = () => {
     }
     return null;
   };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#f4f4f4",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <PageContainer>
