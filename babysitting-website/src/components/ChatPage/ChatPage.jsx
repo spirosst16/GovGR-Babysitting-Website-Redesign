@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   List,
@@ -75,6 +75,7 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -159,6 +160,16 @@ const ChatPage = () => {
       return () => unsubscribe();
     }
   }, [selectedUser, currentUser]);
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSearch = async () => {
     const searchQueryLower = searchQuery.trim().toLowerCase();
@@ -400,6 +411,7 @@ const ChatPage = () => {
                 </Box>
               ))
             )}
+            <div ref={messagesEndRef} />
           </Messages>
           <InputContainer>
             <TextField
