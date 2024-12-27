@@ -14,14 +14,31 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import { getAuth } from "firebase/auth";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  collection,
+  query,
+  where,
+  doc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import "../../style.css";
 
 const ProfilePage = () => {
-  const [profileData, setProfileData] = useState(null);
+  // const [profileData, setProfileData] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [profileData, setProfileData] = useState({
+    city: "",
+    bio: "",
+    experience: "",
+    education: "",
+    knownLanguages: [],
+    childcareActivities: [],
+    firstAid: [],
+  });
   const auth = getAuth();
 
   useEffect(() => {
@@ -35,9 +52,8 @@ const ProfilePage = () => {
           return;
         }
 
-        const userId = user.uid;
         let userData = null;
-
+        const userId = user.uid;
         // Fetch user data
         const babysittersRef = query(
           collection(FIREBASE_DB, "babysitters"),
@@ -94,6 +110,28 @@ const ProfilePage = () => {
       </Box>
     );
   }
+
+  const handleSave = async () => {
+    if (!profileData?.id) return;
+
+    const newProfileData = {
+      ...profileData,
+    };
+
+    try {
+      const docRef = doc(FIREBASE_DB, "babysitters", profileData.id);
+      await updateDoc(docRef, newProfileData);
+
+      // // Update form values and application state after save
+      // setApplication({ ...application, ...newApplicationData });
+      // setFormValues(newApplicationData);
+
+      alert("Changes in profile saved");
+    } catch (error) {
+      console.error("Error saving data:", error);
+      alert("Error saving profile changes. Please try again.");
+    }
+  };
 
   if (!profileData) {
     return (
@@ -188,6 +226,9 @@ const ProfilePage = () => {
             <TextField
               variant="outlined"
               size="small"
+              onChange={(e) =>
+                setProfileData({ ...profileData, city: e.target.value })
+              }
               value={profileData.city || ""}
               sx={{
                 width: "500px",
@@ -210,10 +251,12 @@ const ProfilePage = () => {
             <TextField
               variant="outlined"
               size="small"
+              onChange={(e) =>
+                setProfileData({ ...profileData, bio: e.target.value })
+              }
               multiline
               rows={4}
               value={profileData.bio || ""}
-              readOnly
               sx={{
                 marginBottom: "15px",
                 marginLeft: "140px",
@@ -235,6 +278,9 @@ const ProfilePage = () => {
             <TextField
               variant="outlined"
               multiline
+              onChange={(e) =>
+                setProfileData({ ...profileData, experience: e.target.value })
+              }
               rows={4}
               size="small"
               value={profileData.experience || ""}
@@ -259,6 +305,9 @@ const ProfilePage = () => {
             <TextField
               variant="outlined"
               size="small"
+              onChange={(e) =>
+                setProfileData({ ...profileData, education: e.target.value })
+              }
               value={profileData.education || ""}
               sx={{
                 marginBottom: "15px",
@@ -390,6 +439,7 @@ const ProfilePage = () => {
                     backgroundColor: "#3c3fad",
                   },
                 }}
+                onClick={handleSave}
               >
                 Save Changes
               </Button>
