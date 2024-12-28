@@ -91,7 +91,7 @@ const FilterDialog = styled(Dialog)({
 const CustomSeparator = () => {
   const breadcrumbs = [
     <Link
-      underline="hover"
+      underline="none"
       key="1"
       color="inherit"
       href="/babysitters"
@@ -99,7 +99,6 @@ const CustomSeparator = () => {
       sx={{
         "&:hover": {
           color: "#5e62d1",
-          fontWeight: "700",
         },
         fontFamily: "Poppins, sans-serif",
       }}
