@@ -11,6 +11,9 @@ import {
   Button,
   IconButton,
   Tooltip,
+  Breadcrumbs,
+  Link,
+  Stack,
 } from "@mui/material";
 import { borderRadius, styled } from "@mui/system";
 import SendIcon from "@mui/icons-material/Send";
@@ -27,10 +30,12 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import SearchIcon from "@mui/icons-material/Search";
 import { FIREBASE_DB } from "../../config/firebase";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import DefaultUserImage from "../../assets/Babysitter-image.webp";
 
 const ChatContainer = styled(Box)({
@@ -85,6 +90,100 @@ const StyledTextField = styled(TextField)({
     color: "#5e62d1",
   },
 });
+
+const CustomSeparator = () => {
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email;
+
+        // Check if user is a babysitter
+        const babysitterQuery = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("email", "==", email)
+        );
+        const babysitterSnapshot = await getDocs(babysitterQuery);
+        if (!babysitterSnapshot.empty) {
+          setUserRole("babysitter");
+          return;
+        }
+
+        // Check if user is a guardian
+        const guardianQuery = query(
+          collection(FIREBASE_DB, "guardians"),
+          where("email", "==", email)
+        );
+        const guardianSnapshot = await getDocs(guardianQuery);
+        if (!guardianSnapshot.empty) {
+          setUserRole("guardian");
+          return;
+        }
+      }
+      setUserRole(null); // Not logged in
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
+  const breadcrumbs = [
+    <Link
+      underline="none"
+      key="1"
+      color="inherit"
+      onClick={() => {
+        if (userRole === "guardian") {
+          handleNavigate("/babysitters");
+        } else if (userRole === "babysitter") {
+          handleNavigate("/babysitting-jobs");
+        } else {
+          handleNavigate("/");
+        }
+      }}
+      sx={{
+        "&:hover": { color: "#5e62d1", cursor: "pointer" },
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Home
+    </Link>,
+    <Link
+      underline="none"
+      key="2"
+      color="inherit"
+      sx={{
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Messages
+    </Link>,
+  ];
+
+  return (
+    <Stack
+      sx={{
+        position: "absolute",
+        top: "80px",
+        left: "70px",
+        alignItems: "flex-start",
+      }}
+    >
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+      >
+        {breadcrumbs}
+      </Breadcrumbs>
+    </Stack>
+  );
+};
 
 const ChatPage = () => {
   const auth = getAuth();
@@ -292,9 +391,10 @@ const ChatPage = () => {
 
   return (
     <ChatContainer>
+      <CustomSeparator />
       <Box display="flex" height="100%">
         <UserListContainer>
-          <Box padding="10px">
+          <Box padding="10px" marginTop="30px">
             <StyledTextField
               fullWidth
               variant="outlined"

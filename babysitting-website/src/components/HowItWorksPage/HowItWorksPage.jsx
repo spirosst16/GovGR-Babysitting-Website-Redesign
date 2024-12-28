@@ -134,7 +134,7 @@ const CustomSeparator = () => {
         fontFamily: "Poppins, sans-serif",
       }}
     >
-      Babysitters
+      How It Works
     </Link>,
   ];
 
