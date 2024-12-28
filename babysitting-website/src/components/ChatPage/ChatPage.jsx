@@ -12,7 +12,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { borderRadius, styled } from "@mui/system";
 import SendIcon from "@mui/icons-material/Send";
 import {
   collection,
@@ -65,6 +65,25 @@ const Messages = styled(Box)({
 const InputContainer = styled(Box)({
   display: "flex",
   gap: "10px",
+});
+
+const StyledTextField = styled(TextField)({
+  fontFamily: "'Poppins', sans-serif",
+  color: "#5e62d1",
+  "& .MuiInputBase-input": {
+    fontFamily: "'Poppins', sans-serif",
+  },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "#ccc",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#5e62d1",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#5e62d1",
+  },
 });
 
 const ChatPage = () => {
@@ -276,7 +295,7 @@ const ChatPage = () => {
       <Box display="flex" height="100%">
         <UserListContainer>
           <Box padding="10px">
-            <TextField
+            <StyledTextField
               fullWidth
               variant="outlined"
               value={searchQuery}
@@ -414,7 +433,7 @@ const ChatPage = () => {
             <div ref={messagesEndRef} />
           </Messages>
           <InputContainer>
-            <TextField
+            <StyledTextField
               fullWidth
               variant="outlined"
               value={newMessage}
@@ -425,7 +444,6 @@ const ChatPage = () => {
                 }
               }}
               placeholder="Type your message"
-              sx={{ borderRadius: "10px" }}
             />
             <IconButton
               onClick={sendMessage}
