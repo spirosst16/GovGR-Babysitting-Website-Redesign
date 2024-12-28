@@ -25,7 +25,8 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import SearchIcon from "@mui/icons-material/Search";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
@@ -89,17 +90,63 @@ const FilterDialog = styled(Dialog)({
 });
 
 const CustomSeparator = () => {
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email;
+
+        // Check if user is a babysitter
+        const babysitterQuery = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("email", "==", email)
+        );
+        const babysitterSnapshot = await getDocs(babysitterQuery);
+        if (!babysitterSnapshot.empty) {
+          setUserRole("babysitter");
+          return;
+        }
+
+        // Check if user is a guardian
+        const guardianQuery = query(
+          collection(FIREBASE_DB, "guardians"),
+          where("email", "==", email)
+        );
+        const guardianSnapshot = await getDocs(guardianQuery);
+        if (!guardianSnapshot.empty) {
+          setUserRole("guardian");
+          return;
+        }
+      }
+      setUserRole(null); // Not logged in
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
   const breadcrumbs = [
     <Link
       underline="none"
       key="1"
       color="inherit"
-      href="/babysitters"
-      onClick={useNavigate("/babysitters")}
+      onClick={() => {
+        if (userRole === "guardian") {
+          handleNavigate("/babysitters");
+        } else if (userRole === "babysitter") {
+          handleNavigate("/babysitting-jobs");
+        } else {
+          handleNavigate("/");
+        }
+      }}
       sx={{
-        "&:hover": {
-          color: "#5e62d1",
-        },
+        "&:hover": { color: "#5e62d1", cursor: "pointer" },
         fontFamily: "Poppins, sans-serif",
       }}
     >
