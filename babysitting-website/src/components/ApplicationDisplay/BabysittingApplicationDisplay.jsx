@@ -105,6 +105,8 @@ const BabysittingApplicationDisplay = () => {
   const [application, setApplication] = useState(null);
   const [currentUserRole, setCurrentUserRole] = useState(null);
   const [viewedUserRole, setViewedUserRole] = useState(null);
+  const [agreementExists, setAgreementExists] = useState(false);
+  const [agreementPath, setAgreementPath] = useState(null);
 
   useEffect(() => {
     const auth = getAuth();
@@ -175,6 +177,48 @@ const BabysittingApplicationDisplay = () => {
 
     fetchUserAndApplication();
   }, [userId]);
+
+  useEffect(() => {
+    const fetchAgreement = async () => {
+      if (!currentUser || !userId) return;
+
+      try {
+        const agreementsRef = collection(FIREBASE_DB, "agreements");
+
+        const senderQuery = query(
+          agreementsRef,
+          where("senderId", "==", currentUser.uid),
+          where("recipientId", "==", userId)
+        );
+
+        const recipientQuery = query(
+          agreementsRef,
+          where("senderId", "==", userId),
+          where("recipientId", "==", currentUser.uid)
+        );
+
+        const [senderSnapshot, recipientSnapshot] = await Promise.all([
+          getDocs(senderQuery),
+          getDocs(recipientQuery),
+        ]);
+
+        if (!senderSnapshot.empty) {
+          setAgreementExists(true);
+          setAgreementPath(`agreement/${currentUser.uid}/${userId}`);
+        } else if (!recipientSnapshot.empty) {
+          setAgreementExists(true);
+          setAgreementPath(`agreement/${userId}/${currentUser.uid}`);
+        } else {
+          setAgreementExists(false);
+          setAgreementPath(null);
+        }
+      } catch (error) {
+        console.error("Error fetching agreement data:", error);
+      }
+    };
+
+    fetchAgreement();
+  }, [currentUser, userId]);
 
   const fetchUserRole = async (userId, setRole) => {
     let userData = null;
@@ -475,7 +519,11 @@ const BabysittingApplicationDisplay = () => {
               currentUserRole !== viewedUserRole && (
                 <Button
                   variant="contained"
-                  onClick={handleCreateAgreement}
+                  onClick={() =>
+                    agreementExists
+                      ? navigate(`/${agreementPath}`)
+                      : handleCreateAgreement()
+                  }
                   sx={{
                     backgroundColor: "#5e62d1",
                     fontSize: "1rem",
@@ -488,7 +536,7 @@ const BabysittingApplicationDisplay = () => {
                     fontFamily: "'Poppins', sans-serif",
                   }}
                 >
-                  Create Agreement
+                  {agreementExists ? "Inspect Agreement" : "Create Agreement"}
                 </Button>
               )}
             {currentUser?.uid === application.userId && (

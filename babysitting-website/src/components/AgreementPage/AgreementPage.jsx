@@ -189,8 +189,6 @@ const AgreementPage = () => {
             });
             setStatus(agreementData.status);
           });
-        } else {
-          navigate(`/agreement/${userId2}/${userId1}`);
         }
       } catch (error) {
         console.error("Error fetching agreement data:", error);
