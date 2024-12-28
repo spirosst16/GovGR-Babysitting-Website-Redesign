@@ -293,6 +293,26 @@ const AgreementPage = () => {
     }
   };
 
+  const handleDecline = async () => {
+	try {
+	  if (!agreementId) {
+		alert("No agreement to decline.");
+		return;
+	  }
+  
+	  const agreementDocRef = doc(FIREBASE_DB, "agreements", agreementId);
+	  await deleteDoc(agreementDocRef);
+  
+	  setAgreementId(null);
+	  setStatus("");
+	  console.log("Agreement declined and deleted.");
+	  navigate("/my-applications-and-jobs");
+	} catch (error) {
+	  console.error("Error declining agreement:", error);
+	  alert("Failed to decline agreement. Please try again.");
+	}
+  };
+
   const renderButton = () => {
     const auth = getAuth();
     const currentUser = auth.currentUser;
@@ -319,6 +339,12 @@ const AgreementPage = () => {
         return (
           <Box>
             <StyledButton onClick={handleAccept}>Accept</StyledButton>
+			<StyledButton
+            sx={{ backgroundColor: "red", marginLeft: "10px" }}
+            onClick={handleDecline}
+          >
+            Decline
+          </StyledButton>
           </Box>
         );
       }
