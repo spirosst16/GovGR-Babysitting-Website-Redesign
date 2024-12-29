@@ -237,6 +237,7 @@ const CustomSeparator = () => {
 
 const BabysittingApplicationDisplay = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
@@ -424,7 +425,9 @@ const BabysittingApplicationDisplay = () => {
 
   const handleCreateAgreement = () => {
     if (currentUser && user) {
-      navigate(`/agreement/${currentUser.uid}/${userId}`);
+      navigate(`/agreement/${currentUser.uid}/${userId}`, {
+        state: { from: location.pathname },
+      });
     }
   };
 
@@ -638,7 +641,11 @@ const BabysittingApplicationDisplay = () => {
                 <Box sx={{ textAlign: "center", marginTop: "30px" }}>
                   <Button
                     variant="contained"
-                    onClick={() => navigate(`/edit-application/${userId}`)}
+                    onClick={() =>
+                      navigate(`/edit-application/${userId}`, {
+                        state: { from: location.pathname },
+                      })
+                    }
                     sx={{
                       backgroundColor: "#5e62d1",
                       fontSize: "1rem",
@@ -662,7 +669,9 @@ const BabysittingApplicationDisplay = () => {
                   variant="contained"
                   onClick={() =>
                     agreementExists
-                      ? navigate(`/${agreementPath}`)
+                      ? navigate(`/${agreementPath}`, {
+                          state: { from: location.pathname },
+                        })
                       : handleCreateAgreement()
                   }
                   sx={{

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   TextField,
@@ -16,11 +16,16 @@ import {
   FormLabel,
   Checkbox,
   Grid,
+  Stack,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { collection, addDoc } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { useNavigate, useLocation } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 // Logo components
 const LogoContainer = styled("div")({
@@ -91,6 +96,142 @@ const StyledButton = styled(Button)({
   textTransform: "none",
   borderRadius: "30px",
 });
+
+const CustomSeparator = () => {
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { state } = location; // Access the state for "from"
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email;
+
+        // Check if user is a babysitter
+        const babysitterQuery = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("email", "==", email)
+        );
+        const babysitterSnapshot = await getDocs(babysitterQuery);
+        if (!babysitterSnapshot.empty) {
+          setUserRole("babysitter");
+          return;
+        }
+
+        // Check if user is a guardian
+        const guardianQuery = query(
+          collection(FIREBASE_DB, "guardians"),
+          where("email", "==", email)
+        );
+        const guardianSnapshot = await getDocs(guardianQuery);
+        if (!guardianSnapshot.empty) {
+          setUserRole("guardian");
+          return;
+        }
+      }
+      setUserRole(null); // Not logged in
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
+  const getHomePath = () => {
+    if (userRole === "guardian") return "/babysitters";
+    if (userRole === "babysitter") return "/babysitting-jobs";
+    return "/";
+  };
+
+  const getPageName = (pathname) => {
+    const mapping = {
+      "/": "Welcome",
+      "/login": "Login",
+      "/register": "Register",
+      "/babysitter-form": "Babysitter Form",
+      "/guardian-form": "Guardian Form",
+      "/babysitters": "Babysitters",
+      "/babysitting-jobs": "Babysitting Jobs",
+      "/how-it-works": "How It Works",
+      "/babysitting-application": "Babysitting Application",
+      "/my-applications-and-jobs": "My Applications & Jobs",
+      "/application/:userId": "Application Details",
+      "/edit-application/:userId": "Edit Application",
+      "/agreement/:userId1/:userId2": "Agreement",
+      "/chats": "Messages",
+      "/profile": "Profile",
+    };
+
+    // Replace any dynamic segments like :userId with placeholders or clean display names
+    const cleanPath = pathname
+      .replace(/\/application\/[^/]+/, "/application/:userId")
+      .replace(/\/edit-application\/[^/]+/, "/edit-application/:userId")
+      .replace(/\/agreement\/[^/]+\/[^/]+/, "/agreement/:userId1/:userId2");
+
+    return mapping[cleanPath] || pathname.replace("/", ""); // Fallback to cleaned pathname
+  };
+
+  const breadcrumbs = [
+    <Link
+      underline="none"
+      key="1"
+      color="inherit"
+      onClick={() => handleNavigate(getHomePath())}
+      sx={{
+        "&:hover": { color: "#5e62d1", cursor: "pointer" },
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Home
+    </Link>,
+    state?.from && (
+      <Link
+        underline="none"
+        key="2"
+        color="inherit"
+        onClick={() => handleNavigate(state.from)}
+        sx={{
+          "&:hover": { color: "#5e62d1", cursor: "pointer" },
+          fontFamily: "Poppins, sans-serif",
+        }}
+      >
+        {getPageName(state.from)}
+      </Link>
+    ),
+    <Link
+      underline="none"
+      key="3"
+      color="inherit"
+      sx={{
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Babysitting Application
+    </Link>,
+  ].filter(Boolean);
+
+  return (
+    <Stack
+      sx={{
+        position: "absolute",
+        top: "80px",
+        left: "70px",
+        alignItems: "flex-start",
+      }}
+    >
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+      >
+        {breadcrumbs}
+      </Breadcrumbs>
+    </Stack>
+  );
+};
 
 const BabysittingApplicationForm = () => {
   const [formValues, setFormValues] = useState({
@@ -203,12 +344,13 @@ const BabysittingApplicationForm = () => {
           </Logo>
           <LogoText>Babysitters</LogoText>
         </LogoContainer>
-
+        <CustomSeparator />
         <Container component="main" maxWidth="md">
           <Stepper
             activeStep={currentStep}
             alternativeLabel
             sx={{
+              mt: 4,
               ".MuiStepIcon-root": {
                 color: "#5e62d1",
               },

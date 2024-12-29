@@ -796,7 +796,11 @@ const BabysittingJobsPage = () => {
             fontWeight: "600",
             fontSize: "16px",
           }}
-          onClick={() => (window.location.href = "/babysitting-application")}
+          onClick={() =>
+            navigate(`/babysitting-application`, {
+              state: { from: location.pathname },
+            })
+          }
         >
           Create an application now
         </Button>

@@ -13,9 +13,12 @@ import {
   FormControlLabel,
   Checkbox,
   CircularProgress,
+  Breadcrumbs,
+  Link,
+  Stack,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   collection,
   query,
@@ -28,6 +31,7 @@ import {
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { deleteDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import DefaultUserImage from "../../assets/Babysitter-image.webp";
 
 const PageContainer = styled(Box)({
@@ -98,6 +102,142 @@ const ScheduleItem = styled(Box)(({ available }) => ({
   borderRadius: "8px",
   marginBottom: "5px",
 }));
+
+const CustomSeparator = () => {
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { state } = location; // Access the state for "from"
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email;
+
+        // Check if user is a babysitter
+        const babysitterQuery = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("email", "==", email)
+        );
+        const babysitterSnapshot = await getDocs(babysitterQuery);
+        if (!babysitterSnapshot.empty) {
+          setUserRole("babysitter");
+          return;
+        }
+
+        // Check if user is a guardian
+        const guardianQuery = query(
+          collection(FIREBASE_DB, "guardians"),
+          where("email", "==", email)
+        );
+        const guardianSnapshot = await getDocs(guardianQuery);
+        if (!guardianSnapshot.empty) {
+          setUserRole("guardian");
+          return;
+        }
+      }
+      setUserRole(null); // Not logged in
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
+  const getHomePath = () => {
+    if (userRole === "guardian") return "/babysitters";
+    if (userRole === "babysitter") return "/babysitting-jobs";
+    return "/";
+  };
+
+  const getPageName = (pathname) => {
+    const mapping = {
+      "/": "Welcome",
+      "/login": "Login",
+      "/register": "Register",
+      "/babysitter-form": "Babysitter Form",
+      "/guardian-form": "Guardian Form",
+      "/babysitters": "Babysitters",
+      "/babysitting-jobs": "Babysitting Jobs",
+      "/how-it-works": "How It Works",
+      "/babysitting-application": "Babysitting Application",
+      "/my-applications-and-jobs": "My Applications & Jobs",
+      "/application/:userId": "Application Details",
+      "/edit-application/:userId": "Edit Application",
+      "/agreement/:userId1/:userId2": "Agreement",
+      "/chats": "Messages",
+      "/profile": "Profile",
+    };
+
+    // Replace any dynamic segments like :userId with placeholders or clean display names
+    const cleanPath = pathname
+      .replace(/\/application\/[^/]+/, "/application/:userId")
+      .replace(/\/edit-application\/[^/]+/, "/edit-application/:userId")
+      .replace(/\/agreement\/[^/]+\/[^/]+/, "/agreement/:userId1/:userId2");
+
+    return mapping[cleanPath] || pathname.replace("/", ""); // Fallback to cleaned pathname
+  };
+
+  const breadcrumbs = [
+    <Link
+      underline="none"
+      key="1"
+      color="inherit"
+      onClick={() => handleNavigate(getHomePath())}
+      sx={{
+        "&:hover": { color: "#5e62d1", cursor: "pointer" },
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Home
+    </Link>,
+    state?.from && (
+      <Link
+        underline="none"
+        key="2"
+        color="inherit"
+        onClick={() => handleNavigate(state.from)}
+        sx={{
+          "&:hover": { color: "#5e62d1", cursor: "pointer" },
+          fontFamily: "Poppins, sans-serif",
+        }}
+      >
+        {getPageName(state.from)}
+      </Link>
+    ),
+    <Link
+      underline="none"
+      key="3"
+      color="inherit"
+      sx={{
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Agreement
+    </Link>,
+  ].filter(Boolean);
+
+  return (
+    <Stack
+      sx={{
+        position: "absolute",
+        top: "80px",
+        left: "70px",
+        alignItems: "flex-start",
+      }}
+    >
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+      >
+        {breadcrumbs}
+      </Breadcrumbs>
+    </Stack>
+  );
+};
 
 const AgreementPage = () => {
   const { userId1, userId2 } = useParams();
@@ -294,23 +434,23 @@ const AgreementPage = () => {
   };
 
   const handleDecline = async () => {
-	try {
-	  if (!agreementId) {
-		alert("No agreement to decline.");
-		return;
-	  }
-  
-	  const agreementDocRef = doc(FIREBASE_DB, "agreements", agreementId);
-	  await deleteDoc(agreementDocRef);
-  
-	  setAgreementId(null);
-	  setStatus("");
-	  console.log("Agreement declined and deleted.");
-	  navigate("/my-applications-and-jobs");
-	} catch (error) {
-	  console.error("Error declining agreement:", error);
-	  alert("Failed to decline agreement. Please try again.");
-	}
+    try {
+      if (!agreementId) {
+        alert("No agreement to decline.");
+        return;
+      }
+
+      const agreementDocRef = doc(FIREBASE_DB, "agreements", agreementId);
+      await deleteDoc(agreementDocRef);
+
+      setAgreementId(null);
+      setStatus("");
+      console.log("Agreement declined and deleted.");
+      navigate("/my-applications-and-jobs");
+    } catch (error) {
+      console.error("Error declining agreement:", error);
+      alert("Failed to decline agreement. Please try again.");
+    }
   };
 
   const renderButton = () => {
@@ -339,12 +479,12 @@ const AgreementPage = () => {
         return (
           <Box>
             <StyledButton onClick={handleAccept}>Accept</StyledButton>
-			<StyledButton
-            sx={{ backgroundColor: "red", marginLeft: "10px" }}
-            onClick={handleDecline}
-          >
-            Decline
-          </StyledButton>
+            <StyledButton
+              sx={{ backgroundColor: "red", marginLeft: "10px" }}
+              onClick={handleDecline}
+            >
+              Decline
+            </StyledButton>
           </Box>
         );
       }
@@ -370,6 +510,7 @@ const AgreementPage = () => {
 
   return (
     <PageContainer>
+      <CustomSeparator />
       <ContentWrapper>
         <Typography
           variant="h4"
