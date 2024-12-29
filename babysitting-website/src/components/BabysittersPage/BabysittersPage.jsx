@@ -24,7 +24,7 @@ import {
   Chip,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
@@ -196,6 +196,7 @@ const BabysittersPage = () => {
   const [filteredBabysitters, setFilteredBabysitters] = useState([]);
   const [openFilterDialog, setOpenFilterDialog] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const availabilityOptions = [
     "Monday Morning",
@@ -529,7 +530,11 @@ const BabysittersPage = () => {
             displayBabysitters.map((babysitter) => (
               <BabysitterCard
                 key={babysitter.userId}
-                onClick={() => navigate(`/application/${babysitter.userId}`)}
+                onClick={() =>
+                  navigate(`/application/${babysitter.userId}`, {
+                    state: { from: location.pathname },
+                  })
+                }
                 style={{
                   cursor: "pointer",
                 }}
