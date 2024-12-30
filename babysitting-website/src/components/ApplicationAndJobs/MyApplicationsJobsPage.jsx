@@ -10,9 +10,13 @@ import {
   Tab,
   CircularProgress,
   Avatar,
+  Breadcrumbs,
+  Stack,
+  Link,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import HistoryIcon from "@mui/icons-material/History";
@@ -116,6 +120,100 @@ const EmptyState = styled(Box)({
   padding: "50px 20px",
 });
 
+const CustomSeparator = () => {
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email;
+
+        // Check if user is a babysitter
+        const babysitterQuery = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("email", "==", email)
+        );
+        const babysitterSnapshot = await getDocs(babysitterQuery);
+        if (!babysitterSnapshot.empty) {
+          setUserRole("babysitter");
+          return;
+        }
+
+        // Check if user is a guardian
+        const guardianQuery = query(
+          collection(FIREBASE_DB, "guardians"),
+          where("email", "==", email)
+        );
+        const guardianSnapshot = await getDocs(guardianQuery);
+        if (!guardianSnapshot.empty) {
+          setUserRole("guardian");
+          return;
+        }
+      }
+      setUserRole(null); // Not logged in
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
+  const breadcrumbs = [
+    <Link
+      underline="none"
+      key="1"
+      color="inherit"
+      onClick={() => {
+        if (userRole === "guardian") {
+          handleNavigate("/babysitters");
+        } else if (userRole === "babysitter") {
+          handleNavigate("/babysitting-jobs");
+        } else {
+          handleNavigate("/");
+        }
+      }}
+      sx={{
+        "&:hover": { color: "#5e62d1", cursor: "pointer" },
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Home
+    </Link>,
+    <Link
+      underline="none"
+      key="2"
+      color="inherit"
+      sx={{
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      My Applications & Jobs
+    </Link>,
+  ];
+
+  return (
+    <Stack
+      sx={{
+        position: "absolute",
+        top: "80px",
+        left: "70px",
+        alignItems: "flex-start",
+      }}
+    >
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+      >
+        {breadcrumbs}
+      </Breadcrumbs>
+    </Stack>
+  );
+};
+
 const CompactWeeklySchedule = ({ availability }) => {
   const dayMap = {
     Mon: "Monday",
@@ -190,6 +288,7 @@ const CompactWeeklySchedule = ({ availability }) => {
 };
 
 const MyApplicationsJobs = () => {
+  const [currentUser, setCurrentUser] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   const [agreements, setAgreements] = useState([]);
   const [applications, setApplications] = useState([]);
@@ -209,6 +308,23 @@ const MyApplicationsJobs = () => {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const fetchCurrentUserData = async () => {
+      if (!userId) return;
+      setIsLoading(true);
+      try {
+        const userData = await fetchUserData(userId);
+        setCurrentUser(userData);
+      } catch (error) {
+        console.error("Error fetching current user data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCurrentUserData();
+  }, [userId]);
 
   const fetchUserData = async (userId) => {
     try {
@@ -338,117 +454,119 @@ const MyApplicationsJobs = () => {
         <Grid
           container
           spacing={3}
-          justifyContent="flex-start"
-          alignItems="flex-start"
+          justifyContent="center"
+          alignItems="center"
           wrap="wrap"
         >
-          {agreements.map((agreement) => (
-            <Grid item xs={12} sm={6} md={4} key={agreement.id}>
-              <ApplicationCard
-                onClick={() =>
-                  navigate(
-                    `/agreement/${agreement.senderId}/${agreement.recipientId}`
-                  )
-                }
-                style={{
-                  cursor: "pointer",
-                }}
-              >
-                <CardContent>
-                  <CardHeader>
-                    <Box display="flex" alignItems="center">
-                      {agreement.otherUser && (
-                        <>
-                          <Avatar
-                            src={agreement.otherUser.photo || ""}
-                            alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
-                            style={{
-                              marginBottom: "10px",
-                              marginRight: "6px",
-                              width: "65px",
-                              height: "65px",
-                            }}
-                          />
-                          <Typography variant="h6" fontWeight={600}>
-                            {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
-                          </Typography>
-                        </>
-                      )}
-                    </Box>
-                    <StatusChip status={agreement.status}>
-                      {agreement.status}
-                    </StatusChip>
-                  </CardHeader>
-                  <Typography
-                    variant="body1"
-                    marginLeft="20px"
-                    marginTop="10px"
-                  >
-                    <strong>Babysitting Place:</strong>{" "}
-                    {agreement.babysittingPlace.join(", ")}
-                  </Typography>
-                  <CompactWeeklySchedule
-                    availability={agreement.weeklySchedule}
-                  />
-                  <ProgressContainer>
-                    {agreement.status === "accepted" && (
+          {agreements.length > 0 ? (
+            agreements.map((agreement) => (
+              <Grid item xs={12} sm={6} md={4} key={agreement.id}>
+                <ApplicationCard
+                  onClick={() =>
+                    navigate(
+                      `/agreement/${agreement.senderId}/${agreement.recipientId}`
+                    )
+                  }
+                  style={{
+                    cursor: "pointer",
+                  }}
+                >
+                  <CardContent>
+                    <CardHeader>
                       <Box display="flex" alignItems="center">
-                        <CircularProgress
-                          variant="determinate"
-                          value={calculateProgress(
-                            agreement.startingDate,
-                            agreement.endingDate
-                          )}
-                          size={40}
-                          thickness={4}
-                        />
-                        <Typography
-                          variant="body1"
-                          style={{ marginLeft: "16px" }}
-                        >
-                          {Math.round(
-                            calculateProgress(
+                        {agreement.otherUser && (
+                          <>
+                            <Avatar
+                              src={agreement.otherUser.photo || ""}
+                              alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                              style={{
+                                marginBottom: "10px",
+                                marginRight: "6px",
+                                width: "65px",
+                                height: "65px",
+                              }}
+                            />
+                            <Typography variant="h6" fontWeight={600}>
+                              {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                            </Typography>
+                          </>
+                        )}
+                      </Box>
+                      <StatusChip status={agreement.status}>
+                        {agreement.status}
+                      </StatusChip>
+                    </CardHeader>
+                    <Typography
+                      variant="body1"
+                      marginLeft="20px"
+                      marginTop="10px"
+                    >
+                      <strong>Babysitting Place:</strong>{" "}
+                      {agreement.babysittingPlace.join(", ")}
+                    </Typography>
+                    <CompactWeeklySchedule
+                      availability={agreement.weeklySchedule}
+                    />
+                    <ProgressContainer>
+                      {agreement.status === "accepted" && (
+                        <Box display="flex" alignItems="center">
+                          <CircularProgress
+                            variant="determinate"
+                            value={calculateProgress(
                               agreement.startingDate,
                               agreement.endingDate
-                            )
-                          )}
-                          % Complete
-                        </Typography>
-                      </Box>
-                    )}
-                  </ProgressContainer>
-                </CardContent>
+                            )}
+                            size={40}
+                            thickness={4}
+                          />
+                          <Typography
+                            variant="body1"
+                            style={{ marginLeft: "16px" }}
+                          >
+                            {Math.round(
+                              calculateProgress(
+                                agreement.startingDate,
+                                agreement.endingDate
+                              )
+                            )}
+                            % Complete
+                          </Typography>
+                        </Box>
+                      )}
+                    </ProgressContainer>
+                  </CardContent>
+                </ApplicationCard>
+              </Grid>
+            ))
+          ) : (
+            <Grid item xs={12} sm={6} md={4}>
+              <ApplicationCard
+                onClick={() => {
+                  const roleSpecificPath = isBabysitter
+                    ? "/babysitting-jobs"
+                    : "/babysitters";
+                  navigate(roleSpecificPath);
+                }}
+                style={{
+                  cursor: "pointer",
+                  border: "2px dashed #9E9E9E",
+                  textAlign: "center",
+                  padding: "20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <AddCircleOutlineIcon
+                  style={{ fontSize: 50, color: "#9E9E9E" }}
+                />
+                <Typography variant="body1" color="textSecondary">
+                  Browse {isBabysitter ? "Guardians" : "Babysitters"}
+                </Typography>
               </ApplicationCard>
             </Grid>
-          ))}
-
-          <Grid item xs={12} sm={6} md={4}>
-            <ApplicationCard
-              onClick={() => {
-                const roleSpecificPath = isBabysitter
-                  ? "/babysitting-jobs"
-                  : "/babysitters";
-                navigate(roleSpecificPath);
-              }}
-              style={{
-                cursor: "pointer",
-                border: "2px dashed #9E9E9E",
-                textAlign: "center",
-                padding: "20px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <AddCircleOutlineIcon
-                style={{ fontSize: 50, color: "#9E9E9E" }}
-              />
-              <Typography variant="body1" color="textSecondary">
-                Browse {isBabysitter ? "Guardians" : "Babysitters"}
-              </Typography>
-            </ApplicationCard>
-          </Grid>
+          )}
         </Grid>
       );
     } else if (currentTab === 1) {
@@ -456,71 +574,74 @@ const MyApplicationsJobs = () => {
         <Grid
           container
           spacing={3}
-          justifyContent="flex-start"
-          alignItems="flex-start"
+          justifyContent="center"
+          alignItems="center"
           wrap="wrap"
         >
-          {applications.map((application) => (
-            <Grid item xs={12} sm={6} md={4} key={application.id}>
+          {applications.length > 0 ? (
+            applications.map((application) => (
+              <Grid item xs={12} sm={6} md={4} key={application.id}>
+                <ApplicationCard
+                  onClick={() => navigate(`/application/${application.userId}`)}
+                  style={{
+                    cursor: "pointer",
+                  }}
+                >
+                  <CardContent>
+                    <CardHeader>
+                      <Typography variant="h6" fontWeight={600}>
+                        {application.area}
+                      </Typography>
+                      <StatusChip status={application.status}>
+                        {application.status}
+                      </StatusChip>
+                    </CardHeader>
+                    <Typography
+                      variant="body1"
+                      marginLeft="20px"
+                      marginTop="10px"
+                    >
+                      <strong>Job Type:</strong> {application.jobType}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      marginLeft="20px"
+                      marginTop="10px"
+                    >
+                      <strong>Babysitting Place:</strong>{" "}
+                      {application.babysittingPlace.join(", ")}
+                    </Typography>
+                    <CompactWeeklySchedule
+                      availability={application.availability}
+                    />
+                  </CardContent>
+                </ApplicationCard>
+              </Grid>
+            ))
+          ) : (
+            <Grid item xs={12} sm={6} md={4}>
               <ApplicationCard
-                onClick={() => navigate(`/application/${application.userId}`)}
+                onClick={() => navigate("/babysitting-application")}
                 style={{
                   cursor: "pointer",
+                  border: "2px dashed #9E9E9E",
+                  textAlign: "center",
+                  padding: "20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
-                <CardContent>
-                  <CardHeader>
-                    <Typography variant="h6" fontWeight={600}>
-                      {application.area}
-                    </Typography>
-                    <StatusChip status={application.status}>
-                      {application.status}
-                    </StatusChip>
-                  </CardHeader>
-                  <Typography
-                    variant="body1"
-                    marginLeft="20px"
-                    marginTop="10px"
-                  >
-                    <strong>Job Type:</strong> {application.jobType}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    marginLeft="20px"
-                    marginTop="10px"
-                  >
-                    <strong>Babysitting Place:</strong>{" "}
-                    {application.babysittingPlace.join(", ")}
-                  </Typography>
-                  <CompactWeeklySchedule
-                    availability={application.availability}
-                  />
-                </CardContent>
+                <AddCircleOutlineIcon
+                  style={{ fontSize: 50, color: "#9E9E9E" }}
+                />
+                <Typography variant="body1" color="textSecondary">
+                  Create Application
+                </Typography>
               </ApplicationCard>
             </Grid>
-          ))}
-          <Grid item xs={12} sm={6} md={4}>
-            <ApplicationCard
-              onClick={() => navigate("/babysitting-application")}
-              style={{
-                cursor: "pointer",
-                border: "2px dashed #9E9E9E",
-                textAlign: "center",
-                padding: "20px",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <AddCircleOutlineIcon
-                style={{ fontSize: 50, color: "#9E9E9E" }}
-              />
-              <Typography variant="body1" color="textSecondary">
-                Create Application
-              </Typography>
-            </ApplicationCard>
-          </Grid>
+          )}
         </Grid>
       );
     } else {
@@ -537,6 +658,7 @@ const MyApplicationsJobs = () => {
 
   return (
     <Container>
+      <CustomSeparator />
       <Header>
         <Typography
           variant="h4"
@@ -557,8 +679,29 @@ const MyApplicationsJobs = () => {
           <StyledTabs
             value={currentTab}
             onChange={handleTabChange}
-            indicatorColor="primary"
-            textColor="primary"
+            TabIndicatorProps={{
+              style: {
+                backgroundColor: "#5e62d1",
+              },
+            }}
+            sx={{
+              "& .MuiTab-root": {
+                color: "grey",
+                fontFamily: "Poppins, sans-serif",
+                fontSize: "1.4rem",
+                fontWeight: "100",
+                textTransform: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              },
+              "& .Mui-selected": {
+                color: "#5e62d1 !important",
+              },
+              "& .MuiTab-wrapper": {
+                flexDirection: "row",
+              },
+            }}
           >
             <StyledTab label="Agreements" icon={<WorkOutlineIcon />} />
             <StyledTab label="Applications" icon={<DoneIcon />} />

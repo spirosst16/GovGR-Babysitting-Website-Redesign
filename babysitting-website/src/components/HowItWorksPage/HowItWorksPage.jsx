@@ -362,21 +362,19 @@ const HowItWorksPage = () => {
               }}
               sx={{
                 "& .MuiTab-root": {
-                  color: "#5e62d1 !important",
+                  color: "grey",
+                  fontFamily: "Poppins, sans-serif",
+                  fontSize: "1.4rem",
+                  fontWeight: "100",
+                  textTransform: "none",
                 },
                 "& .Mui-selected": {
                   color: "#5e62d1 !important",
                 },
               }}
             >
-              <Tab
-                label="Guardians"
-                sx={{ fontSize: "1.4rem", textTransform: "none" }}
-              />
-              <Tab
-                label="Babysitters"
-                sx={{ fontSize: "1.4rem", textTransform: "none" }}
-              />
+              <Tab label="Guardians" />
+              <Tab label="Babysitters" />
             </Tabs>
           </TabContainer>
 
