@@ -333,7 +333,13 @@ const MyApplicationsJobs = () => {
 
     if (currentTab === 0) {
       return (
-        <Grid container spacing={8} justifyContent="center" alignItems="center">
+        <Grid
+          container
+          spacing={3}
+          justifyContent="flex-start"
+          alignItems="flex-start"
+          wrap="wrap"
+        >
           {agreements.map((agreement) => (
             <Grid item xs={12} sm={6} md={4} key={agreement.id}>
               <ApplicationCard>
@@ -436,7 +442,13 @@ const MyApplicationsJobs = () => {
       );
     } else if (currentTab === 1) {
       return (
-        <Grid container spacing={8} justifyContent="center" alignItems="center">
+        <Grid
+          container
+          spacing={3}
+          justifyContent="flex-start"
+          alignItems="flex-start"
+          wrap="wrap"
+        >
           {applications.map((application) => (
             <Grid item xs={12} sm={6} md={4} key={application.id}>
               <ApplicationCard>
