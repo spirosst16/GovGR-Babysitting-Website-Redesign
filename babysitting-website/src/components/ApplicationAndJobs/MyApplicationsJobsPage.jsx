@@ -190,6 +190,7 @@ const CompactWeeklySchedule = ({ availability }) => {
 };
 
 const MyApplicationsJobs = () => {
+  const [currentUser, setCurrentUser] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   const [agreements, setAgreements] = useState([]);
   const [applications, setApplications] = useState([]);
@@ -209,6 +210,23 @@ const MyApplicationsJobs = () => {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const fetchCurrentUserData = async () => {
+      if (!userId) return;
+      setIsLoading(true);
+      try {
+        const userData = await fetchUserData(userId);
+        setCurrentUser(userData);
+      } catch (error) {
+        console.error("Error fetching current user data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCurrentUserData();
+  }, [userId]);
 
   const fetchUserData = async (userId) => {
     try {
