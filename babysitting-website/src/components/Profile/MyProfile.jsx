@@ -10,6 +10,7 @@ import {
   Chip,
   Grid,
   Rating,
+  MenuItem,
   IconButton,
   CircularProgress,
 } from "@mui/material";
@@ -47,6 +48,38 @@ const StyledTextField = styled(TextField)({
     color: "#5e62d1",
   },
 });
+
+const childcareActivities = [
+  "Arts and Crafts",
+  "Storytelling",
+  "Outdoor Play",
+  "Meal Preparation",
+  "Tutoring",
+  "Nap Time Assistance",
+];
+
+const ageGroups = [
+  "Infant (0-2 years)",
+  "Toddler (3-5 years)",
+  "Child (6-12 years)",
+  "Teen (13+ years)",
+];
+
+const languages = [
+  "Greek",
+  "English",
+  "Spanish",
+  "French",
+  "German",
+  "Chinese",
+  "Japanese",
+  "Hindi",
+  "Arabic",
+  "Russian",
+  "Portuguese",
+  "Italian",
+  "Korean",
+];
 
 const ProfilePage = () => {
   const [roleRef, setRoleRef] = useState([]);
@@ -284,7 +317,7 @@ const ProfilePage = () => {
                 sx={{
                   width: "500px",
                   marginBottom: "15px",
-                  marginLeft: "140px",
+                  marginLeft: "100px",
                   fontFamily: "Poppins, sans-serif",
                 }}
               />
@@ -292,6 +325,7 @@ const ProfilePage = () => {
               <Typography
                 sx={{
                   marginLeft: "100px",
+                  marginTop: "20px",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
@@ -310,8 +344,8 @@ const ProfilePage = () => {
                 value={profileData.bio || ""}
                 sx={{
                   marginBottom: "15px",
-                  marginLeft: "140px",
-                  width: "600px",
+                  marginLeft: "100px",
+                  width: "500px",
                   fontFamily: "Poppins, sans-serif",
                 }}
               />
@@ -319,6 +353,7 @@ const ProfilePage = () => {
               <Typography
                 sx={{
                   marginLeft: "100px",
+                  marginTop: "20px",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
@@ -337,8 +372,8 @@ const ProfilePage = () => {
                 value={profileData.experience || ""}
                 sx={{
                   marginBottom: "15px",
-                  marginLeft: "140px",
-                  width: "600px",
+                  marginLeft: "100px",
+                  width: "500px",
                   fontFamily: "Poppins, sans-serif",
                 }}
               />
@@ -346,6 +381,7 @@ const ProfilePage = () => {
               <Typography
                 sx={{
                   marginLeft: "100px",
+                  marginTop: "20px",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
@@ -362,7 +398,7 @@ const ProfilePage = () => {
                 value={profileData.education || ""}
                 sx={{
                   marginBottom: "15px",
-                  marginLeft: "140px",
+                  marginLeft: "100px",
                   width: "500px",
                   fontFamily: "Poppins, sans-serif",
                 }}
@@ -378,6 +414,7 @@ const ProfilePage = () => {
                 <Typography
                   sx={{
                     marginLeft: "100px",
+                    marginTop: "20px",
                     fontFamily: "Poppins, sans-serif",
                     fontWeight: "bold",
                   }}
@@ -394,6 +431,7 @@ const ProfilePage = () => {
                     })
                   }
                   sx={{
+                    marginTop: "20px",
                     color: "#5e62d1", // Default color (unchecked)
                     "&.Mui-checked": {
                       color: "#5e62d1", // Checked color
@@ -405,6 +443,7 @@ const ProfilePage = () => {
               <Typography
                 sx={{
                   marginLeft: "100px",
+                  marginTop: "20px",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
@@ -412,35 +451,56 @@ const ProfilePage = () => {
               >
                 Known Languages:
               </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: "10px",
-                  flexWrap: "wrap",
-                  marginBottom: "15px",
-                  marginLeft: "140px",
+              <StyledTextField
+                select
+                name="knownLanguages"
+                value={profileData.knownLanguages}
+                onChange={(e) =>
+                  setProfileData({
+                    ...profileData,
+                    knownLanguages: e.target.value,
+                  })
+                }
+                SelectProps={{
+                  multiple: true,
+                  MenuProps: {
+                    PaperProps: {
+                      style: {
+                        maxHeight: 190,
+                        marginTop: "10px",
+                      },
+                    },
+                    anchorOrigin: {
+                      vertical: "bottom",
+                      horizontal: "left",
+                    },
+                    transformOrigin: {
+                      vertical: "top",
+                      horizontal: "left",
+                    },
+                  },
                 }}
+                sx={{ mb: 2, width: "500px", marginLeft: "100px" }}
               >
-                {profileData.knownLanguages?.map((lang, index) => (
-                  <Chip
+                {languages.map((language) => (
+                  <MenuItem
+                    key={language}
+                    value={language}
                     sx={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #5e62d1",
-                      fontFamily: "Poppins, sans-serif",
-                      "& .MuiChip-label": {
-                        color: "#000",
+                      "&:hover": {
+                        backgroundColor: "#f0f0f0",
                       },
                     }}
-                    key={index}
-                    label={lang}
-                    color="#5e62d1"
-                  />
+                  >
+                    {language}
+                  </MenuItem>
                 ))}
-              </Box>
+              </StyledTextField>
 
               <Typography
                 sx={{
                   marginLeft: "100px",
+                  marginTop: "20px",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
@@ -448,32 +508,43 @@ const ProfilePage = () => {
               >
                 Childcare Activities:
               </Typography>
+              <StyledTextField
+                select
+                name="childcareActivities"
+                value={profileData.childcareActivities}
+                onChange={(e) =>
+                  setProfileData({
+                    ...profileData,
+                    childcareActivities: e.target.value,
+                  })
+                }
+                SelectProps={{
+                  multiple: true,
+                  MenuProps: {
+                    PaperProps: {
+                      style: {
+                        maxHeight: 115,
+                        marginTop: "10px",
+                      },
+                    },
+                  },
+                }}
+                sx={{ mb: 2, width: "500px", marginLeft: "100px" }}
+              >
+                {childcareActivities.map((activity) => (
+                  <MenuItem key={activity} value={activity}>
+                    {activity}
+                  </MenuItem>
+                ))}
+              </StyledTextField>
+
               <Box
                 sx={{
                   display: "flex",
-                  gap: "10px",
-                  flexWrap: "wrap",
-                  marginBottom: "20px",
-                  marginLeft: "140px",
+                  justifyContent: "space-between",
+                  marginTop: "50px",
                 }}
               >
-                {profileData.childcareActivities?.map((activity, index) => (
-                  <Chip
-                    sx={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #5e62d1",
-                      fontFamily: "Poppins, sans-serif",
-                      "& .MuiChip-label": {
-                        color: "#000",
-                      },
-                    }}
-                    key={index}
-                    label={activity}
-                  />
-                ))}
-              </Box>
-
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Button
                   variant="outlined"
                   sx={{
@@ -598,6 +669,7 @@ const ProfilePage = () => {
               flex: 2,
               padding: "20px",
               backgroundColor: "#fff",
+              justifyContent: "center",
               borderRadius: "10px",
               boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
               marginLeft: "250px",
@@ -660,6 +732,7 @@ const ProfilePage = () => {
                 sx={{
                   display: "flex",
                   marginLeft: "100px",
+                  marginTop: "20px",
                   alignItems: "baseline",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
@@ -689,7 +762,7 @@ const ProfilePage = () => {
               <Typography
                 sx={{
                   marginLeft: "100px",
-
+                  marginTop: "20px",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
@@ -721,6 +794,7 @@ const ProfilePage = () => {
                 sx={{
                   display: "flex",
                   alignItems: "baseline",
+                  marginTop: "20px",
                   marginLeft: "100px",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
@@ -738,21 +812,45 @@ const ProfilePage = () => {
                   marginLeft: "100px",
                 }}
               >
-                {profileData.childrenAgeGroups?.map((lang, index) => (
-                  <Chip
-                    sx={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #5e62d1",
-                      fontFamily: "Poppins, sans-serif",
-                      "& .MuiChip-label": {
-                        color: "#000",
+                <StyledTextField
+                  select
+                  name="childrenAgeGroups"
+                  value={profileData.childrenAgeGroups}
+                  onChange={(e) =>
+                    setProfileData({
+                      ...profileData,
+                      childrenAgeGroups:
+                        typeof e.target.value === "string"
+                          ? e.target.value.split(",")
+                          : e.target.value,
+                    })
+                  }
+                  SelectProps={{
+                    multiple: true,
+                    MenuProps: {
+                      PaperProps: {
+                        style: {
+                          marginTop: "10px",
+                        },
                       },
-                    }}
-                    key={index}
-                    label={lang}
-                    color="#5e62d1"
-                  />
-                ))}
+                    },
+                  }}
+                  sx={{ mb: 2, width: "500px" }}
+                >
+                  {ageGroups.map((ageGroup, index) => (
+                    <MenuItem
+                      key={index}
+                      value={ageGroup}
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "#f0f0f0",
+                        },
+                      }}
+                    >
+                      {ageGroup}
+                    </MenuItem>
+                  ))}
+                </StyledTextField>
               </Box>
 
               <Box
