@@ -10,9 +10,13 @@ import {
   Tab,
   CircularProgress,
   Avatar,
+  Breadcrumbs,
+  Stack,
+  Link,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import HistoryIcon from "@mui/icons-material/History";
@@ -115,6 +119,100 @@ const EmptyState = styled(Box)({
   textAlign: "center",
   padding: "50px 20px",
 });
+
+const CustomSeparator = () => {
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email;
+
+        // Check if user is a babysitter
+        const babysitterQuery = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("email", "==", email)
+        );
+        const babysitterSnapshot = await getDocs(babysitterQuery);
+        if (!babysitterSnapshot.empty) {
+          setUserRole("babysitter");
+          return;
+        }
+
+        // Check if user is a guardian
+        const guardianQuery = query(
+          collection(FIREBASE_DB, "guardians"),
+          where("email", "==", email)
+        );
+        const guardianSnapshot = await getDocs(guardianQuery);
+        if (!guardianSnapshot.empty) {
+          setUserRole("guardian");
+          return;
+        }
+      }
+      setUserRole(null); // Not logged in
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
+  const breadcrumbs = [
+    <Link
+      underline="none"
+      key="1"
+      color="inherit"
+      onClick={() => {
+        if (userRole === "guardian") {
+          handleNavigate("/babysitters");
+        } else if (userRole === "babysitter") {
+          handleNavigate("/babysitting-jobs");
+        } else {
+          handleNavigate("/");
+        }
+      }}
+      sx={{
+        "&:hover": { color: "#5e62d1", cursor: "pointer" },
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Home
+    </Link>,
+    <Link
+      underline="none"
+      key="2"
+      color="inherit"
+      sx={{
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      My Applications & Jobs
+    </Link>,
+  ];
+
+  return (
+    <Stack
+      sx={{
+        position: "absolute",
+        top: "80px",
+        left: "70px",
+        alignItems: "flex-start",
+      }}
+    >
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+      >
+        {breadcrumbs}
+      </Breadcrumbs>
+    </Stack>
+  );
+};
 
 const CompactWeeklySchedule = ({ availability }) => {
   const dayMap = {
@@ -560,6 +658,7 @@ const MyApplicationsJobs = () => {
 
   return (
     <Container>
+      <CustomSeparator />
       <Header>
         <Typography
           variant="h4"
@@ -580,8 +679,29 @@ const MyApplicationsJobs = () => {
           <StyledTabs
             value={currentTab}
             onChange={handleTabChange}
-            indicatorColor="primary"
-            textColor="primary"
+            TabIndicatorProps={{
+              style: {
+                backgroundColor: "#5e62d1",
+              },
+            }}
+            sx={{
+              "& .MuiTab-root": {
+                color: "grey",
+                fontFamily: "Poppins, sans-serif",
+                fontSize: "1.4rem",
+                fontWeight: "100",
+                textTransform: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              },
+              "& .Mui-selected": {
+                color: "#5e62d1 !important",
+              },
+              "& .MuiTab-wrapper": {
+                flexDirection: "row",
+              },
+            }}
           >
             <StyledTab label="Agreements" icon={<WorkOutlineIcon />} />
             <StyledTab label="Applications" icon={<DoneIcon />} />
