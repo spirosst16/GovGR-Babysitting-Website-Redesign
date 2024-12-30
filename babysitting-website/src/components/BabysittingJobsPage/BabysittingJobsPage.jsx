@@ -362,7 +362,7 @@ const BabysittingJobsPage = () => {
             fontWeight: "600",
           }}
         >
-          Find Your Babysitter
+          Search for babysitting jobs
         </Typography>
 
         <Box

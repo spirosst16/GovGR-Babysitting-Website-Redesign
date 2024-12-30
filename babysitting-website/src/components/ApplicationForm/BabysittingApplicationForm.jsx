@@ -246,6 +246,8 @@ const BabysittingApplicationForm = () => {
 
   const [isFocused, setIsFocused] = useState(false);
 
+  const navigate = useNavigate();
+
   const steps = [
     "Babysitting Area, Job Type, Babysitting Place & Children Age Groups",
     "Availability",
@@ -303,6 +305,8 @@ const BabysittingApplicationForm = () => {
 
       console.log("Document written successfully!");
       alert("Form submitted successfully!");
+
+      navigate("/my-applications-and-jobs");
 
       setFormValues({
         area: "",

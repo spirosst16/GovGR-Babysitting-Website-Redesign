@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Avatar,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
@@ -127,11 +128,11 @@ const CompactWeeklySchedule = ({ availability }) => {
   };
 
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const timeSlots = ["Morning", "Afternoon", "Evening", "Night"]; // Full time slot names
+  const timeSlots = ["Morning", "Afternoon", "Evening", "Night"];
 
   return (
     <Box display="grid" gridTemplateColumns="repeat(8, 1fr)" gap={0.5} mt={3}>
-      <Box></Box> {/* Empty corner cell */}
+      <Box></Box>
       {days.map((day) => (
         <Typography
           key={day}
@@ -150,7 +151,7 @@ const CompactWeeklySchedule = ({ availability }) => {
             textAlign="center"
             fontWeight="bold"
           >
-            {timeSlot.charAt(0)} {/* First letter of the time slot */}
+            {timeSlot.charAt(0)}
           </Typography>
           {days.map((day) => {
             const isAvailable = availability.includes(
@@ -195,6 +196,7 @@ const MyApplicationsJobs = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState(null);
   const [isBabysitter, setIsBabysitter] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const auth = getAuth();
@@ -342,7 +344,16 @@ const MyApplicationsJobs = () => {
         >
           {agreements.map((agreement) => (
             <Grid item xs={12} sm={6} md={4} key={agreement.id}>
-              <ApplicationCard>
+              <ApplicationCard
+                onClick={() =>
+                  navigate(
+                    `/agreement/${agreement.senderId}/${agreement.recipientId}`
+                  )
+                }
+                style={{
+                  cursor: "pointer",
+                }}
+              >
                 <CardContent>
                   <CardHeader>
                     <Box display="flex" alignItems="center">
@@ -417,7 +428,7 @@ const MyApplicationsJobs = () => {
                 const roleSpecificPath = isBabysitter
                   ? "/babysitting-jobs"
                   : "/babysitters";
-                window.location.href = roleSpecificPath;
+                navigate(roleSpecificPath);
               }}
               style={{
                 cursor: "pointer",
@@ -451,7 +462,12 @@ const MyApplicationsJobs = () => {
         >
           {applications.map((application) => (
             <Grid item xs={12} sm={6} md={4} key={application.id}>
-              <ApplicationCard>
+              <ApplicationCard
+                onClick={() => navigate(`/application/${application.userId}`)}
+                style={{
+                  cursor: "pointer",
+                }}
+              >
                 <CardContent>
                   <CardHeader>
                     <Typography variant="h6" fontWeight={600}>
@@ -485,9 +501,7 @@ const MyApplicationsJobs = () => {
           ))}
           <Grid item xs={12} sm={6} md={4}>
             <ApplicationCard
-              onClick={() =>
-                (window.location.href = "/babysitting-application")
-              }
+              onClick={() => navigate("/babysitting-application")}
               style={{
                 cursor: "pointer",
                 border: "2px dashed #9E9E9E",
