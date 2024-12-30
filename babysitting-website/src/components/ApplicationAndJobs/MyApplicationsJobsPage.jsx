@@ -12,6 +12,7 @@ import {
   Avatar,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
 import HistoryIcon from "@mui/icons-material/History";
 import DoneIcon from "@mui/icons-material/Done";
@@ -36,17 +37,37 @@ const Header = styled(Box)({
 });
 
 const TabContainer = styled(Box)({
-  margin: "20px 0",
+  marginTop: "5px",
+  marginBottom: "7px",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
+});
+
+const StyledTabs = styled(Tabs)({
+  display: "flex",
+  justifyContent: "space-around",
+  width: "100%",
+});
+
+const StyledTab = styled(Tab)({
+  fontSize: "1.2rem",
+  fontWeight: "bold",
+  minHeight: "70px",
+  "& .MuiTab-iconWrapper": {
+    fontSize: "2rem",
+    marginBottom: "5px",
+  },
 });
 
 const ApplicationCard = styled(Card)({
   margin: "15px",
   boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
   borderRadius: "10px",
+  width: "450px",
+  height: "350px",
   transition: "transform 0.2s, box-shadow 0.2s",
+  justifyContent: "space-between",
   "&:hover": {
     transform: "scale(1.03)",
     boxShadow: "0px 6px 25px rgba(0, 0, 0, 0.3)",
@@ -76,8 +97,8 @@ const StatusChip = styled(Box)(({ status }) => ({
 const ProgressContainer = styled(Box)({
   display: "flex",
   alignItems: "center",
-  justifyContent: "space-between",
-  margin: "10px 0",
+  justifyContent: "center",
+  marginTop: "30px",
 });
 
 const ActionButton = styled(Button)({
@@ -94,12 +115,86 @@ const EmptyState = styled(Box)({
   padding: "50px 20px",
 });
 
+const CompactWeeklySchedule = ({ availability }) => {
+  const dayMap = {
+    Mon: "Monday",
+    Tue: "Tuesday",
+    Wed: "Wednesday",
+    Thu: "Thursday",
+    Fri: "Friday",
+    Sat: "Saturday",
+    Sun: "Sunday",
+  };
+
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const timeSlots = ["Morning", "Afternoon", "Evening", "Night"]; // Full time slot names
+
+  return (
+    <Box display="grid" gridTemplateColumns="repeat(8, 1fr)" gap={0.5} mt={3}>
+      <Box></Box> {/* Empty corner cell */}
+      {days.map((day) => (
+        <Typography
+          key={day}
+          variant="caption"
+          textAlign="center"
+          fontWeight="bold"
+        >
+          {day}
+        </Typography>
+      ))}
+      {timeSlots.map((timeSlot) => (
+        <>
+          <Typography
+            key={`label-${timeSlot}`}
+            variant="caption"
+            textAlign="center"
+            fontWeight="bold"
+          >
+            {timeSlot.charAt(0)} {/* First letter of the time slot */}
+          </Typography>
+          {days.map((day) => {
+            const isAvailable = availability.includes(
+              `${dayMap[day]} ${timeSlot}`
+            );
+            return (
+              <Box
+                key={`${day}-${timeSlot}`}
+                width={20}
+                height={20}
+                borderRadius="50%"
+                bgcolor={isAvailable ? "#5e62d1" : "#888"}
+                mx="auto"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                position="relative"
+              >
+                {isAvailable && (
+                  <Typography
+                    variant="caption"
+                    component="span"
+                    fontWeight="bold"
+                    color="white"
+                  >
+                    ✔
+                  </Typography>
+                )}
+              </Box>
+            );
+          })}
+        </>
+      ))}
+    </Box>
+  );
+};
+
 const MyApplicationsJobs = () => {
   const [currentTab, setCurrentTab] = useState(0);
   const [agreements, setAgreements] = useState([]);
   const [applications, setApplications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState(null);
+  const [isBabysitter, setIsBabysitter] = useState(false);
 
   useEffect(() => {
     const auth = getAuth();
@@ -124,6 +219,7 @@ const MyApplicationsJobs = () => {
       const babysittersSnapshot = await getDocs(babysittersRef);
       if (!babysittersSnapshot.empty) {
         userData = babysittersSnapshot.docs[0].data();
+        setIsBabysitter(true);
       } else {
         const guardiansRef = query(
           collection(FIREBASE_DB, "guardians"),
@@ -132,6 +228,7 @@ const MyApplicationsJobs = () => {
         const guardiansSnapshot = await getDocs(guardiansRef);
         if (!guardiansSnapshot.empty) {
           userData = guardiansSnapshot.docs[0].data();
+          setIsBabysitter(false);
         }
       }
 
@@ -209,6 +306,17 @@ const MyApplicationsJobs = () => {
     setCurrentTab(newValue);
   };
 
+  const calculateProgress = (startingDate, endingDate) => {
+    const currentDate = new Date();
+    const start = new Date(startingDate);
+    const end = new Date(endingDate);
+
+    const totalDuration = end - start;
+    const elapsedDuration = currentDate - start;
+
+    return Math.min((elapsedDuration / totalDuration) * 100, 100);
+  };
+
   const renderTabContent = () => {
     if (isLoading) {
       return (
@@ -225,92 +333,180 @@ const MyApplicationsJobs = () => {
 
     if (currentTab === 0) {
       return (
-        <Grid container spacing={3} justifyContent="center" alignItems="center">
-          {agreements.length > 0 ? (
-            agreements.map((agreement) => (
-              <Grid item xs={12} sm={6} md={4} key={agreement.id}>
-                <ApplicationCard>
-                  <CardContent>
-                    <CardHeader>
+        <Grid
+          container
+          spacing={3}
+          justifyContent="flex-start"
+          alignItems="flex-start"
+          wrap="wrap"
+        >
+          {agreements.map((agreement) => (
+            <Grid item xs={12} sm={6} md={4} key={agreement.id}>
+              <ApplicationCard>
+                <CardContent>
+                  <CardHeader>
+                    <Box display="flex" alignItems="center">
+                      {agreement.otherUser && (
+                        <>
+                          <Avatar
+                            src={agreement.otherUser.photo || ""}
+                            alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                            style={{
+                              marginBottom: "10px",
+                              marginRight: "6px",
+                              width: "65px",
+                              height: "65px",
+                            }}
+                          />
+                          <Typography variant="h6" fontWeight={600}>
+                            {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
+                    <StatusChip status={agreement.status}>
+                      {agreement.status}
+                    </StatusChip>
+                  </CardHeader>
+                  <Typography
+                    variant="body1"
+                    marginLeft="20px"
+                    marginTop="10px"
+                  >
+                    <strong>Babysitting Place:</strong>{" "}
+                    {agreement.babysittingPlace.join(", ")}
+                  </Typography>
+                  <CompactWeeklySchedule
+                    availability={agreement.weeklySchedule}
+                  />
+                  <ProgressContainer>
+                    {agreement.status === "accepted" && (
                       <Box display="flex" alignItems="center">
-                        {agreement.otherUser && (
-                          <>
-                            <Avatar
-                              src={agreement.otherUser.photo || ""}
-                              alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
-                              style={{
-                                marginBottom: "10px",
-                              }}
-                            />
-                            <Typography variant="h6">
-                              {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
-                            </Typography>
-                          </>
-                        )}
+                        <CircularProgress
+                          variant="determinate"
+                          value={calculateProgress(
+                            agreement.startingDate,
+                            agreement.endingDate
+                          )}
+                          size={40}
+                          thickness={4}
+                        />
+                        <Typography
+                          variant="body1"
+                          style={{ marginLeft: "16px" }}
+                        >
+                          {Math.round(
+                            calculateProgress(
+                              agreement.startingDate,
+                              agreement.endingDate
+                            )
+                          )}
+                          % Complete
+                        </Typography>
                       </Box>
-                      <StatusChip status={agreement.status}>
-                        {agreement.status}
-                      </StatusChip>
-                    </CardHeader>
-                    <Typography variant="body2">
-                      <strong>Babysitting Place:</strong>{" "}
-                      {agreement.babysittingPlace.join(", ")}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Weekly Schedule:</strong>{" "}
-                      {agreement.weeklySchedule.join(", ")}
-                    </Typography>
-                  </CardContent>
-                </ApplicationCard>
-              </Grid>
-            ))
-          ) : (
-            <EmptyState>
-              <WorkOutlineIcon style={{ fontSize: 50, color: "#9E9E9E" }} />
+                    )}
+                  </ProgressContainer>
+                </CardContent>
+              </ApplicationCard>
+            </Grid>
+          ))}
+
+          <Grid item xs={12} sm={6} md={4}>
+            <ApplicationCard
+              onClick={() => {
+                const roleSpecificPath = isBabysitter
+                  ? "/babysitting-jobs"
+                  : "/babysitters";
+                window.location.href = roleSpecificPath;
+              }}
+              style={{
+                cursor: "pointer",
+                border: "2px dashed #9E9E9E",
+                textAlign: "center",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <AddCircleOutlineIcon
+                style={{ fontSize: 50, color: "#9E9E9E" }}
+              />
               <Typography variant="body1" color="textSecondary">
-                No active agreements found.
+                Browse {isBabysitter ? "Guardians" : "Babysitters"}
               </Typography>
-            </EmptyState>
-          )}
+            </ApplicationCard>
+          </Grid>
         </Grid>
       );
     } else if (currentTab === 1) {
       return (
-        <Grid container spacing={3} justifyContent="center" alignItems="center">
-          {applications.length > 0 ? (
-            applications.map((application) => (
-              <Grid item xs={12} sm={6} md={4} key={application.id}>
-                <ApplicationCard>
-                  <CardContent>
-                    <CardHeader>
-                      <Typography variant="h6">{application.area}</Typography>
-                      <StatusChip status={application.status}>
-                        {application.status}
-                      </StatusChip>
-                    </CardHeader>
-                    <Typography variant="body2">
-                      <strong>Job Type:</strong> {application.jobType}
+        <Grid
+          container
+          spacing={3}
+          justifyContent="flex-start"
+          alignItems="flex-start"
+          wrap="wrap"
+        >
+          {applications.map((application) => (
+            <Grid item xs={12} sm={6} md={4} key={application.id}>
+              <ApplicationCard>
+                <CardContent>
+                  <CardHeader>
+                    <Typography variant="h6" fontWeight={600}>
+                      {application.area}
                     </Typography>
-                    <Typography variant="body2">
-                      <strong>Availability:</strong>{" "}
-                      {application.availability.join(", ")}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Babysitting Place:</strong>{" "}
-                      {application.babysittingPlace.join(", ")}
-                    </Typography>
-                  </CardContent>
-                </ApplicationCard>
-              </Grid>
-            ))
-          ) : (
-            <EmptyState>
-              <DoneIcon style={{ fontSize: 50, color: "#9E9E9E" }} />
+                    <StatusChip status={application.status}>
+                      {application.status}
+                    </StatusChip>
+                  </CardHeader>
+                  <Typography
+                    variant="body1"
+                    marginLeft="20px"
+                    marginTop="10px"
+                  >
+                    <strong>Job Type:</strong> {application.jobType}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    marginLeft="20px"
+                    marginTop="10px"
+                  >
+                    <strong>Babysitting Place:</strong>{" "}
+                    {application.babysittingPlace.join(", ")}
+                  </Typography>
+                  <CompactWeeklySchedule
+                    availability={application.availability}
+                  />
+                </CardContent>
+              </ApplicationCard>
+            </Grid>
+          ))}
+          <Grid item xs={12} sm={6} md={4}>
+            <ApplicationCard
+              onClick={() =>
+                (window.location.href = "/babysitting-application")
+              }
+              style={{
+                cursor: "pointer",
+                border: "2px dashed #9E9E9E",
+                textAlign: "center",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <AddCircleOutlineIcon
+                style={{ fontSize: 50, color: "#9E9E9E" }}
+              />
               <Typography variant="body1" color="textSecondary">
-                No applications found.
+                Create Application
               </Typography>
-            </EmptyState>
-          )}
+            </ApplicationCard>
+          </Grid>
         </Grid>
       );
     } else {
@@ -343,16 +539,18 @@ const MyApplicationsJobs = () => {
       </Header>
 
       <TabContainer>
-        <Tabs
-          value={currentTab}
-          onChange={handleTabChange}
-          indicatorColor="primary"
-          textColor="primary"
-        >
-          <Tab label="Agreements" icon={<WorkOutlineIcon />} />
-          <Tab label="Applications" icon={<DoneIcon />} />
-          <Tab label="History" icon={<HistoryIcon />} />
-        </Tabs>
+        <TabContainer>
+          <StyledTabs
+            value={currentTab}
+            onChange={handleTabChange}
+            indicatorColor="primary"
+            textColor="primary"
+          >
+            <StyledTab label="Agreements" icon={<WorkOutlineIcon />} />
+            <StyledTab label="Applications" icon={<DoneIcon />} />
+            <StyledTab label="History" icon={<HistoryIcon />} />
+          </StyledTabs>
+        </TabContainer>
       </TabContainer>
 
       {renderTabContent()}
