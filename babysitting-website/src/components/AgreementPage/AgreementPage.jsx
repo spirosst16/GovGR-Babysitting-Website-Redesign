@@ -283,7 +283,7 @@ const AgreementPage = () => {
   const [formValues, setFormValues] = useState({
     area: "",
     weeklySchedule: [],
-    babysittingPlace: [],
+    babysittingPlace: "",
     startingDate: "",
     endingDate: "",
     additionalNotes: "",
@@ -840,7 +840,7 @@ const AgreementPage = () => {
                 Babysitting Place:
               </Box>{" "}
               <Box component="span" sx={{ fontWeight: "normal" }}>
-                {formValues.babysittingPlace.join(", ")}
+                {formValues.babysittingPlace}
               </Box>
             </Typography>
 

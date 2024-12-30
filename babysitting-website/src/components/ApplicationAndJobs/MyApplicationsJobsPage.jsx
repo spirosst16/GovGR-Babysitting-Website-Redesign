@@ -502,7 +502,7 @@ const MyApplicationsJobs = () => {
                       marginTop="10px"
                     >
                       <strong>Babysitting Place:</strong>{" "}
-                      {agreement.babysittingPlace.join(", ")}
+                      {agreement.babysittingPlace}
                     </Typography>
                     <CompactWeeklySchedule
                       availability={agreement.weeklySchedule}
@@ -609,7 +609,7 @@ const MyApplicationsJobs = () => {
                       marginTop="10px"
                     >
                       <strong>Babysitting Place:</strong>{" "}
-                      {application.babysittingPlace.join(", ")}
+                      {application.babysittingPlace}
                     </Typography>
                     <CompactWeeklySchedule
                       availability={application.availability}
@@ -644,14 +644,155 @@ const MyApplicationsJobs = () => {
           )}
         </Grid>
       );
-    } else {
+    } else if (currentTab === 2) {
+      const filteredAgreements = agreements.filter(
+        (agreement) => new Date(agreement.endingDate) <= new Date()
+      );
+
+      const filteredApplications = applications.filter(
+        (application) => new Date(application.endingDate) <= new Date()
+      );
+
       return (
-        <EmptyState>
-          <HistoryIcon style={{ fontSize: 50, color: "#9E9E9E" }} />
-          <Typography variant="body1" color="textSecondary">
-            No history available yet.
-          </Typography>
-        </EmptyState>
+        <Grid
+          container
+          spacing={3}
+          justifyContent="center"
+          alignItems="center"
+          wrap="wrap"
+        >
+          {filteredAgreements.length > 0 || filteredApplications.length > 0 ? (
+            <>
+              {filteredAgreements.map((agreement) => (
+                <Grid item xs={12} sm={6} md={4} key={agreement.id}>
+                  <ApplicationCard
+                    onClick={() =>
+                      navigate(
+                        `/agreement/${agreement.senderId}/${agreement.recipientId}`
+                      )
+                    }
+                    style={{
+                      cursor: "pointer",
+                    }}
+                  >
+                    <CardContent>
+                      <CardHeader>
+                        <Box display="flex" alignItems="center">
+                          {agreement.otherUser && (
+                            <>
+                              <Avatar
+                                src={agreement.otherUser.photo || ""}
+                                alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                                style={{
+                                  marginBottom: "10px",
+                                  marginRight: "6px",
+                                  width: "65px",
+                                  height: "65px",
+                                }}
+                              />
+                              <Typography variant="h6" fontWeight={600}>
+                                {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                              </Typography>
+                            </>
+                          )}
+                        </Box>
+                        <StatusChip status={agreement.status}>
+                          {agreement.status}
+                        </StatusChip>
+                      </CardHeader>
+                      <Typography
+                        variant="body1"
+                        marginLeft="20px"
+                        marginTop="10px"
+                      >
+                        <strong>Babysitting Place:</strong>{" "}
+                        {agreement.babysittingPlace}
+                      </Typography>
+                      <CompactWeeklySchedule
+                        availability={agreement.weeklySchedule}
+                      />
+                      <ProgressContainer>
+                        {agreement.status === "accepted" && (
+                          <Box display="flex" alignItems="center">
+                            <CircularProgress
+                              variant="determinate"
+                              value={calculateProgress(
+                                agreement.startingDate,
+                                agreement.endingDate
+                              )}
+                              size={40}
+                              thickness={4}
+                            />
+                            <Typography
+                              variant="body1"
+                              style={{ marginLeft: "16px" }}
+                            >
+                              {Math.round(
+                                calculateProgress(
+                                  agreement.startingDate,
+                                  agreement.endingDate
+                                )
+                              )}
+                              % Complete
+                            </Typography>
+                          </Box>
+                        )}
+                      </ProgressContainer>
+                    </CardContent>
+                  </ApplicationCard>
+                </Grid>
+              ))}
+              {filteredApplications.map((application) => (
+                <Grid item xs={12} sm={6} md={4} key={application.id}>
+                  <ApplicationCard
+                    onClick={() =>
+                      navigate(`/application/${application.userId}`)
+                    }
+                    style={{
+                      cursor: "pointer",
+                    }}
+                  >
+                    <CardContent>
+                      <CardHeader>
+                        <Typography variant="h6" fontWeight={600}>
+                          {application.area}
+                        </Typography>
+                        <StatusChip status={application.status}>
+                          {application.status}
+                        </StatusChip>
+                      </CardHeader>
+                      <Typography
+                        variant="body1"
+                        marginLeft="20px"
+                        marginTop="10px"
+                      >
+                        <strong>Job Type:</strong> {application.jobType}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        marginLeft="20px"
+                        marginTop="10px"
+                      >
+                        <strong>Babysitting Place:</strong>{" "}
+                        {application.babysittingPlace}
+                      </Typography>
+                      <CompactWeeklySchedule
+                        availability={application.availability}
+                      />
+                    </CardContent>
+                  </ApplicationCard>
+                </Grid>
+              ))}
+            </>
+          ) : (
+            <EmptyState>
+              <HistoryIcon style={{ fontSize: 50, color: "#9E9E9E" }} />
+              <Typography variant="body1" color="textSecondary">
+                No history available yet.
+              </Typography>
+            </EmptyState>
+          )}
+        </Grid>
       );
     }
   };
