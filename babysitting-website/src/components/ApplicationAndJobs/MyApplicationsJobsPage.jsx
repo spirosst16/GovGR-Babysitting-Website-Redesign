@@ -64,8 +64,8 @@ const ApplicationCard = styled(Card)({
   margin: "15px",
   boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
   borderRadius: "10px",
-  width: "500px",
-  height: "230px",
+  width: "450px",
+  height: "350px",
   transition: "transform 0.2s, box-shadow 0.2s",
   justifyContent: "space-between",
   "&:hover": {
@@ -97,8 +97,8 @@ const StatusChip = styled(Box)(({ status }) => ({
 const ProgressContainer = styled(Box)({
   display: "flex",
   alignItems: "center",
-  justifyContent: "space-between",
-  margin: "10px 0",
+  justifyContent: "center",
+  marginTop: "30px",
 });
 
 const ActionButton = styled(Button)({
@@ -114,6 +114,79 @@ const EmptyState = styled(Box)({
   textAlign: "center",
   padding: "50px 20px",
 });
+
+const CompactWeeklySchedule = ({ availability }) => {
+  const dayMap = {
+    Mon: "Monday",
+    Tue: "Tuesday",
+    Wed: "Wednesday",
+    Thu: "Thursday",
+    Fri: "Friday",
+    Sat: "Saturday",
+    Sun: "Sunday",
+  };
+
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const timeSlots = ["Morning", "Afternoon", "Evening", "Night"]; // Full time slot names
+
+  return (
+    <Box display="grid" gridTemplateColumns="repeat(8, 1fr)" gap={0.5} mt={3}>
+      <Box></Box> {/* Empty corner cell */}
+      {days.map((day) => (
+        <Typography
+          key={day}
+          variant="caption"
+          textAlign="center"
+          fontWeight="bold"
+        >
+          {day}
+        </Typography>
+      ))}
+      {timeSlots.map((timeSlot) => (
+        <>
+          <Typography
+            key={`label-${timeSlot}`}
+            variant="caption"
+            textAlign="center"
+            fontWeight="bold"
+          >
+            {timeSlot.charAt(0)} {/* First letter of the time slot */}
+          </Typography>
+          {days.map((day) => {
+            const isAvailable = availability.includes(
+              `${dayMap[day]} ${timeSlot}`
+            );
+            return (
+              <Box
+                key={`${day}-${timeSlot}`}
+                width={20}
+                height={20}
+                borderRadius="50%"
+                bgcolor={isAvailable ? "#5e62d1" : "#888"}
+                mx="auto"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                position="relative"
+              >
+                {isAvailable && (
+                  <Typography
+                    variant="caption"
+                    component="span"
+                    fontWeight="bold"
+                    color="white"
+                  >
+                    ✔
+                  </Typography>
+                )}
+              </Box>
+            );
+          })}
+        </>
+      ))}
+    </Box>
+  );
+};
 
 const MyApplicationsJobs = () => {
   const [currentTab, setCurrentTab] = useState(0);
@@ -289,14 +362,17 @@ const MyApplicationsJobs = () => {
                       {agreement.status}
                     </StatusChip>
                   </CardHeader>
-                  <Typography variant="body2">
+                  <Typography
+                    variant="body1"
+                    marginLeft="20px"
+                    marginTop="10px"
+                  >
                     <strong>Babysitting Place:</strong>{" "}
                     {agreement.babysittingPlace.join(", ")}
                   </Typography>
-                  <Typography variant="body2">
-                    <strong>Weekly Schedule:</strong>{" "}
-                    {agreement.weeklySchedule.join(", ")}
-                  </Typography>
+                  <CompactWeeklySchedule
+                    availability={agreement.weeklySchedule}
+                  />
                   <ProgressContainer>
                     {agreement.status === "accepted" && (
                       <Box display="flex" alignItems="center">
@@ -310,8 +386,8 @@ const MyApplicationsJobs = () => {
                           thickness={4}
                         />
                         <Typography
-                          variant="body2"
-                          style={{ marginLeft: "16px", fontSize: "14px" }}
+                          variant="body1"
+                          style={{ marginLeft: "16px" }}
                         >
                           {Math.round(
                             calculateProgress(
@@ -373,17 +449,24 @@ const MyApplicationsJobs = () => {
                       {application.status}
                     </StatusChip>
                   </CardHeader>
-                  <Typography variant="body2">
+                  <Typography
+                    variant="body1"
+                    marginLeft="20px"
+                    marginTop="10px"
+                  >
                     <strong>Job Type:</strong> {application.jobType}
                   </Typography>
-                  <Typography variant="body2">
-                    <strong>Availability:</strong>{" "}
-                    {application.availability.join(", ")}
-                  </Typography>
-                  <Typography variant="body2">
+                  <Typography
+                    variant="body1"
+                    marginLeft="20px"
+                    marginTop="10px"
+                  >
                     <strong>Babysitting Place:</strong>{" "}
                     {application.babysittingPlace.join(", ")}
                   </Typography>
+                  <CompactWeeklySchedule
+                    availability={application.availability}
+                  />
                 </CardContent>
               </ApplicationCard>
             </Grid>
