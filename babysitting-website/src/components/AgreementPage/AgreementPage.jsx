@@ -16,6 +16,7 @@ import {
   Breadcrumbs,
   Link,
   Stack,
+  Radio,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -78,6 +79,7 @@ const StyledButton = styled(Button)({
   backgroundColor: "#5e62d1",
   color: "#fff",
   fontFamily: "'Poppins', sans-serif",
+  fontSize: "1rem",
   padding: "10px 20px",
   borderRadius: "25px",
   textTransform: "none",
@@ -102,6 +104,37 @@ const ScheduleItem = styled(Box)(({ available }) => ({
   borderRadius: "8px",
   marginBottom: "5px",
 }));
+
+const StyledTextField = styled(TextField)({
+  fontFamily: "'Poppins', sans-serif",
+  color: "#5e62d1",
+  "& .MuiInputBase-input": {
+    fontFamily: "'Poppins', sans-serif",
+  },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "#ccc",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#5e62d1",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#5e62d1",
+  },
+});
+
+const StyledRadio = styled(Radio)({
+  "&.Mui-checked": {
+    color: "#5e62d1",
+  },
+});
+
+const StyledCheckbox = styled(Checkbox)({
+  "&.Mui-checked": {
+    color: "#5e62d1",
+  },
+});
 
 const CustomSeparator = () => {
   const [userRole, setUserRole] = useState(null);
@@ -564,7 +597,7 @@ const AgreementPage = () => {
             >
               Agreement Details
             </Typography>
-            <TextField
+            <StyledTextField
               fullWidth
               label="Area"
               name="area"
@@ -575,84 +608,91 @@ const AgreementPage = () => {
               sx={{ fontFamily: "'Poppins', sans-serif" }}
             />
 
-            <FormLabel
-              component="legend"
-              sx={{ fontFamily: "'Poppins', sans-serif", fontSize: "20px" }}
-            >
-              Weekly Schedule *
-            </FormLabel>
-            <Grid container spacing={3}>
-              {[
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday",
-                "Sunday",
-              ].map((day) => (
-                <Grid item xs={12} sm={6} md={3} key={day}>
-                  <Typography variant="h6">{day}</Typography>
-                  <FormGroup>
-                    {["Morning", "Afternoon", "Evening", "Night"].map(
-                      (time) => (
-                        <FormControlLabel
-                          key={time}
-                          control={
-                            <Checkbox
-                              checked={formValues.weeklySchedule.includes(
-                                `${day} ${time}`
-                              )}
-                              onChange={(e) => {
-                                const updatedSchedule = e.target.checked
-                                  ? [
-                                      ...formValues.weeklySchedule,
-                                      `${day} ${time}`,
-                                    ]
-                                  : formValues.weeklySchedule.filter(
-                                      (slot) => slot !== `${day} ${time}`
-                                    );
-                                setFormValues({
-                                  ...formValues,
-                                  weeklySchedule: updatedSchedule,
-                                });
-                              }}
-                            />
-                          }
-                          label={time}
-                        />
-                      )
-                    )}
-                  </FormGroup>
-                </Grid>
-              ))}
-            </Grid>
+            <FormControl>
+              <FormLabel
+                component="legend"
+                sx={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: "20px",
+                  "&.Mui-focused": {
+                    color: "#5e62d1",
+                  },
+                }}
+              >
+                Weekly Schedule *
+              </FormLabel>
+              <Grid container spacing={3}>
+                {[
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday",
+                ].map((day) => (
+                  <Grid item xs={12} sm={6} md={3} key={day}>
+                    <Typography variant="h6">{day}</Typography>
+                    <FormGroup>
+                      {["Morning", "Afternoon", "Evening", "Night"].map(
+                        (time) => (
+                          <FormControlLabel
+                            key={time}
+                            control={
+                              <StyledCheckbox
+                                checked={formValues.weeklySchedule.includes(
+                                  `${day} ${time}`
+                                )}
+                                onChange={(e) => {
+                                  const updatedSchedule = e.target.checked
+                                    ? [
+                                        ...formValues.weeklySchedule,
+                                        `${day} ${time}`,
+                                      ]
+                                    : formValues.weeklySchedule.filter(
+                                        (slot) => slot !== `${day} ${time}`
+                                      );
+                                  setFormValues({
+                                    ...formValues,
+                                    weeklySchedule: updatedSchedule,
+                                  });
+                                }}
+                              />
+                            }
+                            label={time}
+                          />
+                        )
+                      )}
+                    </FormGroup>
+                  </Grid>
+                ))}
+              </Grid>
+            </FormControl>
 
             <FormControl component="fieldset" sx={{ mb: 2 }}>
               <FormLabel
                 component="legend"
-                sx={{ fontFamily: "'Poppins', sans-serif", fontSize: "20px" }}
+                sx={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: "20px",
+                  "&.Mui-focused": {
+                    color: "#5e62d1",
+                  },
+                }}
               >
                 Babysitting Place *
               </FormLabel>
               <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
                 <FormControlLabel
                   control={
-                    <Checkbox
-                      checked={formValues.babysittingPlace.includes(
-                        "Family's House"
-                      )}
-                      onChange={(e) => {
-                        const newBabysittingPlace = e.target.checked
-                          ? [...formValues.babysittingPlace, "Family's House"]
-                          : formValues.babysittingPlace.filter(
-                              (place) => place !== "Family's House"
-                            );
+                    <StyledRadio
+                      checked={formValues.babysittingPlace === "Family's House"}
+                      onChange={() =>
                         setFormValues({
                           ...formValues,
-                          babysittingPlace: newBabysittingPlace,
-                        });
-                      }}
+                          babysittingPlace: "Family's House",
+                        })
+                      }
                     />
                   }
                   label="Family's House"
@@ -660,24 +700,16 @@ const AgreementPage = () => {
                 />
                 <FormControlLabel
                   control={
-                    <Checkbox
-                      checked={formValues.babysittingPlace.includes(
-                        "Babysitter's House"
-                      )}
-                      onChange={(e) => {
-                        const newBabysittingPlace = e.target.checked
-                          ? [
-                              ...formValues.babysittingPlace,
-                              "Babysitter's House",
-                            ]
-                          : formValues.babysittingPlace.filter(
-                              (place) => place !== "Babysitter's House"
-                            );
+                    <StyledRadio
+                      checked={
+                        formValues.babysittingPlace === "Babysitter's House"
+                      }
+                      onChange={() =>
                         setFormValues({
                           ...formValues,
-                          babysittingPlace: newBabysittingPlace,
-                        });
-                      }}
+                          babysittingPlace: "Babysitter's House",
+                        })
+                      }
                     />
                   }
                   label="Babysitter's House"
@@ -686,7 +718,7 @@ const AgreementPage = () => {
               </Box>
             </FormControl>
 
-            <TextField
+            <StyledTextField
               fullWidth
               label="Starting Date"
               name="startingDate"
@@ -698,7 +730,7 @@ const AgreementPage = () => {
               sx={{ fontFamily: "'Poppins', sans-serif" }}
             />
 
-            <TextField
+            <StyledTextField
               fullWidth
               label="Ending Date"
               name="endingDate"
@@ -710,7 +742,7 @@ const AgreementPage = () => {
               sx={{ fontFamily: "'Poppins', sans-serif" }}
             />
 
-            <TextField
+            <StyledTextField
               fullWidth
               label="Additional Notes"
               name="additionalNotes"
