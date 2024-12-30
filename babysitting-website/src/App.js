@@ -24,7 +24,7 @@ import BabysittingApplicationDisplay from "./components/ApplicationDisplay/Babys
 import BabysittingApplicationEdit from "./components/ApplicationEdit/BabysittingApplicationEdit";
 import AgreementPage from "./components/AgreementPage/AgreementPage";
 import ChatPage from "./components/ChatPage/ChatPage";
-import ProfilePage from "./components/Profile/BabysitterProfile";
+import ProfilePage from "./components/Profile/MyProfile";
 
 function App() {
   const [user, setUser] = useState(null);
