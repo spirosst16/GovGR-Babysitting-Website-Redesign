@@ -27,6 +27,26 @@ import {
 } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import "../../style.css";
+import { styled } from "@mui/system";
+
+const StyledTextField = styled(TextField)({
+  fontFamily: "'Poppins', sans-serif",
+  color: "#5e62d1",
+  "& .MuiInputBase-input": {
+    fontFamily: "'Poppins', sans-serif",
+  },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "#ccc",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#5e62d1",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#5e62d1",
+  },
+});
 
 const ProfilePage = () => {
   const [roleRef, setRoleRef] = useState([]);
@@ -254,7 +274,7 @@ const ProfilePage = () => {
               >
                 Area:
               </Typography>
-              <TextField
+              <StyledTextField
                 variant="outlined"
                 size="small"
                 onChange={(e) =>
@@ -279,7 +299,7 @@ const ProfilePage = () => {
               >
                 Bio:
               </Typography>
-              <TextField
+              <StyledTextField
                 variant="outlined"
                 size="small"
                 onChange={(e) =>
@@ -306,7 +326,7 @@ const ProfilePage = () => {
               >
                 Experience:
               </Typography>
-              <TextField
+              <StyledTextField
                 variant="outlined"
                 multiline
                 onChange={(e) =>
@@ -333,7 +353,7 @@ const ProfilePage = () => {
               >
                 Level of Education:
               </Typography>
-              <TextField
+              <StyledTextField
                 variant="outlined"
                 size="small"
                 onChange={(e) =>
@@ -611,14 +631,17 @@ const ProfilePage = () => {
               <Typography
                 variant="body1"
                 sx={{
+                  display: "flex",
+                  alignItems: "baseline",
+
                   marginLeft: "100px",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
               >
-                Area:
+                Area
               </Typography>
-              <TextField
+              <StyledTextField
                 variant="outlined"
                 size="small"
                 onChange={(e) =>
@@ -628,31 +651,36 @@ const ProfilePage = () => {
                 sx={{
                   width: "500px",
                   marginBottom: "15px",
-                  marginLeft: "140px",
+                  marginLeft: "100px",
                   fontFamily: "Poppins, sans-serif",
                 }}
               />
 
               <Typography
                 sx={{
+                  display: "flex",
                   marginLeft: "100px",
+                  alignItems: "baseline",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
                 variant="body1"
               >
-                Number of Children:
+                Number of Children
               </Typography>
-              <TextField
+              <StyledTextField
                 variant="outlined"
                 onChange={(e) =>
-                  setProfileData({ ...profileData, experience: e.target.value })
+                  setProfileData({
+                    ...profileData,
+                    experience: e.target.value,
+                  })
                 }
                 size="small"
                 value={profileData.numberOfChildren || ""}
                 sx={{
                   marginBottom: "15px",
-                  marginLeft: "140px",
+                  marginLeft: "100px",
                   width: "500px",
                   fontFamily: "Poppins, sans-serif",
                 }}
@@ -661,14 +689,15 @@ const ProfilePage = () => {
               <Typography
                 sx={{
                   marginLeft: "100px",
+
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
                 variant="body1"
               >
-                Children Description:
+                Children Description
               </Typography>
-              <TextField
+              <StyledTextField
                 variant="outlined"
                 size="small"
                 onChange={(e) =>
@@ -682,21 +711,23 @@ const ProfilePage = () => {
                 value={profileData.childrenDescription || ""}
                 sx={{
                   marginBottom: "15px",
-                  marginLeft: "140px",
-                  width: "600px",
+                  marginLeft: "100px",
+                  width: "500px",
                   fontFamily: "Poppins, sans-serif",
                 }}
               />
 
               <Typography
                 sx={{
+                  display: "flex",
+                  alignItems: "baseline",
                   marginLeft: "100px",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
                 variant="body1"
               >
-                Children Age Groups:
+                Children Age Groups
               </Typography>
               <Box
                 sx={{
@@ -704,7 +735,7 @@ const ProfilePage = () => {
                   gap: "10px",
                   flexWrap: "wrap",
                   marginBottom: "15px",
-                  marginLeft: "140px",
+                  marginLeft: "100px",
                 }}
               >
                 {profileData.childrenAgeGroups?.map((lang, index) => (
@@ -724,7 +755,13 @@ const ProfilePage = () => {
                 ))}
               </Box>
 
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: "50px",
+                }}
+              >
                 <Button
                   variant="outlined"
                   sx={{
@@ -809,369 +846,6 @@ const ProfilePage = () => {
       </Box>
     );
   }
-
-  // return (
-  //   <Box>
-  //     {/* Profile Heading */}
-  //     <Box
-  //       sx={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         alignItems: "center",
-  //         padding: "50px",
-  //         backgroundColor: "#f4f4f4",
-  //       }}
-  //     >
-  //       <Typography
-  //         variant="h4"
-  //         sx={{
-  //           fontFamily: "Poppins, sans-serif",
-  //           fontWeight: "600",
-  //           marginTop: "50px",
-  //         }}
-  //       >
-  //         Profile
-  //       </Typography>
-  //     </Box>
-
-  //     {/* Profile Content */}
-  //     <Box
-  //       sx={{
-  //         display: "flex",
-  //         justifyContent: "space-between",
-  //         backgroundColor: "#f4f4f4",
-  //         pb: 4,
-  //       }}
-  //     >
-  //       {/* Left Section - Profile Form */}
-  //       <Box
-  //         sx={{
-  //           flex: 2,
-  //           padding: "20px",
-  //           backgroundColor: "#fff",
-  //           borderRadius: "10px",
-  //           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-  //           marginLeft: "250px",
-  //         }}
-  //       >
-  //         {/* Profile Picture */}
-  //         <Box sx={{ textAlign: "center", marginBottom: "20px" }}>
-  //           <Avatar
-  //             src={profileData.photo}
-  //             alt={profileData.name}
-  //             sx={{
-  //               width: 140,
-  //               height: 140,
-  //               margin: "0 auto",
-  //               marginBottom: "10px",
-  //             }}
-  //           />
-  //           <Typography
-  //             sx={{ fontFamily: "Poppins, sans-serif", fontWeight: "bold" }}
-  //             variant="h6"
-  //           >{`${profileData.firstName} ${profileData.lastName}`}</Typography>
-  //           <Rating
-  //             value={profileData.rating}
-  //             readOnly
-  //             sx={{ margin: "10px 0" }}
-  //           />
-  //         </Box>
-
-  //         {/* Editable Form */}
-  //         <Box>
-  //           <Typography
-  //             variant="body1"
-  //             sx={{
-  //               marginLeft: "100px",
-  //               fontFamily: "Poppins, sans-serif",
-  //               fontWeight: "bold",
-  //             }}
-  //           >
-  //             Area:
-  //           </Typography>
-  //           <TextField
-  //             variant="outlined"
-  //             size="small"
-  //             onChange={(e) =>
-  //               setProfileData({ ...profileData, city: e.target.value })
-  //             }
-  //             value={profileData.city || ""}
-  //             sx={{
-  //               width: "500px",
-  //               marginBottom: "15px",
-  //               marginLeft: "140px",
-  //               fontFamily: "Poppins, sans-serif",
-  //             }}
-  //           />
-
-  //           <Typography
-  //             sx={{
-  //               marginLeft: "100px",
-  //               fontFamily: "Poppins, sans-serif",
-  //               fontWeight: "bold",
-  //             }}
-  //             variant="body1"
-  //           >
-  //             Bio:
-  //           </Typography>
-  //           <TextField
-  //             variant="outlined"
-  //             size="small"
-  //             onChange={(e) =>
-  //               setProfileData({ ...profileData, bio: e.target.value })
-  //             }
-  //             multiline
-  //             rows={4}
-  //             value={profileData.bio || ""}
-  //             sx={{
-  //               marginBottom: "15px",
-  //               marginLeft: "140px",
-  //               width: "600px",
-  //               fontFamily: "Poppins, sans-serif",
-  //             }}
-  //           />
-
-  //           <Typography
-  //             sx={{
-  //               marginLeft: "100px",
-  //               fontFamily: "Poppins, sans-serif",
-  //               fontWeight: "bold",
-  //             }}
-  //             variant="body1"
-  //           >
-  //             Experience:
-  //           </Typography>
-  //           <TextField
-  //             variant="outlined"
-  //             multiline
-  //             onChange={(e) =>
-  //               setProfileData({ ...profileData, experience: e.target.value })
-  //             }
-  //             rows={4}
-  //             size="small"
-  //             value={profileData.experience || ""}
-  //             sx={{
-  //               marginBottom: "15px",
-  //               marginLeft: "140px",
-  //               width: "600px",
-  //               fontFamily: "Poppins, sans-serif",
-  //             }}
-  //           />
-
-  //           <Typography
-  //             sx={{
-  //               marginLeft: "100px",
-  //               fontFamily: "Poppins, sans-serif",
-  //               fontWeight: "bold",
-  //             }}
-  //             variant="body1"
-  //           >
-  //             Level of Education:
-  //           </Typography>
-  //           <TextField
-  //             variant="outlined"
-  //             size="small"
-  //             onChange={(e) =>
-  //               setProfileData({ ...profileData, education: e.target.value })
-  //             }
-  //             value={profileData.education || ""}
-  //             sx={{
-  //               marginBottom: "15px",
-  //               marginLeft: "140px",
-  //               width: "500px",
-  //               fontFamily: "Poppins, sans-serif",
-  //             }}
-  //           />
-
-  //           <Box
-  //             sx={{
-  //               display: "flex",
-  //               alignItems: "center",
-  //               marginBottom: "15px",
-  //             }}
-  //           >
-  //             <Typography
-  //               sx={{
-  //                 marginLeft: "100px",
-  //                 fontFamily: "Poppins, sans-serif",
-  //                 fontWeight: "bold",
-  //               }}
-  //               variant="body1"
-  //             >
-  //               First Aid Certification:
-  //             </Typography>
-  //             <Checkbox
-  //               checked={profileData.firstAidCertificateUploaded || false}
-  //               onChange={(e) =>
-  //                 setProfileData({
-  //                   ...profileData,
-  //                   firstAidCertificateUploaded: e.target.checked,
-  //                 })
-  //               }
-  //               sx={{
-  //                 color: "#5e62d1", // Default color (unchecked)
-  //                 "&.Mui-checked": {
-  //                   color: "#5e62d1", // Checked color
-  //                 },
-  //               }}
-  //             />
-  //           </Box>
-
-  //           <Typography
-  //             sx={{
-  //               marginLeft: "100px",
-  //               fontFamily: "Poppins, sans-serif",
-  //               fontWeight: "bold",
-  //             }}
-  //             variant="body1"
-  //           >
-  //             Known Languages:
-  //           </Typography>
-  //           <Box
-  //             sx={{
-  //               display: "flex",
-  //               gap: "10px",
-  //               flexWrap: "wrap",
-  //               marginBottom: "15px",
-  //               marginLeft: "140px",
-  //             }}
-  //           >
-  //             {profileData.knownLanguages?.map((lang, index) => (
-  //               <Chip
-  //                 sx={{
-  //                   backgroundColor: "#ffffff",
-  //                   border: "1px solid #5e62d1",
-  //                   fontFamily: "Poppins, sans-serif",
-  //                   "& .MuiChip-label": {
-  //                     color: "#000",
-  //                   },
-  //                 }}
-  //                 key={index}
-  //                 label={lang}
-  //                 color="#5e62d1"
-  //               />
-  //             ))}
-  //           </Box>
-
-  //           <Typography
-  //             sx={{
-  //               marginLeft: "100px",
-  //               fontFamily: "Poppins, sans-serif",
-  //               fontWeight: "bold",
-  //             }}
-  //             variant="body1"
-  //           >
-  //             Childcare Activities:
-  //           </Typography>
-  //           <Box
-  //             sx={{
-  //               display: "flex",
-  //               gap: "10px",
-  //               flexWrap: "wrap",
-  //               marginBottom: "20px",
-  //               marginLeft: "140px",
-  //             }}
-  //           >
-  //             {profileData.childcareActivities?.map((activity, index) => (
-  //               <Chip
-  //                 sx={{
-  //                   backgroundColor: "#ffffff",
-  //                   border: "1px solid #5e62d1",
-  //                   fontFamily: "Poppins, sans-serif",
-  //                   "& .MuiChip-label": {
-  //                     color: "#000",
-  //                   },
-  //                 }}
-  //                 key={index}
-  //                 label={activity}
-  //               />
-  //             ))}
-  //           </Box>
-
-  //           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-  //             <Button
-  //               variant="outlined"
-  //               sx={{
-  //                 fontFamily: "Poppins, sans-serif",
-  //                 color: "#5e62d1",
-  //                 borderColor: "#5e62d1",
-  //                 borderRadius: "30px",
-  //                 fontSize: "1rem",
-  //                 textTransform: "none",
-  //                 "&:hover": {
-  //                   borderColor: "#3c3fad",
-  //                   color: "#3c3fad",
-  //                 },
-  //               }}
-  //             >
-  //               Cancel
-  //             </Button>
-  //             <Button
-  //               variant="contained"
-  //               sx={{
-  //                 color: "#ffffff",
-  //                 backgroundColor: "#5e62d1",
-  //                 borderRadius: "30px",
-  //                 textTransform: "none",
-  //                 fontSize: "1rem",
-  //                 fontFamily: "Poppins, sans-serif",
-  //                 "&:hover": {
-  //                   backgroundColor: "#3c3fad",
-  //                 },
-  //               }}
-  //               onClick={handleSave}
-  //             >
-  //               Save Changes
-  //             </Button>
-  //           </Box>
-  //         </Box>
-  //       </Box>
-
-  //       {/* Right Section - Reviews */}
-  //       <Box
-  //         sx={{
-  //           flex: 1,
-  //           padding: "20px",
-  //           backgroundColor: "#fff",
-  //           borderRadius: "10px",
-  //           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-  //           marginLeft: "20px",
-  //           marginRight: "250px",
-  //           height: "fit-content",
-  //         }}
-  //       >
-  //         <Typography variant="h6" sx={{ marginBottom: "20px" }}>
-  //           My Reviews
-  //         </Typography>
-  //         {reviews.map((review, index) => (
-  //           <Box
-  //             key={index}
-  //             sx={{
-  //               display: "flex",
-  //               alignItems: "center",
-  //               gap: "10px",
-  //               marginBottom: "15px",
-  //               padding: "10px",
-  //               borderRadius: "8px",
-  //               backgroundColor: "#f5f5f5",
-  //             }}
-  //           >
-  //             <Avatar sx={{ width: 40, height: 40 }}>
-  //               {review.reviewer.charAt(0)}
-  //             </Avatar>
-  //             <Box>
-  //               <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-  //                 {review.reviewer}
-  //               </Typography>
-  //               <Typography variant="body2">{review.text}</Typography>
-  //             </Box>
-  //             <Rating value={review.rating} readOnly size="small" />
-  //           </Box>
-  //         ))}
-  //       </Box>
-  //     </Box>
-  //   </Box>
-  // );
 };
 
 export default ProfilePage;
