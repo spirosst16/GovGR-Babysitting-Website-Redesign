@@ -295,6 +295,7 @@ const MyApplicationsJobs = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState(null);
   const [isBabysitter, setIsBabysitter] = useState(false);
+  const [paymentReadyAgreements, setPaymentReadyAgreements] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -420,6 +421,15 @@ const MyApplicationsJobs = () => {
     fetchData();
   }, [userId]);
 
+  useEffect(() => {
+    const readyForPayment = agreements.filter(
+      (agreement) =>
+        new Date(agreement.endingDate) < new Date() &&
+        agreement.status === "accepted"
+    );
+    setPaymentReadyAgreements(readyForPayment);
+  }, [agreements]);
+
   const handleTabChange = (event, newValue) => {
     setCurrentTab(newValue);
   };
@@ -433,6 +443,77 @@ const MyApplicationsJobs = () => {
     const elapsedDuration = currentDate - start;
 
     return Math.min((elapsedDuration / totalDuration) * 100, 100);
+  };
+
+  const renderNotifications = () => {
+    if (paymentReadyAgreements.length === 0) return null;
+
+    return (
+      <Box
+        sx={{
+          padding: "16px",
+          backgroundColor: "#f4f4f4",
+          marginBottom: "20px",
+          borderRadius: "8px",
+        }}
+      >
+        <Typography
+          variant="h6"
+          sx={{
+            color: "#5e62d1",
+            fontWeight: "bold",
+            marginBottom: "16px",
+          }}
+        >
+          Agreements Ready for Payment
+        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+          {paymentReadyAgreements.map((agreement) => (
+            <Box
+              key={agreement.id}
+              sx={{
+                padding: "12px",
+                backgroundColor: "white",
+                borderRadius: "8px",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                cursor: "pointer",
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                },
+                border: "1px solid #5e62d1",
+              }}
+              onClick={() => handlePaymentDetails(agreement.id)}
+            >
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "black",
+                  fontWeight: 500,
+                }}
+              >
+                Agreement with {agreement.otherUser?.firstName}{" "}
+                {agreement.otherUser?.lastName}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "#5e62d1",
+                  marginTop: "4px",
+                }}
+              >
+                Click to inspect payment details
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+    );
+  };
+
+  const handlePaymentDetails = (agreementId) => {
+    console.log(`Inspecting payment details for agreement ID: ${agreementId}`);
   };
 
   const renderTabContent = () => {
@@ -454,128 +535,131 @@ const MyApplicationsJobs = () => {
         (agreement) => new Date(agreement.endingDate) <= new Date()
       );
       return (
-        <Grid
-          container
-          spacing={3}
-          justifyContent="center"
-          alignItems="center"
-          wrap="wrap"
-        >
-          {agreements.length > 0 ? (
-            agreements
-              .filter(
-                (agreement) =>
-                  !filteredAgreements.some((fa) => fa.id === agreement.id)
-              )
-              .map((agreement) => (
-                <Grid item xs={12} sm={6} md={4} key={agreement.id}>
-                  <ApplicationCard
-                    onClick={() =>
-                      navigate(
-                        `/agreement/${agreement.senderId}/${agreement.recipientId}`
-                      )
-                    }
-                    style={{
-                      cursor: "pointer",
-                    }}
-                  >
-                    <CardContent>
-                      <CardHeader>
-                        <Box display="flex" alignItems="center">
-                          {agreement.otherUser && (
-                            <>
-                              <Avatar
-                                src={agreement.otherUser.photo || ""}
-                                alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
-                                style={{
-                                  marginBottom: "10px",
-                                  marginRight: "6px",
-                                  width: "65px",
-                                  height: "65px",
-                                }}
-                              />
-                              <Typography variant="h6" fontWeight={600}>
-                                {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
-                              </Typography>
-                            </>
-                          )}
-                        </Box>
-                        <StatusChip status={agreement.status}>
-                          {agreement.status}
-                        </StatusChip>
-                      </CardHeader>
-                      <Typography
-                        variant="body1"
-                        marginLeft="20px"
-                        marginTop="10px"
-                      >
-                        <strong>Babysitting Place:</strong>{" "}
-                        {agreement.babysittingPlace}
-                      </Typography>
-                      <CompactWeeklySchedule
-                        availability={agreement.weeklySchedule}
-                      />
-                      <ProgressContainer>
-                        {agreement.status === "accepted" && (
+        <>
+          {renderNotifications()}
+          <Grid
+            container
+            spacing={3}
+            justifyContent="center"
+            alignItems="center"
+            wrap="wrap"
+          >
+            {agreements.length > 0 ? (
+              agreements
+                .filter(
+                  (agreement) =>
+                    !filteredAgreements.some((fa) => fa.id === agreement.id)
+                )
+                .map((agreement) => (
+                  <Grid item xs={12} sm={6} md={4} key={agreement.id}>
+                    <ApplicationCard
+                      onClick={() =>
+                        navigate(
+                          `/agreement/${agreement.senderId}/${agreement.recipientId}`
+                        )
+                      }
+                      style={{
+                        cursor: "pointer",
+                      }}
+                    >
+                      <CardContent>
+                        <CardHeader>
                           <Box display="flex" alignItems="center">
-                            <CircularProgress
-                              variant="determinate"
-                              value={calculateProgress(
-                                agreement.startingDate,
-                                agreement.endingDate
-                              )}
-                              size={40}
-                              thickness={4}
-                            />
-                            <Typography
-                              variant="body1"
-                              style={{ marginLeft: "16px" }}
-                            >
-                              {Math.round(
-                                calculateProgress(
+                            {agreement.otherUser && (
+                              <>
+                                <Avatar
+                                  src={agreement.otherUser.photo || ""}
+                                  alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                                  style={{
+                                    marginBottom: "10px",
+                                    marginRight: "6px",
+                                    width: "65px",
+                                    height: "65px",
+                                  }}
+                                />
+                                <Typography variant="h6" fontWeight={600}>
+                                  {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                                </Typography>
+                              </>
+                            )}
+                          </Box>
+                          <StatusChip status={agreement.status}>
+                            {agreement.status}
+                          </StatusChip>
+                        </CardHeader>
+                        <Typography
+                          variant="body1"
+                          marginLeft="20px"
+                          marginTop="10px"
+                        >
+                          <strong>Babysitting Place:</strong>{" "}
+                          {agreement.babysittingPlace}
+                        </Typography>
+                        <CompactWeeklySchedule
+                          availability={agreement.weeklySchedule}
+                        />
+                        <ProgressContainer>
+                          {agreement.status === "accepted" && (
+                            <Box display="flex" alignItems="center">
+                              <CircularProgress
+                                variant="determinate"
+                                value={calculateProgress(
                                   agreement.startingDate,
                                   agreement.endingDate
-                                )
-                              )}
-                              % Complete
-                            </Typography>
-                          </Box>
-                        )}
-                      </ProgressContainer>
-                    </CardContent>
-                  </ApplicationCard>
-                </Grid>
-              ))
-          ) : (
-            <Grid item xs={12} sm={6} md={4}>
-              <ApplicationCard
-                onClick={() => {
-                  const roleSpecificPath = isBabysitter
-                    ? "/babysitting-jobs"
-                    : "/babysitters";
-                  navigate(roleSpecificPath);
-                }}
-                style={{
-                  cursor: "pointer",
-                  border: "2px dashed #9E9E9E",
-                  textAlign: "center",
-                  padding: "20px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <AddCircleOutlineIcon
-                  style={{ fontSize: 50, color: "#9E9E9E" }}
-                />
-                <Typography variant="body1" color="textSecondary">
-                  Browse {isBabysitter ? "Guardians" : "Babysitters"}
-                </Typography>
-              </ApplicationCard>
-            </Grid>
-          )}
-        </Grid>
+                                )}
+                                size={40}
+                                thickness={4}
+                              />
+                              <Typography
+                                variant="body1"
+                                style={{ marginLeft: "16px" }}
+                              >
+                                {Math.round(
+                                  calculateProgress(
+                                    agreement.startingDate,
+                                    agreement.endingDate
+                                  )
+                                )}
+                                % Complete
+                              </Typography>
+                            </Box>
+                          )}
+                        </ProgressContainer>
+                      </CardContent>
+                    </ApplicationCard>
+                  </Grid>
+                ))
+            ) : (
+              <Grid item xs={12} sm={6} md={4}>
+                <ApplicationCard
+                  onClick={() => {
+                    const roleSpecificPath = isBabysitter
+                      ? "/babysitting-jobs"
+                      : "/babysitters";
+                    navigate(roleSpecificPath);
+                  }}
+                  style={{
+                    cursor: "pointer",
+                    border: "2px dashed #9E9E9E",
+                    textAlign: "center",
+                    padding: "20px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <AddCircleOutlineIcon
+                    style={{ fontSize: 50, color: "#9E9E9E" }}
+                  />
+                  <Typography variant="body1" color="textSecondary">
+                    Browse {isBabysitter ? "Guardians" : "Babysitters"}
+                  </Typography>
+                </ApplicationCard>
+              </Grid>
+            )}
+          </Grid>
+        </>
       );
     } else if (currentTab === 1) {
       const filteredApplications = applications.filter(
