@@ -9,6 +9,8 @@ import {
   Breadcrumbs,
   Stack,
   Link,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { styled } from "@mui/system";
@@ -248,6 +250,11 @@ const BabysittingApplicationDisplay = () => {
   const [viewedUserRole, setViewedUserRole] = useState(null);
   const [agreementExists, setAgreementExists] = useState(false);
   const [agreementPath, setAgreementPath] = useState(null);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   useEffect(() => {
     const auth = getAuth();
@@ -442,8 +449,16 @@ const BabysittingApplicationDisplay = () => {
       navigate("/my-applications-and-jobs");
     } catch (error) {
       console.error("Error deleting application: ", error);
-      alert("Failed to delete the application. Please try again.");
+      setAlert({
+        open: true,
+        message: "Failed to delete the application. Please try again.",
+        severity: "error",
+      });
     }
+  };
+
+  const handleAlertClose = () => {
+    setAlert({ ...alert, open: false });
   };
 
   return (
@@ -713,6 +728,20 @@ const BabysittingApplicationDisplay = () => {
           </ApplicationSection>
         </InfoSection>
       </ContentWrapper>
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={6000}
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleAlertClose}
+          severity={alert.severity}
+          sx={{ width: "100%" }}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
     </PageContainer>
   );
 };

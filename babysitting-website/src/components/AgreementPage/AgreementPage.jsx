@@ -17,6 +17,8 @@ import {
   Link,
   Stack,
   Radio,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -300,6 +302,11 @@ const AgreementPage = () => {
     const currentUser = auth.currentUser;
     return currentUser?.uid === userId1 && status === "";
   };
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   useEffect(() => {
     const fetchUserData = async (userId, setUser) => {
@@ -399,7 +406,11 @@ const AgreementPage = () => {
 
   const handleSend = async () => {
     if (!validateForm()) {
-      alert("Please fill in all required fields.");
+      setAlert({
+        open: true,
+        message: "Please fill in all required fields.",
+        severity: "error",
+      });
       return;
     }
 
@@ -408,7 +419,11 @@ const AgreementPage = () => {
       const currentUser = auth.currentUser;
 
       if (!currentUser) {
-        alert("You must be logged in to send an agreement.");
+        setAlert({
+          open: true,
+          message: "You must be logged in to send an agreement.",
+          severity: "error",
+        });
         return;
       }
 
@@ -425,14 +440,22 @@ const AgreementPage = () => {
       console.log("Agreement sent with ID:", docRef.id);
     } catch (error) {
       console.error("Error sending agreement:", error);
-      alert("Failed to send agreement. Please try again.");
+      setAlert({
+        open: true,
+        message: "Failed to send agreement. Please try again.",
+        severity: "error",
+      });
     }
   };
 
   const handleUnsend = async () => {
     try {
       if (!agreementId) {
-        alert("No agreement to unsend.");
+        setAlert({
+          open: true,
+          message: "No agreement to unsend.",
+          severity: "error",
+        });
         return;
       }
 
@@ -444,14 +467,22 @@ const AgreementPage = () => {
       console.log("Agreement unsent and deleted.");
     } catch (error) {
       console.error("Error unsending agreement:", error);
-      alert("Failed to unsend agreement. Please try again.");
+      setAlert({
+        open: true,
+        message: "Failed to unsend agreement. Please try again.",
+        severity: "error",
+      });
     }
   };
 
   const handleAccept = async () => {
     try {
       if (!agreementId) {
-        alert("No agreement to accept.");
+        setAlert({
+          open: true,
+          message: "No agreement to accept.",
+          severity: "error",
+        });
         return;
       }
 
@@ -462,14 +493,22 @@ const AgreementPage = () => {
       console.log("Agreement accepted.");
     } catch (error) {
       console.error("Error accepting agreement:", error);
-      alert("Failed to accept agreement. Please try again.");
+      setAlert({
+        open: true,
+        message: "Failed to accept agreement. Please try again.",
+        severity: "error",
+      });
     }
   };
 
   const handleDecline = async () => {
     try {
       if (!agreementId) {
-        alert("No agreement to decline.");
+        setAlert({
+          open: true,
+          message: "No agreement to decline.",
+          severity: "error",
+        });
         return;
       }
 
@@ -482,8 +521,16 @@ const AgreementPage = () => {
       navigate("/my-applications-and-jobs");
     } catch (error) {
       console.error("Error declining agreement:", error);
-      alert("Failed to decline agreement. Please try again.");
+      setAlert({
+        open: true,
+        message: "Failed to decline agreement. Please try again.",
+        severity: "error",
+      });
     }
+  };
+
+  const handleAlertClose = () => {
+    setAlert({ ...alert, open: false });
   };
 
   const renderButton = () => {
@@ -886,6 +933,20 @@ const AgreementPage = () => {
           {renderButton()}
         </Box>
       </ContentWrapper>
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={6000}
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleAlertClose}
+          severity={alert.severity}
+          sx={{ width: "100%" }}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
     </PageContainer>
   );
 };

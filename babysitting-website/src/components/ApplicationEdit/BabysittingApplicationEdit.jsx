@@ -19,6 +19,8 @@ import {
   Breadcrumbs,
   Stack,
   Link,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import {
@@ -257,6 +259,11 @@ const EditApplicationForm = () => {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [application, setApplication] = useState(null);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   useEffect(() => {
     const fetchUserAndApplication = async () => {
@@ -347,10 +354,18 @@ const EditApplicationForm = () => {
       setApplication({ ...application, ...newApplicationData });
       setFormValues(newApplicationData);
 
-      alert("Changes saved temporarily");
+      setAlert({
+        open: true,
+        message: "Changes saved temporarily!",
+        severity: "success",
+      });
     } catch (error) {
       console.error("Error saving data:", error);
-      alert("Error saving form. Please try again.");
+      setAlert({
+        open: true,
+        message: "Error saving form. Please try again.",
+        severity: "error",
+      });
     }
   };
 
@@ -374,12 +389,24 @@ const EditApplicationForm = () => {
       setApplication({ ...application, ...newApplicationData });
       setFormValues(newApplicationData);
 
-      alert("Application submitted!");
+      setAlert({
+        open: true,
+        message: "Application submitted!",
+        severity: "success",
+      });
       navigate(`/application/${userId}`);
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert("Error submitting form. Please try again.");
+      setAlert({
+        open: true,
+        message: "Error submitting form. Please try again.",
+        severity: "error",
+      });
     }
+  };
+
+  const handleAlertClose = () => {
+    setAlert({ ...alert, open: false });
   };
 
   return (
@@ -749,6 +776,20 @@ const EditApplicationForm = () => {
           </Box>
         </InfoSection>
       </ContentWrapper>
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={6000}
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleAlertClose}
+          severity={alert.severity}
+          sx={{ width: "100%" }}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
     </PageContainer>
   );
 };

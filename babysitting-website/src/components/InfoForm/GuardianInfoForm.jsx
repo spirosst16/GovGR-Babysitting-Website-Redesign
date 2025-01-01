@@ -9,6 +9,8 @@ import {
   Stepper,
   Step,
   StepLabel,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -108,6 +110,11 @@ const GuardianInfoForm = () => {
   });
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   const steps = ["Personal Information", "Child Info & Needs", "Photo"];
 
@@ -141,9 +148,13 @@ const GuardianInfoForm = () => {
     );
 
     if (missingFields.length > 0) {
-      alert(
-        `Please fill out the following fields: ${missingFields.join(", ")}`
-      );
+      setAlert({
+        open: true,
+        message: `Please fill out the following fields: ${missingFields.join(
+          ", "
+        )}`,
+        severity: "error",
+      });
       return;
     }
 
@@ -174,7 +185,11 @@ const GuardianInfoForm = () => {
 
     for (const key in formValues) {
       if (formValues[key] === "") {
-        alert(`Please fill out the ${key} field.`);
+        setAlert({
+          open: true,
+          message: `Please fill out the ${key} field.`,
+          severity: "error",
+        });
         return;
       }
     }
@@ -184,7 +199,11 @@ const GuardianInfoForm = () => {
       const currentUser = auth.currentUser;
 
       if (!currentUser) {
-        alert("You must be logged in to submit the application.");
+        setAlert({
+          open: true,
+          message: "You must be logged in to submit the application.",
+          severity: "error",
+        });
         return;
       }
 
@@ -196,7 +215,11 @@ const GuardianInfoForm = () => {
       });
 
       console.log("Document written successfully!");
-      alert("Form submitted successfully!");
+      setAlert({
+        open: true,
+        message: "Form submitted successfully!",
+        severity: "success",
+      });
 
       navigate("/babysitters");
 
@@ -221,8 +244,16 @@ const GuardianInfoForm = () => {
       setCurrentStep(0);
     } catch (error) {
       console.error("Error adding document: ", error);
-      alert("Error submitting form. Please try again.");
+      setAlert({
+        open: true,
+        message: "Error submitting form. Please try again.",
+        severity: "error",
+      });
     }
+  };
+
+  const handleAlertClose = () => {
+    setAlert({ ...alert, open: false });
   };
 
   return (
@@ -609,6 +640,20 @@ const GuardianInfoForm = () => {
           </Box>
         </Container>
       </div>
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={6000}
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleAlertClose}
+          severity={alert.severity}
+          sx={{ width: "100%" }}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

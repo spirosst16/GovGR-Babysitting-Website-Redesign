@@ -19,6 +19,8 @@ import {
   Stack,
   Breadcrumbs,
   Link,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -101,7 +103,7 @@ const CustomSeparator = () => {
   const [userRole, setUserRole] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { state } = location; // Access the state for "from"
+  const { state } = location;
 
   useEffect(() => {
     const auth = getAuth();
@@ -248,6 +250,12 @@ const BabysittingApplicationForm = () => {
 
   const navigate = useNavigate();
 
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
+
   const steps = [
     "Babysitting Area, Job Type, Babysitting Place & Children Age Groups",
     "Availability",
@@ -279,7 +287,11 @@ const BabysittingApplicationForm = () => {
         formValues[key] === "" ||
         (Array.isArray(formValues[key]) && formValues[key].length === 0)
       ) {
-        alert(`Please fill out the ${key} field.`);
+        setAlert({
+          open: true,
+          message: `Please fill out the ${key} field.`,
+          severity: "error",
+        });
         return;
       }
     }
@@ -289,7 +301,11 @@ const BabysittingApplicationForm = () => {
       const currentUser = auth.currentUser;
 
       if (!currentUser) {
-        alert("You must be logged in to submit the application.");
+        setAlert({
+          open: true,
+          message: "You must be logged in to submit the application.",
+          severity: "error",
+        });
         return;
       }
 
@@ -304,7 +320,11 @@ const BabysittingApplicationForm = () => {
       });
 
       console.log("Document written successfully!");
-      alert("Form submitted successfully!");
+      setAlert({
+        open: true,
+        message: "Form submitted successfully!",
+        severity: "success",
+      });
 
       navigate("/my-applications-and-jobs");
 
@@ -318,8 +338,16 @@ const BabysittingApplicationForm = () => {
       setCurrentStep(0);
     } catch (error) {
       console.error("Error adding document: ", error);
-      alert("Error submitting form. Please try again.");
+      setAlert({
+        open: true,
+        message: "Error submitting form. Please try again.",
+        severity: "error",
+      });
     }
+  };
+
+  const handleAlertClose = () => {
+    setAlert({ ...alert, open: false });
   };
 
   return (
@@ -1496,6 +1524,20 @@ const BabysittingApplicationForm = () => {
           </Box>
         </Container>
       </div>
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={6000}
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleAlertClose}
+          severity={alert.severity}
+          sx={{ width: "100%" }}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
