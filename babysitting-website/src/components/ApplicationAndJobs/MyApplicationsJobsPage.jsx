@@ -451,60 +451,110 @@ const MyApplicationsJobs = () => {
     return (
       <Box
         sx={{
-          padding: "16px",
-          backgroundColor: "#f4f4f4",
-          marginBottom: "20px",
-          borderRadius: "8px",
+          padding: "24px",
+          backgroundColor: "#5e62d1",
+          borderRadius: "16px",
+          boxShadow: "0 6px 16px rgba(0, 0, 0, 0.2)",
+          color: "white",
+          textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          width: "100%",
+          margin: "0 auto",
         }}
       >
         <Typography
-          variant="h6"
+          variant="h5"
           sx={{
-            color: "#5e62d1",
             fontWeight: "bold",
             marginBottom: "16px",
           }}
         >
-          Agreements Ready for Payment
+          Agreements Pending Payment
         </Typography>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        <Typography
+          variant="body2"
+          sx={{
+            marginBottom: "24px",
+            opacity: 0.85,
+            maxWidth: "800px",
+          }}
+        >
+          Please review and complete the payments listed below to proceed with
+          your agreements.
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-evenly",
+            gap: "20px",
+            width: "100%",
+          }}
+        >
           {paymentReadyAgreements.map((agreement) => (
             <Box
               key={agreement.id}
               sx={{
-                padding: "12px",
+                display: "flex",
+                alignItems: "center",
                 backgroundColor: "white",
-                borderRadius: "8px",
-                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                borderRadius: "12px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                padding: "16px 24px",
+                width: "100%",
                 cursor: "pointer",
-                transition: "transform 0.2s, box-shadow 0.2s",
+                transition: "box-shadow 0.2s, transform 0.2s",
                 "&:hover": {
-                  transform: "translateY(-2px)",
-                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                  boxShadow: "0 8px 20px rgba(0, 0, 0, 0.2)",
+                  transform: "translateY(-6px)",
                 },
-                border: "1px solid #5e62d1",
               }}
               onClick={() => handlePaymentDetails(agreement.id)}
             >
-              <Typography
-                variant="body1"
+              <Box
                 sx={{
-                  color: "black",
-                  fontWeight: 500,
+                  width: "64px",
+                  height: "64px",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  marginRight: "20px",
+                  backgroundColor: "#f4f4f4",
                 }}
               >
-                Agreement with {agreement.otherUser?.firstName}{" "}
-                {agreement.otherUser?.lastName}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "#5e62d1",
-                  marginTop: "4px",
-                }}
-              >
-                Click to inspect payment details
-              </Typography>
+                <img
+                  src={agreement.otherUser?.photo}
+                  alt={`${agreement.otherUser?.firstName} ${agreement.otherUser?.lastName}`}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+              </Box>
+              <Box sx={{ textAlign: "left", flex: 1 }}>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontWeight: "bold",
+                    color: "#5e62d1",
+                    marginBottom: "4px",
+                  }}
+                >
+                  {agreement.otherUser?.firstName}{" "}
+                  {agreement.otherUser?.lastName}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "black",
+                    opacity: 0.75,
+                  }}
+                >
+                  Payment details available. Click to review.
+                </Typography>
+              </Box>
             </Box>
           ))}
         </Box>
