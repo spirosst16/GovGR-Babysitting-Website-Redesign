@@ -25,7 +25,8 @@ import BabysittingApplicationEdit from "./components/ApplicationEdit/Babysitting
 import AgreementPage from "./components/AgreementPage/AgreementPage";
 import ChatPage from "./components/ChatPage/ChatPage";
 import ProfilePage from "./components/Profile/MyProfile";
-import ProfileInspect from "./components/Profile/ProfileInspect"
+import ProfileInspect from "./components/Profile/ProfileInspect";
+import PaymentDetails from "./components/PaymentDetails/PaymentTracker";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -110,10 +111,8 @@ function App() {
           path="/profile"
           element={user ? <ProfilePage /> : <Navigate to="/login" />}
         />
-        <Route
-          path="/Profile/:userId"
-          element={<ProfileInspect />}
-        />
+        <Route path="/Profile/:userId" element={<ProfileInspect />} />
+        <Route path="/payment-details" element={<PaymentDetails />} />
       </Routes>
       {!shouldHideNavbarAndFooter && !location.pathname.includes("/chats") && (
         <Footer />
