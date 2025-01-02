@@ -112,7 +112,10 @@ function App() {
           element={user ? <ProfilePage /> : <Navigate to="/login" />}
         />
         <Route path="/Profile/:userId" element={<ProfileInspect />} />
-        <Route path="/payment-details" element={<PaymentDetails />} />
+        <Route
+          path="/payment/:senderId/:recipientId"
+          element={<PaymentDetails />}
+        />
       </Routes>
       {!shouldHideNavbarAndFooter && !location.pathname.includes("/chats") && (
         <Footer />

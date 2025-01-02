@@ -1,4 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { getDocs, query, where, collection } from "firebase/firestore";
+import { FIREBASE_DB } from "../../config/firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   Container,
   Typography,
@@ -38,17 +42,145 @@ const steps = [
   "Finalize Payment Process",
 ];
 
-const mockVoucherData = {
-  id: "12345",
-  amount: "$1500",
-  date: new Date().toLocaleDateString(),
-  description: "Monthly Professional Service Payment",
-  recipient: "John Doe",
-};
-
 const PaymentTracker = () => {
+  const { senderId, recipientId } = useParams();
+  const [currentUser, setCurrentUser] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [sender, setSender] = useState(null);
+  const [recipient, setRecipient] = useState(null);
+  const [agreement, setAgreement] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [workConfirmed, setWorkConfirmed] = useState(false);
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setCurrentUser(user);
+
+        const email = user.email;
+        try {
+          const babysitterQuery = query(
+            collection(FIREBASE_DB, "babysitters"),
+            where("email", "==", email)
+          );
+          const babysitterSnapshot = await getDocs(babysitterQuery);
+
+          if (!babysitterSnapshot.empty) {
+            setUserRole("babysitter");
+            return;
+          }
+
+          const guardianQuery = query(
+            collection(FIREBASE_DB, "guardians"),
+            where("email", "==", email)
+          );
+          const guardianSnapshot = await getDocs(guardianQuery);
+
+          if (!guardianSnapshot.empty) {
+            setUserRole("guardian");
+            return;
+          }
+
+          setUserRole("unauthorized");
+        } catch (error) {
+          console.error("Error determining user role:", error.message);
+        }
+      } else {
+        setCurrentUser(null);
+        setUserRole(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const fetchData = async () => {
+    if (!currentUser) {
+      console.error("Error: User not authenticated");
+      return;
+    }
+
+    try {
+      if (!senderId || !recipientId) {
+        console.error("Error: senderId or recipientId is undefined");
+        return;
+      }
+
+      const fetchUserData = async (userId) => {
+        console.log("Fetching data for userId:", userId);
+        let userData = null;
+
+        const babysittersRef = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("userId", "==", userId)
+        );
+        const babysittersSnapshot = await getDocs(babysittersRef);
+
+        if (!babysittersSnapshot.empty) {
+          console.log("User found in babysitters collection.");
+          userData = babysittersSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))[0];
+        } else {
+          const guardiansRef = query(
+            collection(FIREBASE_DB, "guardians"),
+            where("userId", "==", userId)
+          );
+          const guardiansSnapshot = await getDocs(guardiansRef);
+
+          if (!guardiansSnapshot.empty) {
+            console.log("User found in guardians collection.");
+            userData = guardiansSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }))[0];
+          }
+        }
+
+        if (!userData) {
+          console.error(`User with ID ${userId} not found`);
+          throw new Error(`User with ID ${userId} not found`);
+        }
+        return userData;
+      };
+
+      const [senderData, recipientData] = await Promise.all([
+        fetchUserData(senderId),
+        fetchUserData(recipientId),
+      ]);
+
+      setSender(senderData);
+      setRecipient(recipientData);
+
+      // Fetch agreement data
+      const agreementRef = query(
+        collection(FIREBASE_DB, "agreements"),
+        where("senderId", "==", senderId),
+        where("recipientId", "==", recipientId)
+      );
+
+      const agreementSnapshot = await getDocs(agreementRef);
+      if (!agreementSnapshot.empty) {
+        const agreementData = agreementSnapshot.docs[0].data();
+        setAgreement(agreementData);
+        console.log("Agreement data:", agreementData);
+      } else {
+        console.log(
+          "No agreement found for the provided sender and recipient."
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchData();
+    }
+  }, [currentUser, senderId, recipientId]);
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -120,18 +252,23 @@ const PaymentTracker = () => {
                   Digital Voucher
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
-                {Object.entries(mockVoucherData).map(([key, value]) => (
-                  <Typography
-                    key={key}
-                    variant="body2"
-                    sx={{ mb: 1, fontSize: "0.95rem" }}
-                  >
-                    <strong>{`${
-                      key.charAt(0).toUpperCase() + key.slice(1)
-                    }:`}</strong>{" "}
-                    {value}
-                  </Typography>
-                ))}
+                {agreement && (
+                  <>
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 1, fontSize: "0.95rem" }}
+                    >
+                      <strong>Amount:</strong> ${agreement.amount || "N/A"}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ mb: 1, fontSize: "0.95rem" }}
+                    >
+                      <strong>Description:</strong>{" "}
+                      {agreement.description || "N/A"}
+                    </Typography>
+                  </>
+                )}
               </CardContent>
             </Card>
           </>
