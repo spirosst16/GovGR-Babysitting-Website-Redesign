@@ -283,12 +283,14 @@ const AgreementPage = () => {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
-    area: "",
-    weeklySchedule: [],
-    babysittingPlace: "",
-    startingDate: "",
-    endingDate: "",
-    additionalNotes: "",
+	area: "",
+	weeklySchedule: [],
+	babysittingPlace: "",
+	startingDate: "",
+	endingDate: "",
+	additionalNotes: "",
+	amount: "X",
+	paymentStatus: "not available yet",
   });
   const [errors, setErrors] = useState({
     area: false,
