@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getDocs, query, where, collection, getDoc, doc,  } from "firebase/firestore";
+import {
+  getDocs,
+  query,
+  where,
+  collection,
+  getDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
@@ -37,14 +45,14 @@ const StyledButton = styled(Button)({
 });
 
 const PageContainer = styled(Container)({
-	backgroundColor: "#f9f9f9",
-	borderRadius: "10px",
-	padding: "20px",
-	boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-	fontFamily: "'Poppins', sans-serif",
-	textAlign: "center",
-	minHeight: "calc(100vh - 120px)",
-  });
+  backgroundColor: "#f9f9f9",
+  borderRadius: "10px",
+  padding: "20px",
+  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+  fontFamily: "'Poppins', sans-serif",
+  textAlign: "center",
+  minHeight: "calc(100vh - 120px)",
+});
 
 const steps = [
   "Confirm Monthly Work Completion",
@@ -107,24 +115,27 @@ const PaymentTracker = () => {
   }, []);
 
   useEffect(() => {
-	const fetchUserRole = async () => {
-	  const auth = getAuth();
-	  const currentUser = auth.currentUser;
-	  if (!currentUser) return;
-  
-	  try {
-		const userDoc = await getDoc(doc(FIREBASE_DB, "users", currentUser.uid));
-		if (userDoc.exists()) {
-		  setCurrentUserRole(userDoc.data().role);
-		}
-	  } catch (error) {
-		console.error("Error fetching user role:", error);
-	  }
-	};
-  
-	fetchUserRole();
-  }, []);  
+    const fetchUserRole = async () => {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
 
+      try {
+        const userDoc = await getDoc(
+          doc(FIREBASE_DB, "users", currentUser.uid)
+        );
+        if (userDoc.exists()) {
+          setCurrentUserRole(userDoc.data().role);
+        }
+      } catch (error) {
+        console.error("Error fetching user role:", error);
+      }
+    };
+
+    fetchUserRole();
+  }, []);
+
+  // Updated fetchData with integrated payment status update
   const fetchData = async () => {
     if (!currentUser) {
       console.error("Error: User not authenticated");
@@ -184,7 +195,6 @@ const PaymentTracker = () => {
       setSender(senderData);
       setRecipient(recipientData);
 
-      // Fetch agreement data
       const agreementRef = query(
         collection(FIREBASE_DB, "agreements"),
         where("senderId", "==", senderId),
@@ -195,7 +205,31 @@ const PaymentTracker = () => {
       if (!agreementSnapshot.empty) {
         const agreementData = agreementSnapshot.docs[0].data();
         setAgreement(agreementData);
+
         console.log("Agreement data:", agreementData);
+
+        if (
+          new Date() > new Date(agreementData.endingDate) &&
+          agreementData.paymentStatus !== "pending guardian"
+        ) {
+          try {
+            const agreementDocRef = doc(
+              FIREBASE_DB,
+              "agreements",
+              agreementSnapshot.docs[0].id
+            );
+            await updateDoc(agreementDocRef, {
+              paymentStatus: "pending guardian",
+            });
+            setAgreement((prev) => ({
+              ...prev,
+              paymentStatus: "pending guardian",
+            }));
+            console.log("Payment status updated to pending guardian.");
+          } catch (error) {
+            console.error("Error updating payment status:", error.message);
+          }
+        }
       } else {
         console.log(
           "No agreement found for the provided sender and recipient."
@@ -341,116 +375,126 @@ const PaymentTracker = () => {
   };
 
   return (
-	<div
-	  style={{
-		paddingTop: "120px",
-		backgroundColor: "#f4f4f4",
-		minHeight: "100vh",
-		paddingBottom: "70px",
-		fontFamily: "Poppins, sans-serif",
-	  }}
-	>
-	  <Navbar />
-	  <Container component="main" maxWidth="md">
-		{agreement?.paymentStatus === "not available yet" ? (
-		  (() => {
-			const remainingDays = Math.ceil(
-			  (new Date(agreement.endingDate) - new Date()) / (1000 * 60 * 60 * 24)
-			);
-  
-			return (
-			  <PageContainer>
-				<Typography
-				  variant="h4"
-				  sx={{
-					textAlign: "center",
-					fontWeight: "bold",
-					fontFamily: "'Poppins', sans-serif",
-					paddingBottom: "20px",
-				  }}
-				>
-				  Payment Not Available Yet
-				</Typography>
-				<Typography
-				  variant="body1"
-				  sx={{
-					textAlign: "center",
-					fontFamily: "'Poppins', sans-serif",
-				  }}
-				>
-				  The payment for this agreement is not available yet. Please wait{" "}
-				  <strong>{remainingDays > 0 ? remainingDays : 0}</strong> days until the
-				  agreement's end date.
-				</Typography>
-			  </PageContainer>
-			);
-		  })()
-		) : (
-		  <>
-			<Typography
-			  variant="h4"
-			  component="h1"
-			  textAlign="center"
-			  sx={{
-				mb: 3,
-				fontFamily: "Poppins, sans-serif",
-			  }}
-			>
-			  Professional Payment Tracker
-			</Typography>
-			<Stepper
-			  activeStep={currentStep}
-			  alternativeLabel
-			  sx={{
-				".MuiStepIcon-root": {
-				  color: "#5e62d1",
-				},
-				".MuiStepIcon-root.Mui-active": {
-				  color: "#5e62d1",
-				},
-				".MuiStepIcon-root.Mui-completed": {
-				  color: "#5e62d1",
-				},
-			  }}
-			>
-			  {steps.map((label, index) => (
-				<Step key={index}>
-				  <StepLabel>{label}</StepLabel>
-				</Step>
-			  ))}
-			</Stepper>
-			<Box
-			  sx={{
-				mt: 4,
-				p: 3,
-				backgroundColor: "white",
-				borderRadius: "10px",
-				boxShadow: 4,
-				display: "flex",
-				flexDirection: "column",
-				gap: 3,
-			  }}
-			>
-			  {renderStepContent(currentStep)}
-			  {currentStep < steps.length - 1 && (
-				<Box sx={{ display: "flex", justifyContent: "space-between" }}>
-				  <StyledButton onClick={handleBack} disabled={currentStep === 0}>
-					Back
-				  </StyledButton>
-				  <StyledButton
-					onClick={handleNext}
-					disabled={currentStep === 0 && !workConfirmed}
-				  >
-					Next
-				  </StyledButton>
-				</Box>
-			  )}
-			</Box>
-		  </>
-		)}
-	  </Container>
-	</div>
-  );  
+    <div
+      style={{
+        paddingTop: "120px",
+        backgroundColor: "#f4f4f4",
+        minHeight: "100vh",
+        paddingBottom: "70px",
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      <Navbar />
+      <Container component="main" maxWidth="md">
+        {agreement ? (
+          agreement.paymentStatus === "not available yet" ? (
+            <PageContainer>
+              <Typography
+                variant="h4"
+                sx={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  fontFamily: "'Poppins', sans-serif",
+                  paddingBottom: "20px",
+                }}
+              >
+                Payment Not Available Yet
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  textAlign: "center",
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                The payment for this agreement is not available yet. Please wait{" "}
+                <strong>
+                  {Math.ceil(
+                    (new Date(agreement.endingDate) - new Date()) /
+                      (1000 * 60 * 60 * 24)
+                  ) || 0}
+                </strong>{" "}
+                days until the agreement's end date.
+              </Typography>
+            </PageContainer>
+          ) : agreement.paymentStatus === "pending guardian" ? (
+            <>
+              <Typography
+                variant="h4"
+                component="h1"
+                textAlign="center"
+                sx={{
+                  mb: 3,
+                  fontFamily: "Poppins, sans-serif",
+                }}
+              >
+                Professional Payment Tracker
+              </Typography>
+              <Stepper
+                activeStep={currentStep}
+                alternativeLabel
+                sx={{
+                  ".MuiStepIcon-root": {
+                    color: "#5e62d1",
+                  },
+                  ".MuiStepIcon-root.Mui-active": {
+                    color: "#5e62d1",
+                  },
+                  ".MuiStepIcon-root.Mui-completed": {
+                    color: "#5e62d1",
+                  },
+                }}
+              >
+                {steps.map((label, index) => (
+                  <Step key={index}>
+                    <StepLabel>{label}</StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+              <Box
+                sx={{
+                  mt: 4,
+                  p: 3,
+                  backgroundColor: "white",
+                  borderRadius: "10px",
+                  boxShadow: 4,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 3,
+                }}
+              >
+                {renderStepContent(currentStep)}
+                {currentStep < steps.length - 1 && (
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <StyledButton
+                      onClick={handleBack}
+                      disabled={currentStep === 0}
+                    >
+                      Back
+                    </StyledButton>
+                    <StyledButton
+                      onClick={handleNext}
+                      disabled={currentStep === 0 && !workConfirmed}
+                    >
+                      Next
+                    </StyledButton>
+                  </Box>
+                )}
+              </Box>
+            </>
+          ) : (
+            <PageContainer>
+              <Typography variant="body1">Unknown payment status</Typography>
+            </PageContainer>
+          )
+        ) : (
+          <Typography variant="body1">Loading...</Typography>
+        )}
+      </Container>
+    </div>
+  );
 };
 
 export default PaymentTracker;
