@@ -191,7 +191,7 @@ const CustomSeparator = () => {
         fontFamily: "Poppins, sans-serif",
       }}
     >
-      My Applications & Jobs
+      My Agreements & Applications
     </Link>,
   ];
 
@@ -287,7 +287,7 @@ const CompactWeeklySchedule = ({ availability }) => {
   );
 };
 
-const MyApplicationsJobs = () => {
+const MyAgreementsAndApplicationsPage = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   const [agreements, setAgreements] = useState([]);
@@ -957,7 +957,7 @@ const MyApplicationsJobs = () => {
           variant="h4"
           style={{ fontFamily: "Poppins, sans-serif", fontWeight: "600" }}
         >
-          My Applications & Jobs
+          My Agreements & Applications
         </Typography>
         <Typography
           variant="h6"
@@ -1008,4 +1008,4 @@ const MyApplicationsJobs = () => {
   );
 };
 
-export default MyApplicationsJobs;
+export default MyAgreementsAndApplicationsPage;

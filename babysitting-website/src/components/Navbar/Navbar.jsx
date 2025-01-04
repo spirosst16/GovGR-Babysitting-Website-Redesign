@@ -206,8 +206,8 @@ const Navbar = () => {
             { to: "/babysitting-jobs", label: "Babysitting Jobs" },
             { to: "/how-it-works", label: "How it works" },
             {
-              to: "/my-applications-and-jobs",
-              label: "My Applications & Jobs",
+              to: "/my-agreements-and-applications",
+              label: "My Agreements & Applications",
               requiresLogin: true,
             },
             {

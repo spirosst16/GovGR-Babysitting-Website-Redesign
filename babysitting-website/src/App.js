@@ -19,7 +19,7 @@ import BabysittersPage from "./components/BabysittersPage/BabysittersPage";
 import BabysittingJobsPage from "./components/BabysittingJobsPage/BabysittingJobsPage";
 import HowItWorksPage from "./components/HowItWorksPage/HowItWorksPage";
 import BabysittingApplicationForm from "./components/ApplicationForm/BabysittingApplicationForm";
-import MyApplicationsJobsPage from "./components/ApplicationAndJobs/MyApplicationsJobsPage";
+import MyAgreementsAndApplications from "./components/AgreementsAndApplications/MyAgreementsAndApplications";
 import BabysittingApplicationDisplay from "./components/ApplicationDisplay/BabysittingApplicationDisplay";
 import BabysittingApplicationEdit from "./components/ApplicationEdit/BabysittingApplicationEdit";
 import AgreementPage from "./components/AgreementPage/AgreementPage";
@@ -86,8 +86,10 @@ function App() {
           }
         />
         <Route
-          path="/my-applications-and-jobs"
-          element={user ? <MyApplicationsJobsPage /> : <Navigate to="/login" />}
+          path="/my-agreements-and-applications"
+          element={
+            user ? <MyAgreementsAndApplications /> : <Navigate to="/login" />
+          }
         />
         <Route
           path="/application/:userId"

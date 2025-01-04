@@ -170,7 +170,7 @@ const CustomSeparator = () => {
       "/babysitting-jobs": "Babysitting Jobs",
       "/how-it-works": "How It Works",
       "/babysitting-application": "Babysitting Application",
-      "/my-applications-and-jobs": "My Applications & Jobs",
+      "/my-agreements-and-applications": "My Agreements & Applications",
       "/application/:userId": "Application Details",
       "/edit-application/:userId": "Edit Application",
       "/agreement/:userId1/:userId2": "Agreement",

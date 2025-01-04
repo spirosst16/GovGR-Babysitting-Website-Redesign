@@ -199,7 +199,7 @@ const CustomSeparator = () => {
       "/babysitting-jobs": "Babysitting Jobs",
       "/how-it-works": "How It Works",
       "/babysitting-application": "Babysitting Application",
-      "/my-applications-and-jobs": "My Applications & Jobs",
+      "/my-agreements-and-applications": "My Agreements & Applications",
       "/application/:userId": "Application Details",
       "/edit-application/:userId": "Edit Application",
       "/agreement/:userId1/:userId2": "Agreement",
@@ -283,14 +283,14 @@ const AgreementPage = () => {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
-	area: "",
-	weeklySchedule: [],
-	babysittingPlace: "",
-	startingDate: "",
-	endingDate: "",
-	additionalNotes: "",
-	amount: "X",
-	paymentStatus: "not available yet",
+    area: "",
+    weeklySchedule: [],
+    babysittingPlace: "",
+    startingDate: "",
+    endingDate: "",
+    additionalNotes: "",
+    amount: "X",
+    paymentStatus: "not available yet",
   });
   const [errors, setErrors] = useState({
     area: false,
@@ -520,7 +520,7 @@ const AgreementPage = () => {
       setAgreementId(null);
       setStatus("");
       console.log("Agreement declined and deleted.");
-      navigate("/my-applications-and-jobs");
+      navigate("/my-agreements-and-applications");
     } catch (error) {
       console.error("Error declining agreement:", error);
       setAlert({
