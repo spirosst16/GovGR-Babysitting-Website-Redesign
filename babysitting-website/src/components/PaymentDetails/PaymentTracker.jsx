@@ -258,9 +258,66 @@ const PaymentTracker = () => {
     }
   };
 
-  const handleReset = () => {
-    setCurrentStep(0);
-    setWorkConfirmed(false);
+  const updatePaymentStatusToPendingBabysitter = async () => {
+    if (!currentUser) {
+      console.error("Error: User not authenticated");
+      return;
+    }
+
+    try {
+      if (!senderId || !recipientId) {
+        console.error("Error: senderId or recipientId is undefined");
+        return;
+      }
+
+      const agreementRef = query(
+        collection(FIREBASE_DB, "agreements"),
+        where("senderId", "==", senderId),
+        where("recipientId", "==", recipientId)
+      );
+
+      const agreementSnapshot = await getDocs(agreementRef);
+
+      if (!agreementSnapshot.empty) {
+        const agreementDocRef = doc(
+          FIREBASE_DB,
+          "agreements",
+          agreementSnapshot.docs[0].id
+        );
+        const agreementData = agreementSnapshot.docs[0].data();
+
+        // Ensure the payment status is not already updated
+        if (agreementData.paymentStatus !== "pending babysitter") {
+          await updateDoc(agreementDocRef, {
+            paymentStatus: "pending babysitter",
+          });
+
+          setAgreement((prev) => ({
+            ...prev,
+            paymentStatus: "pending babysitter",
+          }));
+          console.log("Payment status updated to pending babysitter.");
+        } else {
+          console.log("Payment status is already pending babysitter.");
+        }
+      } else {
+        console.log(
+          "No agreement found for the provided sender and recipient."
+        );
+      }
+    } catch (error) {
+      console.error("Error updating payment status:", error.message);
+    }
+  };
+
+  const handleReset = async () => {
+    try {
+      await updatePaymentStatusToPendingBabysitter();
+      setCurrentStep(0);
+      setWorkConfirmed(false);
+    } catch (error) {
+      console.error("Error resetting and updating status:", error.message);
+    }
   };
 
   const renderStepContent = (step) => {
