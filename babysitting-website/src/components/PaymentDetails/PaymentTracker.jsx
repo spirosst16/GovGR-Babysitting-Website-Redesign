@@ -10,6 +10,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
+import { jsPDF } from "jspdf";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   Container,
@@ -210,7 +211,7 @@ const PaymentTracker = () => {
 
         if (
           new Date() > new Date(agreementData.endingDate) &&
-          agreementData.paymentStatus !== "pending guardian"
+          agreementData.paymentStatus === "not available yet"
         ) {
           try {
             const agreementDocRef = doc(
@@ -286,7 +287,6 @@ const PaymentTracker = () => {
         );
         const agreementData = agreementSnapshot.docs[0].data();
 
-        // Ensure the payment status is not already updated
         if (agreementData.paymentStatus !== "pending babysitter") {
           await updateDoc(agreementDocRef, {
             paymentStatus: "pending babysitter",
@@ -318,6 +318,19 @@ const PaymentTracker = () => {
     } catch (error) {
       console.error("Error resetting and updating status:", error.message);
     }
+  };
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.setFont("Poppins", "normal");
+    doc.setFontSize(14);
+    doc.text("Digital Payment Voucher", 10, 10);
+    if (agreement) {
+      doc.text(`Amount: $${agreement.amount || "N/A"}`, 10, 30);
+      doc.text(`Description: ${agreement.description || "N/A"}`, 10, 40);
+      doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 50);
+    }
+    doc.save("PaymentVoucher.pdf");
   };
 
   const renderStepContent = (step) => {
@@ -356,8 +369,8 @@ const PaymentTracker = () => {
         return (
           <>
             <Typography variant="body1" textAlign="center">
-              A digital voucher has been generated for the payment. Review its
-              details below.
+              A digital voucher has been generated for the payment. Download it
+              below.
             </Typography>
             <Card
               sx={{
@@ -375,16 +388,10 @@ const PaymentTracker = () => {
                 <Divider sx={{ mb: 2 }} />
                 {agreement && (
                   <>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 1, fontSize: "0.95rem" }}
-                    >
+                    <Typography variant="body2" sx={{ mb: 1 }}>
                       <strong>Amount:</strong> ${agreement.amount || "N/A"}
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ mb: 1, fontSize: "0.95rem" }}
-                    >
+                    <Typography variant="body2" sx={{ mb: 1 }}>
                       <strong>Description:</strong>{" "}
                       {agreement.description || "N/A"}
                     </Typography>
@@ -392,6 +399,11 @@ const PaymentTracker = () => {
                 )}
               </CardContent>
             </Card>
+            <Box sx={{ mt: 3, textAlign: "center" }}>
+              <StyledButton onClick={generatePDF}>
+                Download Voucher
+              </StyledButton>
+            </Box>
           </>
         );
       case 2:
@@ -541,6 +553,80 @@ const PaymentTracker = () => {
                 )}
               </Box>
             </>
+          ) : agreement.paymentStatus === "pending babysitter" ? (
+            <PageContainer>
+              <Typography
+                variant="h4"
+                sx={{
+                  textAlign: "center",
+                  fontWeight: "bold",
+                  fontFamily: "'Poppins', sans-serif",
+                  paddingBottom: "20px",
+                }}
+              >
+                Babysitter Action Required
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  textAlign: "center",
+                  fontFamily: "'Poppins', sans-serif",
+                  marginBottom: "20px",
+                }}
+              >
+                The payment is now pending babysitter confirmation. Please
+                review the details below and proceed with the verification.
+              </Typography>
+              <Card
+                sx={{
+                  mt: 3,
+                  p: 3,
+                  borderRadius: "10px",
+                  boxShadow: 3,
+                  backgroundColor: "#ffffff",
+                }}
+              >
+                <CardContent>
+                  <Typography
+                    variant="h6"
+                    sx={{ marginBottom: "10px", textAlign: "center" }}
+                  >
+                    Verification Details
+                  </Typography>
+                  <Divider sx={{ marginBottom: "10px" }} />
+                  <Typography variant="body2" sx={{ marginBottom: "10px" }}>
+                    <strong>Amount:</strong> ${agreement.amount || "N/A"}
+                  </Typography>
+                  <Typography variant="body2" sx={{ marginBottom: "10px" }}>
+                    <strong>Description:</strong>{" "}
+                    {agreement.description || "N/A"}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Verification Code:</strong>{" "}
+                    {agreement.verificationCode || "Pending Generation"}
+                  </Typography>
+                </CardContent>
+              </Card>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  marginTop: "30px",
+                }}
+              >
+                <StyledButton
+                  onClick={() => alert("Verification Completed!")}
+                  sx={{ marginBottom: "20px" }}
+                >
+                  Confirm & Verify
+                </StyledButton>
+                <StyledButton onClick={generatePDF}>
+                  Download Virtual Receipt
+                </StyledButton>
+              </Box>
+            </PageContainer>
           ) : (
             <PageContainer>
               <Typography variant="body1">Unknown payment status</Typography>
