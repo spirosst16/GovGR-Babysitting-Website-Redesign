@@ -617,7 +617,71 @@ const PaymentTracker = () => {
                 }}
               >
                 <StyledButton
-                  onClick={() => alert("Verification Completed!")}
+                  onClick={async () => {
+                    if (!senderId || !recipientId) {
+                      console.error(
+                        "Error: senderId or recipientId is undefined"
+                      );
+                      alert(
+                        "Sender or Recipient information is missing. Cannot proceed."
+                      );
+                      return;
+                    }
+
+                    try {
+                      const agreementRef = query(
+                        collection(FIREBASE_DB, "agreements"),
+                        where("senderId", "==", senderId),
+                        where("recipientId", "==", recipientId)
+                      );
+
+                      const agreementSnapshot = await getDocs(agreementRef);
+
+                      if (!agreementSnapshot.empty) {
+                        const agreementDoc = agreementSnapshot.docs[0];
+                        const agreementData = agreementDoc.data();
+                        setAgreement({
+                          id: agreementDoc.id,
+                          ...agreementData,
+                        });
+
+                        console.log("Agreement data fetched:", agreementData);
+
+                        const agreementDocRef = doc(
+                          FIREBASE_DB,
+                          "agreements",
+                          agreementDoc.id
+                        );
+                        await updateDoc(agreementDocRef, {
+                          paymentStatus: "not available yet",
+                        });
+
+                        setAgreement((prev) => ({
+                          ...prev,
+                          paymentStatus: "not available yet",
+                        }));
+
+                        alert(
+                          "Verification Completed! Payment status updated to 'not available yet.'"
+                        );
+                      } else {
+                        console.error(
+                          "No agreement found for the provided sender and recipient."
+                        );
+                        alert(
+                          "No agreement found for the provided sender and recipient."
+                        );
+                      }
+                    } catch (error) {
+                      console.error(
+                        "Error fetching or updating agreement:",
+                        error.message
+                      );
+                      alert(
+                        "An error occurred while processing. Please try again."
+                      );
+                    }
+                  }}
                   sx={{ marginBottom: "20px" }}
                 >
                   Confirm & Verify
