@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   getDocs,
   query,
@@ -27,10 +27,20 @@ import {
   Card,
   CardContent,
   Divider,
+  Grid,
+  Stack,
+  Breadcrumbs,
+  Link,
 } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { CheckCircle, Payment, CalendarToday } from "@mui/icons-material";
 import CelebrationIcon from "@mui/icons-material/Celebration";
 import { styled } from "@mui/system";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import PlaceIcon from "@mui/icons-material/Place";
+import DownloadIcon from "@mui/icons-material/Download";
 import Navbar from "../Navbar/Navbar";
 
 const StyledButton = styled(Button)({
@@ -38,8 +48,6 @@ const StyledButton = styled(Button)({
   fontSize: "1rem",
   textTransform: "none",
   borderRadius: "30px",
-  backgroundColor: "#5e62d1",
-  color: "white",
   "&:hover": {
     backgroundColor: "#4a4fbf",
   },
@@ -61,6 +69,15 @@ const steps = [
   "Finalize Payment Process",
 ];
 
+const tasks = [
+  "Tasks completed as per agreement",
+  "Deadlines met",
+  "Quality standards maintained",
+  "Good communication skills",
+  "Reliable and punctual",
+  "Positive attitude",
+];
+
 const PaymentTracker = () => {
   const { senderId, recipientId } = useParams();
   const [currentUser, setCurrentUser] = useState(null);
@@ -71,6 +88,7 @@ const PaymentTracker = () => {
   const [agreement, setAgreement] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [workConfirmed, setWorkConfirmed] = useState(false);
+  const [taskProgress, setTaskProgress] = useState(0);
 
   useEffect(() => {
     const auth = getAuth();
@@ -333,75 +351,277 @@ const PaymentTracker = () => {
     doc.save("PaymentVoucher.pdf");
   };
 
+  const handleTaskConfirmation = () => {
+    setWorkConfirmed(true);
+    // Simulate task completion animation or update
+    setTaskProgress(100); // Update progress bar to full
+  };
+
   const renderStepContent = (step) => {
     switch (step) {
       case 0:
         return (
           <>
-            <Typography variant="body1" textAlign="center">
-              Confirm the completion of the monthly work.
+            <Typography
+              variant="h6"
+              fontFamily={"'Poppins', sans-serif"}
+              textAlign="center"
+            >
+              Confirm Voucher Details to Proceed
             </Typography>
-            <List sx={{ mt: 2, pl: 2 }}>
-              {[
-                "Tasks completed as per agreement",
-                "Deadlines met",
-                "Quality standards maintained",
-              ].map((task, index) => (
-                <ListItem key={index}>
-                  <ListItemIcon>
-                    <CheckCircleIcon sx={{ color: "#5e62d1" }} />
-                  </ListItemIcon>
-                  <ListItemText primary={task} />
-                </ListItem>
-              ))}
-            </List>
+
+            <Box
+              sx={{
+                mt: 3,
+                textAlign: "left",
+                maxWidth: "500px",
+                margin: "auto",
+              }}
+            >
+              <Box sx={{ mt: 3, mb: 2, display: "flex", alignItems: "center" }}>
+                <CheckCircle sx={{ color: "#5e62d1", marginRight: 2 }} />
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: "1rem",
+                    color: "#555555",
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
+                >
+                  <strong>Voucher Price:</strong> $50
+                </Typography>
+              </Box>
+
+              <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
+                <Payment sx={{ color: "#5e62d1", marginRight: 2 }} />
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: "1rem",
+                    color: "#555555",
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
+                >
+                  <strong>Value:</strong> Covers one month's babysitting
+                  services.
+                </Typography>
+              </Box>
+
+              <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
+                <CalendarToday sx={{ color: "#5e62d1", marginRight: 2 }} />
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: "1rem",
+                    color: "#555555",
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
+                >
+                  <strong>Expiry:</strong> Valid for 6 months from the date of
+                  purchase.
+                </Typography>
+              </Box>
+
+              <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
+                <CheckCircle sx={{ color: "#5e62d1", marginRight: 2 }} />
+                <Typography
+                  variant="body1"
+                  sx={{
+                    fontSize: "1rem",
+                    color: "#555555",
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
+                >
+                  <strong>Note:</strong> Voucher is non-refundable and
+                  non-transferable.
+                </Typography>
+              </Box>
+            </Box>
+
             <Box sx={{ mt: 2, textAlign: "center" }}>
-              <StyledButton
-                onClick={() => setWorkConfirmed(true)}
-                disabled={workConfirmed}
-              >
-                Confirm Work Completion
-              </StyledButton>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={workConfirmed}
+                  onChange={() => setWorkConfirmed(!workConfirmed)}
+                  style={{
+                    marginRight: "10px",
+                    accentColor: workConfirmed ? "#5e62d1" : "#000000",
+                  }}
+                />
+                <Typography
+                  variant="body1"
+                  component="span"
+                  sx={{
+                    fontSize: "1rem",
+                    color: "#555555",
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
+                >
+                  I confirm the voucher details and agree to proceed.
+                </Typography>
+              </label>
             </Box>
           </>
         );
       case 1:
         return (
           <>
-            <Typography variant="body1" textAlign="center">
+            <Typography
+              variant="h6"
+              fontFamily={"'Poppins', sans-serif"}
+              textAlign="center"
+            >
               A digital voucher has been generated for the payment. Download it
               below.
             </Typography>
             <Card
               sx={{
-                mt: 3,
-                p: 2,
-                borderRadius: "10px",
-                boxShadow: 3,
-                backgroundColor: "#f9f9f9",
+                mt: 4,
+                p: 4,
+                borderRadius: "15px",
+                boxShadow: 10,
+                backgroundColor: "#ffffff",
+                border: "none",
+                width: 800,
+                margin: "auto",
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                overflow: "hidden",
+                position: "relative",
               }}
             >
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 2 }}>
-                  Digital Voucher
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  backgroundImage: "linear-gradient(135deg, #5e62d1, #3f51b5)",
+                  borderRadius: "15px",
+                  zIndex: -1,
+                }}
+              />
+              <CardContent sx={{ paddingBottom: "16px" }}>
+                <Box
+                  sx={{
+                    backgroundImage:
+                      "linear-gradient(135deg, #5e62d1, #3f51b5)",
+                    borderRadius: "10px",
+                    padding: "12px",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: "bold",
+                      fontSize: "1.5rem",
+                      color: "white",
+                      fontFamily: "'Poppins', sans-serif",
+                      textAlign: "center",
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    Digital Voucher
+                  </Typography>
+                </Box>
+                <Divider sx={{ mt: 3, mb: 3, borderColor: "#e0e0e0" }} />
                 {agreement && (
-                  <>
-                    <Typography variant="body2" sx={{ mb: 1 }}>
-                      <strong>Amount:</strong> ${agreement.amount || "N/A"}
-                    </Typography>
-                    <Typography variant="body2" sx={{ mb: 1 }}>
-                      <strong>Description:</strong>{" "}
-                      {agreement.description || "N/A"}
-                    </Typography>
-                  </>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          mb: 2,
+                          fontWeight: 600,
+                          fontSize: "1rem",
+                          color: "#333333",
+                          fontFamily: "'Poppins', sans-serif",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1, // added gap between icon and text
+                        }}
+                      >
+                        <AttachMoneyIcon sx={{ color: "#5e62d1" }} />
+                        <strong>Amount:</strong> {agreement.amount || "N/A"}€
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          mb: 2,
+                          fontWeight: 600,
+                          fontSize: "1rem",
+                          color: "#333333",
+                          fontFamily: "'Poppins', sans-serif",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1, // added gap between icon and text
+                        }}
+                      >
+                        <LocationOnIcon sx={{ color: "#5e62d1" }} />
+                        <strong>Area:</strong> {agreement.area || "N/A"}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          mb: 2,
+                          fontWeight: 600,
+                          fontSize: "1rem",
+                          color: "#333333",
+                          fontFamily: "'Poppins', sans-serif",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1, // added gap between icon and text
+                        }}
+                      >
+                        <AccessTimeIcon sx={{ color: "#5e62d1" }} />
+                        <strong>Service Period:</strong> 1 Month
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          mb: 2,
+                          fontWeight: 600,
+                          fontSize: "1rem",
+                          color: "#333333",
+                          fontFamily: "'Poppins', sans-serif",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1, // added gap between icon and text
+                        }}
+                      >
+                        <PlaceIcon sx={{ color: "#5e62d1" }} />
+                        <strong>Service Location:</strong>{" "}
+                        {agreement.babysittingPlace || "N/A"}
+                      </Typography>
+                    </Grid>
+                  </Grid>
                 )}
               </CardContent>
             </Card>
+
             <Box sx={{ mt: 3, textAlign: "center" }}>
-              <StyledButton onClick={generatePDF}>
-                Download Voucher
+              <StyledButton
+                onClick={generatePDF}
+                sx={{
+                  backgroundColor: "white",
+                  color: "#5e62d1",
+                  outline: "1px solid #5e62d1",
+                  borderRadius: "30px",
+                  padding: "8px 16px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  "&:hover": {
+                    backgroundColor: "#f0f4ff",
+                  },
+                }}
+              >
+                <DownloadIcon sx={{ mr: 1, fontSize: "20px" }} />{" "}
+                <span>Download Voucher</span>
               </StyledButton>
             </Box>
           </>
@@ -434,7 +654,18 @@ const PaymentTracker = () => {
               securely logged.
             </Typography>
             <Box sx={{ textAlign: "center", mt: 4 }}>
-              <StyledButton onClick={handleReset}>Start Over</StyledButton>
+              <StyledButton
+                variant="contained"
+                onClick={handleReset}
+                sx={{
+                  backgroundColor: "#5e62d1",
+                  "&:hover": {
+                    backgroundColor: "#4a4fbf",
+                  },
+                }}
+              >
+                Start Over
+              </StyledButton>
             </Box>
           </>
         );
@@ -538,14 +769,28 @@ const PaymentTracker = () => {
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
                     <StyledButton
+                      variant="contained"
                       onClick={handleBack}
                       disabled={currentStep === 0}
+                      sx={{
+                        backgroundColor: "#5e62d1",
+                        "&:hover": {
+                          backgroundColor: "#4a4fbf",
+                        },
+                      }}
                     >
                       Back
                     </StyledButton>
                     <StyledButton
+                      variant="contained"
                       onClick={handleNext}
                       disabled={currentStep === 0 && !workConfirmed}
+                      sx={{
+                        backgroundColor: "#5e62d1",
+                        "&:hover": {
+                          backgroundColor: "#4a4fbf",
+                        },
+                      }}
                     >
                       Next
                     </StyledButton>
