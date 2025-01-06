@@ -388,7 +388,7 @@ const PaymentTracker = () => {
                     fontFamily: "'Poppins', sans-serif",
                   }}
                 >
-                  <strong>Voucher Price:</strong> $50
+                  <strong>Voucher Price:</strong> {agreement.amount || "N/A"}€
                 </Typography>
               </Box>
 
@@ -687,7 +687,11 @@ const PaymentTracker = () => {
       <Navbar />
       <Container component="main" maxWidth="md">
         {agreement ? (
-          agreement.paymentStatus === "not available yet" ? (
+          agreement.paymentStatus === "not available yet" ||
+          (agreement.paymentStatus === "pending guardian" &&
+            currentUserRole === "Babysitter") ||
+          (agreement.paymentStatus === "pending babysitter" &&
+            currentUserRole === "Guardian") ? (
             <PageContainer>
               <Typography
                 variant="h4"
@@ -717,7 +721,8 @@ const PaymentTracker = () => {
                 days until the agreement's end date.
               </Typography>
             </PageContainer>
-          ) : agreement.paymentStatus === "pending guardian" ? (
+          ) : agreement.paymentStatus === "pending guardian" &&
+            currentUserRole === "Guardian" ? (
             <>
               <Typography
                 variant="h4"
@@ -798,7 +803,8 @@ const PaymentTracker = () => {
                 )}
               </Box>
             </>
-          ) : agreement.paymentStatus === "pending babysitter" ? (
+          ) : agreement.paymentStatus === "pending babysitter" &&
+            currentUserRole === "Babysitter" ? (
             <PageContainer>
               <Typography
                 variant="h4"
