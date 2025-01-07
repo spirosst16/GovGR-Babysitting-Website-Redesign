@@ -246,9 +246,7 @@ const PaymentTracker = () => {
 
           if (agreementData.paymentStatus === "not available yet") {
             updatedAmount = `${K}X`;
-            newLastPaymentDate = new Date(
-              newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + K)
-            );
+            newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + K);
 
             await updateDoc(agreementDocRef, {
               paymentStatus: "pending guardian",
@@ -275,9 +273,7 @@ const PaymentTracker = () => {
               parseInt(agreementData.amount.match(/\d+/)[0], 10) || 0;
             const newK = previousK + 1;
             updatedAmount = `${newK}X`;
-            newLastPaymentDate = new Date(
-              newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + 1)
-            );
+            newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + 1);
 
             await updateDoc(agreementDocRef, {
               amount: updatedAmount,

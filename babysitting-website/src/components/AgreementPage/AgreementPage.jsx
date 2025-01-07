@@ -368,6 +368,7 @@ const AgreementPage = () => {
               startingDate: agreementData.startingDate,
               endingDate: agreementData.endingDate,
               additionalNotes: agreementData.additionalNotes,
+              paymentStatus: agreementData.paymentStatus,
               lastPaymentDate: agreementData.lastPaymentDate,
             });
             setStatus(agreementData.status);
@@ -436,6 +437,7 @@ const AgreementPage = () => {
         recipientId: userId2,
         status: "pending",
         ...formValues,
+        paymentStatus: "unknown",
         lastPaymentDate: formValues.startingDate,
       });
 
@@ -491,7 +493,10 @@ const AgreementPage = () => {
       }
 
       const agreementDocRef = doc(FIREBASE_DB, "agreements", agreementId);
-      await updateDoc(agreementDocRef, { status: "accepted" });
+      await updateDoc(agreementDocRef, {
+        status: "accepted",
+        paymentStatus: "not available yet",
+      });
 
       setStatus("accepted");
       console.log("Agreement accepted.");
