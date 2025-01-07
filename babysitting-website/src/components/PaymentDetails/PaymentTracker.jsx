@@ -223,30 +223,74 @@ const PaymentTracker = () => {
       const agreementSnapshot = await getDocs(agreementRef);
       if (!agreementSnapshot.empty) {
         const agreementData = agreementSnapshot.docs[0].data();
+        const agreementDocRef = doc(
+          FIREBASE_DB,
+          "agreements",
+          agreementSnapshot.docs[0].id
+        );
+
         setAgreement(agreementData);
 
         console.log("Agreement data:", agreementData);
 
-        if (
-          new Date() > new Date(agreementData.endingDate) &&
-          agreementData.paymentStatus === "not available yet"
-        ) {
-          try {
-            const agreementDocRef = doc(
-              FIREBASE_DB,
-              "agreements",
-              agreementSnapshot.docs[0].id
+        const currentDate = new Date();
+        const lastPaymentDate = new Date(agreementData.lastPaymentDate);
+        const dayDifference = Math.floor(
+          (currentDate - lastPaymentDate) / (1000 * 60 * 60 * 24)
+        );
+        const K = Math.floor(dayDifference / 30);
+
+        if (K >= 1) {
+          let updatedAmount = agreementData.amount;
+          let newLastPaymentDate = new Date(lastPaymentDate);
+
+          if (agreementData.paymentStatus === "not available yet") {
+            updatedAmount = `${K}X`;
+            newLastPaymentDate = new Date(
+              newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + K)
             );
+
             await updateDoc(agreementDocRef, {
               paymentStatus: "pending guardian",
+              amount: updatedAmount,
+              lastPaymentDate: newLastPaymentDate.toISOString(),
             });
+
             setAgreement((prev) => ({
               ...prev,
               paymentStatus: "pending guardian",
+              amount: updatedAmount,
+              lastPaymentDate: newLastPaymentDate.toISOString(),
             }));
-            console.log("Payment status updated to pending guardian.");
-          } catch (error) {
-            console.error("Error updating payment status:", error.message);
+
+            console.log(
+              "Payment status updated to pending guardian with amount:",
+              updatedAmount
+            );
+          } else if (
+            agreementData.paymentStatus === "pending guardian" ||
+            agreementData.paymentStatus === "pending babysitter"
+          ) {
+            const previousK =
+              parseInt(agreementData.amount.match(/\d+/)[0], 10) || 0;
+            const newK = previousK + 1;
+            updatedAmount = `${newK}X`;
+            newLastPaymentDate = new Date(
+              newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + 1)
+            );
+
+            await updateDoc(agreementDocRef, {
+              amount: updatedAmount,
+              lastPaymentDate: newLastPaymentDate.toISOString(),
+            });
+
+            setAgreement((prev) => ({
+              ...prev,
+              amount: updatedAmount,
+              lastPaymentDate: newLastPaymentDate.toISOString(),
+            }));
+
+            console.log("Amount updated to:", updatedAmount);
           }
         }
       } else {

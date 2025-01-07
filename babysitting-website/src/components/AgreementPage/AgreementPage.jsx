@@ -368,6 +368,7 @@ const AgreementPage = () => {
               startingDate: agreementData.startingDate,
               endingDate: agreementData.endingDate,
               additionalNotes: agreementData.additionalNotes,
+              lastPaymentDate: agreementData.lastPaymentDate,
             });
             setStatus(agreementData.status);
           });
@@ -435,6 +436,7 @@ const AgreementPage = () => {
         recipientId: userId2,
         status: "pending",
         ...formValues,
+        lastPaymentDate: formValues.startingDate,
       });
 
       setAgreementId(docRef.id);
