@@ -21,6 +21,9 @@ import {
   where,
   doc,
   deleteDoc,
+  addDoc,
+  getDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { FIREBASE_DB } from "../../config/firebase";
@@ -432,11 +435,45 @@ const BabysittingApplicationDisplay = () => {
     }
   }
 
-  const handleCreateAgreement = () => {
+  const handleCreateAgreement = async () => {
     if (currentUser && user) {
-      navigate(`/${agreementPath}`, {
-        state: { from: location.pathname },
-      });
+      try {
+        // Create a new agreement with "temporary" status
+        const newAgreementRef = await addDoc(
+          collection(FIREBASE_DB, "agreements"),
+          {
+            recipientId: userId,
+            senderId: currentUser.uid,
+            status: "",
+          }
+        );
+
+        // Navigate to the agreement
+        navigate(`/agreement/${newAgreementRef.id}`, {
+          state: { from: location.pathname },
+        });
+
+        // Monitor agreement for status change
+        const agreementDocRef = doc(
+          FIREBASE_DB,
+          "agreements",
+          newAgreementRef.id
+        );
+        const unsubscribe = onSnapshot(agreementDocRef, async (snapshot) => {
+          const agreement = snapshot.data();
+          if (agreement && agreement.status !== "") {
+            // Agreement is no longer temporary; stop monitoring
+            unsubscribe();
+          }
+        });
+      } catch (error) {
+        console.error("Error creating agreement:", error);
+        setAlert({
+          open: true,
+          message: "Failed to create the agreement. Please try again.",
+          severity: "error",
+        });
+      }
     }
   };
 

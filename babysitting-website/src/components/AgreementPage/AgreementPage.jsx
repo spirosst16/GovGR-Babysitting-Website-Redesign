@@ -364,14 +364,14 @@ const AgreementPage = () => {
           setUserId1(agreementData.senderId);
           setUserId2(agreementData.recipientId);
           setFormValues({
-            area: agreementData.area,
-            weeklySchedule: agreementData.weeklySchedule,
-            babysittingPlace: agreementData.babysittingPlace,
-            startingDate: agreementData.startingDate,
-            endingDate: agreementData.endingDate,
-            additionalNotes: agreementData.additionalNotes,
-            paymentStatus: agreementData.paymentStatus,
-            lastPaymentDate: agreementData.lastPaymentDate,
+            area: agreementData.area || "",
+            weeklySchedule: agreementData.weeklySchedule || [],
+            babysittingPlace: agreementData.babysittingPlace || "",
+            startingDate: agreementData.startingDate || "",
+            endingDate: agreementData.endingDate || "",
+            additionalNotes: agreementData.additionalNotes || "",
+            paymentStatus: agreementData.paymentStatus || "unknown",
+            lastPaymentDate: agreementData.lastPaymentDate || "",
           });
           setStatus(agreementData.status);
         } else {

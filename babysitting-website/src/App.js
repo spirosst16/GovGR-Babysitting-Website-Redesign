@@ -6,7 +6,14 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
-import { FIREBASE_AUTH } from "./config/firebase";
+import { FIREBASE_AUTH, FIREBASE_DB } from "./config/firebase";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
@@ -45,6 +52,34 @@ function App() {
   }, []);
 
   const location = useLocation();
+
+  useEffect(() => {
+    const deleteTemporaryAgreements = async () => {
+      try {
+        const agreementsRef = collection(FIREBASE_DB, "agreements");
+
+        const tempAgreementsQuery = query(
+          agreementsRef,
+          where("status", "==", "")
+        );
+
+        const tempAgreementsSnapshot = await getDocs(tempAgreementsQuery);
+
+        if (!tempAgreementsSnapshot.empty) {
+          const deletePromises = tempAgreementsSnapshot.docs.map((doc) =>
+            deleteDoc(doc.ref)
+          );
+          await Promise.all(deletePromises);
+        }
+      } catch (error) {
+        console.error("Error deleting temporary agreements:", error);
+      }
+    };
+
+    if (!location.pathname.startsWith("/agreement/")) {
+      deleteTemporaryAgreements();
+    }
+  }, [location.pathname]);
 
   const hideNavbarAndFooterRoutes = [
     "/login",
