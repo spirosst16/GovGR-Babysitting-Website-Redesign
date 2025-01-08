@@ -202,7 +202,7 @@ const CustomSeparator = () => {
       "/my-agreements-and-applications": "My Agreements & Applications",
       "/application/:userId": "Application Details",
       "/edit-application/:userId": "Edit Application",
-      "/agreement/:userId1/:userId2": "Agreement",
+      "/agreement/:agreementId": "Agreement",
       "/chats": "Messages",
       "/profile": "Profile",
     };
@@ -211,7 +211,7 @@ const CustomSeparator = () => {
     const cleanPath = pathname
       .replace(/\/application\/[^/]+/, "/application/:userId")
       .replace(/\/edit-application\/[^/]+/, "/edit-application/:userId")
-      .replace(/\/agreement\/[^/]+\/[^/]+/, "/agreement/:userId1/:userId2");
+      .replace(/\/agreement\/[^/]+\/[^/]+/, "/agreement/:agreementId");
 
     return mapping[cleanPath] || pathname.replace("/", ""); // Fallback to cleaned pathname
   };
@@ -275,11 +275,12 @@ const CustomSeparator = () => {
 };
 
 const AgreementPage = () => {
-  const { userId1, userId2 } = useParams();
+  const { agreementId } = useParams();
   const navigate = useNavigate();
+  const [userId1, setUserId1] = useState(null);
+  const [userId2, setUserId2] = useState(null);
   const [sender, setSender] = useState(null);
   const [recipient, setRecipient] = useState(null);
-  const [agreementId, setAgreementId] = useState(null);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
@@ -290,7 +291,6 @@ const AgreementPage = () => {
     endingDate: "",
     additionalNotes: "",
     amount: "X",
-    paymentStatus: "not available yet",
   });
   const [errors, setErrors] = useState({
     area: false,
@@ -312,6 +312,9 @@ const AgreementPage = () => {
 
   useEffect(() => {
     const fetchUserData = async (userId, setUser) => {
+      if (!userId) {
+        return;
+      }
       try {
         let userData = null;
 
@@ -350,29 +353,29 @@ const AgreementPage = () => {
       setLoading(true);
       try {
         const agreementsRef = collection(FIREBASE_DB, "agreements");
-        const q = query(
+        const agreementQuery = query(
           agreementsRef,
-          where("senderId", "==", userId1),
-          where("recipientId", "==", userId2)
+          where("__name__", "==", agreementId)
         );
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocs(agreementQuery);
 
         if (!querySnapshot.empty) {
-          querySnapshot.forEach((doc) => {
-            const agreementData = doc.data();
-            setAgreementId(doc.id);
-            setFormValues({
-              area: agreementData.area,
-              weeklySchedule: agreementData.weeklySchedule,
-              babysittingPlace: agreementData.babysittingPlace,
-              startingDate: agreementData.startingDate,
-              endingDate: agreementData.endingDate,
-              additionalNotes: agreementData.additionalNotes,
-              paymentStatus: agreementData.paymentStatus,
-              lastPaymentDate: agreementData.lastPaymentDate,
-            });
-            setStatus(agreementData.status);
+          const agreementData = querySnapshot.docs[0].data();
+          setUserId1(agreementData.senderId);
+          setUserId2(agreementData.recipientId);
+          setFormValues({
+            area: agreementData.area,
+            weeklySchedule: agreementData.weeklySchedule,
+            babysittingPlace: agreementData.babysittingPlace,
+            startingDate: agreementData.startingDate,
+            endingDate: agreementData.endingDate,
+            additionalNotes: agreementData.additionalNotes,
+            paymentStatus: agreementData.paymentStatus,
+            lastPaymentDate: agreementData.lastPaymentDate,
           });
+          setStatus(agreementData.status);
+        } else {
+          console.error("No agreement found with the provided ID.");
         }
       } catch (error) {
         console.error("Error fetching agreement data:", error);
@@ -383,8 +386,8 @@ const AgreementPage = () => {
 
     fetchAgreementData();
 
-    fetchUserData(userId1, setSender);
-    fetchUserData(userId2, setRecipient);
+    if (userId1) fetchUserData(userId1, setSender);
+    if (userId2) fetchUserData(userId2, setRecipient);
   }, [userId1, userId2]);
 
   const handleInputChange = (e) => {
@@ -441,7 +444,6 @@ const AgreementPage = () => {
         lastPaymentDate: formValues.startingDate,
       });
 
-      setAgreementId(docRef.id);
       setStatus("pending");
       console.log("Agreement sent with ID:", docRef.id);
     } catch (error) {
@@ -468,7 +470,6 @@ const AgreementPage = () => {
       const agreementDocRef = doc(FIREBASE_DB, "agreements", agreementId);
       await deleteDoc(agreementDocRef);
 
-      setAgreementId(null);
       setStatus("");
       console.log("Agreement unsent and deleted.");
     } catch (error) {
@@ -524,7 +525,6 @@ const AgreementPage = () => {
       const agreementDocRef = doc(FIREBASE_DB, "agreements", agreementId);
       await deleteDoc(agreementDocRef);
 
-      setAgreementId(null);
       setStatus("");
       console.log("Agreement declined and deleted.");
       navigate("/my-agreements-and-applications");

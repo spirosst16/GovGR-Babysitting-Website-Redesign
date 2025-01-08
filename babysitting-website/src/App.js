@@ -102,7 +102,7 @@ function App() {
           }
         />
         <Route
-          path="/agreement/:userId1/:userId2"
+          path="/agreement/:agreementId"
           element={user ? <AgreementPage /> : <Navigate to="/login" />}
         />
         <Route

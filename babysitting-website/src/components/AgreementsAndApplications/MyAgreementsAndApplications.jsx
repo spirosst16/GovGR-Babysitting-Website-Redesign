@@ -603,11 +603,7 @@ const MyAgreementsAndApplicationsPage = () => {
                 .map((agreement) => (
                   <Grid item xs={12} sm={6} md={4} key={agreement.id}>
                     <ApplicationCard
-                      onClick={() =>
-                        navigate(
-                          `/agreement/${agreement.senderId}/${agreement.recipientId}`
-                        )
-                      }
+                      onClick={() => navigate(`/agreement/${agreement.id}`)}
                       style={{
                         cursor: "pointer",
                       }}
@@ -818,11 +814,7 @@ const MyAgreementsAndApplicationsPage = () => {
               {filteredAgreements.map((agreement) => (
                 <Grid item xs={12} sm={6} md={4} key={agreement.id}>
                   <ApplicationCard
-                    onClick={() =>
-                      navigate(
-                        `/agreement/${agreement.senderId}/${agreement.recipientId}`
-                      )
-                    }
+                    onClick={() => navigate(`/agreement/${agreement.id}`)}
                     style={{
                       cursor: "pointer",
                     }}
