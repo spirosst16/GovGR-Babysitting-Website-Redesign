@@ -249,7 +249,7 @@ const ChatPage = () => {
           (a, b) => b.lastMessageTimestamp - a.lastMessageTimestamp
         );
         setUserList(filteredUsers);
-        if (filteredUsers.length > 0) {
+        if (filteredUsers.length > 0 && selectedUser === null) {
           setSelectedUser(filteredUsers[0]);
         }
       };

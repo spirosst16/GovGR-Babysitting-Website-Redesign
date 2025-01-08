@@ -148,7 +148,7 @@ function App() {
           path="/profile"
           element={user ? <ProfilePage /> : <Navigate to="/login" />}
         />
-        <Route path="/Profile/:userId" element={<ProfileInspect />} />
+        <Route path="/Profile/:profileUserID" element={<ProfileInspect />} />
         <Route
           path="/payment/:agreementId"
           element={user ? <PaymentDetails /> : <Navigate to="/login" />}
