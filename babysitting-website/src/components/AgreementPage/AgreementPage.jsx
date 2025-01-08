@@ -397,6 +397,10 @@ const AgreementPage = () => {
             alert("No valid profile data to save.");
             return;
         }
+        if (currentUser === null) {
+            navigate(`/profile/${userId}`);
+            return;
+        }
         if (currentUser.uid === userId) {
             navigate(`/profile`);
         } else {

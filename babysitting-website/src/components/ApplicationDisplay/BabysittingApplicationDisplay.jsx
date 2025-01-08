@@ -377,6 +377,10 @@ const BabysittingApplicationDisplay = () => {
             alert("No valid profile data to save.");
             return;
         }
+        if (currentUser === null) {
+            navigate(`/profile/${user.userId}`);
+            return;
+        }
         if (currentUser.uid === user.userId) {
             navigate(`/profile`);
         } else {
