@@ -461,13 +461,31 @@ const PaymentTracker = () => {
         return;
       }
 
+      const babysitterDoc = await getDoc(babysitterRef);
+      if (!babysitterDoc.exists()) {
+        console.error("Babysitter document does not exist.");
+        return;
+      }
+
+      const babysitterData = babysitterDoc.data();
+      const existingReviews = babysitterData.reviews || [];
+      const newReview = {
+        userId: currentUser.uid,
+        reviewText,
+        rating: parseInt(rating, 10),
+        timestamp: new Date().toISOString(),
+      };
+
+      const updatedReviews = [...existingReviews, newReview];
+      const totalRatings = updatedReviews.reduce(
+        (sum, review) => sum + review.rating,
+        0
+      );
+      const averageRating = totalRatings / updatedReviews.length;
+
       await updateDoc(babysitterRef, {
-        reviews: arrayUnion({
-          userId: currentUser.uid,
-          reviewText,
-          rating: parseInt(rating, 10),
-          timestamp: new Date().toISOString(),
-        }),
+        reviews: arrayUnion(newReview),
+        rating: averageRating,
       });
 
       alert("Thank you for your review!");
