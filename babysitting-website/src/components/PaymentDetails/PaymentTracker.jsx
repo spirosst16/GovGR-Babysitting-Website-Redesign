@@ -8,6 +8,7 @@ import {
   getDoc,
   doc,
   updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import { jsPDF } from "jspdf";
@@ -31,12 +32,17 @@ import {
   Stack,
   Breadcrumbs,
   Link,
+  Snackbar,
+  Alert,
+  TextField,
 } from "@mui/material";
 import { CheckCircle, Payment, CalendarToday } from "@mui/icons-material";
 import CelebrationIcon from "@mui/icons-material/Celebration";
 import { styled } from "@mui/system";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import DescriptionIcon from "@mui/icons-material/Description";
+import VerifiedIcon from "@mui/icons-material/Verified";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import PlaceIcon from "@mui/icons-material/Place";
@@ -50,6 +56,25 @@ const StyledButton = styled(Button)({
   borderRadius: "30px",
   "&:hover": {
     backgroundColor: "#4a4fbf",
+  },
+});
+
+const StyledTextField = styled(TextField)({
+  fontFamily: "'Poppins', sans-serif",
+  color: "#5e62d1",
+  "& .MuiInputBase-input": {
+    fontFamily: "'Poppins', sans-serif",
+  },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "#ccc",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#5e62d1",
+    },
+  },
+  "& .MuiInputLabel-root.Mui-focused": {
+    color: "#5e62d1",
   },
 });
 
@@ -69,15 +94,6 @@ const steps = [
   "Finalize Payment Process",
 ];
 
-const tasks = [
-  "Tasks completed as per agreement",
-  "Deadlines met",
-  "Quality standards maintained",
-  "Good communication skills",
-  "Reliable and punctual",
-  "Positive attitude",
-];
-
 const PaymentTracker = () => {
   const { agreementId } = useParams();
   const [userId1, setUserId1] = useState(null);
@@ -90,7 +106,10 @@ const PaymentTracker = () => {
   const [agreement, setAgreement] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [workConfirmed, setWorkConfirmed] = useState(false);
-  const [taskProgress, setTaskProgress] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [rating, setRating] = useState("");
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const [isReviewSubmitted, setIsReviewSubmitted] = useState(false);
 
   useEffect(() => {
     const auth = getAuth();
@@ -402,10 +421,63 @@ const PaymentTracker = () => {
     doc.save("PaymentVoucher.pdf");
   };
 
-  const handleTaskConfirmation = () => {
-    setWorkConfirmed(true);
-    // Simulate task completion animation or update
-    setTaskProgress(100); // Update progress bar to full
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!reviewText || !rating) {
+      alert("Please provide both a review and a rating.");
+      return;
+    }
+
+    try {
+      const babysitterQuery1 = query(
+        collection(FIREBASE_DB, "babysitters"),
+        where("userId", "==", userId1)
+      );
+
+      const babysitterQuery2 = query(
+        collection(FIREBASE_DB, "babysitters"),
+        where("userId", "==", userId2)
+      );
+
+      let babysitterRef = null;
+
+      const babysitterSnapshot1 = await getDocs(babysitterQuery1);
+
+      if (!babysitterSnapshot1.empty) {
+        const babysitterDoc1 = babysitterSnapshot1.docs[0];
+        babysitterRef = babysitterDoc1.ref;
+      } else {
+        const babysitterSnapshot2 = await getDocs(babysitterQuery2);
+
+        if (!babysitterSnapshot2.empty) {
+          const babysitterDoc2 = babysitterSnapshot2.docs[0];
+          babysitterRef = babysitterDoc2.ref;
+        }
+      }
+
+      if (!babysitterRef) {
+        alert("Babysitter could not be determined.");
+        return;
+      }
+
+      await updateDoc(babysitterRef, {
+        reviews: arrayUnion({
+          userId: currentUser.uid,
+          reviewText,
+          rating: parseInt(rating, 10),
+          timestamp: new Date().toISOString(),
+        }),
+      });
+
+      alert("Thank you for your review!");
+      setReviewText("");
+      setRating("");
+      setIsReviewSubmitted(true);
+    } catch (error) {
+      console.error("Error submitting review:", error.message);
+      alert("An error occurred. Please try again.");
+    }
   };
 
   const renderStepContent = (step) => {
@@ -679,46 +751,146 @@ const PaymentTracker = () => {
         );
       case 2:
         return (
-          <>
-            <Box textAlign="center" sx={{ mt: 4 }}>
-              <CelebrationIcon
-                sx={{
-                  fontSize: "5rem",
-                  color: "#5e62d1",
-                }}
-              />
-            </Box>
+          <Box
+            sx={{
+              mt: 6,
+              borderRadius: "15px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              maxWidth: "600px",
+              margin: "auto",
+            }}
+          >
             <Typography
               variant="h5"
               textAlign="center"
-              sx={{ mt: 2, fontWeight: "bold" }}
+              sx={{ fontWeight: "bold", fontFamily: "'Poppins', sans-serif" }}
             >
-              Payment Process Completed!
+              Leave a Review
             </Typography>
             <Typography
-              variant="body1"
+              variant="h6"
               textAlign="center"
-              sx={{ mt: 1, color: "gray" }}
+              sx={{ mt: 2, mb: 4, fontFamily: "'Poppins', sans-serif" }}
             >
-              Thank you for ensuring a smooth payment experience. The
-              professional has been notified, and the payment details have been
-              securely logged.
+              Thank you for completing the payment process! Please take a moment
+              to leave a review for the babysitter.
             </Typography>
-            <Box sx={{ textAlign: "center", mt: 4 }}>
+
+            {/* Review Form */}
+            <Box
+              component="form"
+              onSubmit={handleReviewSubmit}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 3,
+                width: "100%",
+              }}
+            >
+              {/* TextField */}
+              <StyledTextField
+                label="Write your review here..."
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+                multiline
+                rows={4}
+                variant="outlined"
+                disabled={isReviewSubmitted} // Disable when review is submitted
+              />
+
+              {/* Star Rating */}
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 1,
+                  mb: 2,
+                }}
+              >
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    onClick={() => !isReviewSubmitted && setRating(star)} // Disable click when review is submitted
+                    onMouseOver={() =>
+                      !isReviewSubmitted && setHoveredRating(star)
+                    }
+                    onMouseOut={() => !isReviewSubmitted && setHoveredRating(0)}
+                    style={{
+                      fontSize: "3rem",
+                      cursor: isReviewSubmitted ? "not-allowed" : "pointer", // Disable pointer events
+                      color:
+                        hoveredRating >= star || rating >= star
+                          ? "#FFD700"
+                          : "#ccc",
+                      transition: "color 0.2s ease",
+                    }}
+                  >
+                    ★
+                  </span>
+                ))}
+              </Box>
+
+              {/* Submit Review Button */}
+              <StyledButton
+                type="submit"
+                variant="contained"
+                disabled={isReviewSubmitted}
+                sx={{
+                  backgroundColor: isReviewSubmitted ? "#cccccc" : "#5e62d1",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: isReviewSubmitted ? "#cccccc" : "#4a4fbf",
+                  },
+                  alignSelf: "center",
+                }}
+              >
+                {isReviewSubmitted ? "Review Submitted" : "Submit Review"}
+              </StyledButton>
+            </Box>
+
+            {/* Back and Finish Buttons */}
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+                mt: 4,
+              }}
+            >
+              <StyledButton
+                variant="contained"
+                onClick={handleBack}
+                sx={{
+                  backgroundColor: "#5e62d1",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "#4a4fbf",
+                  },
+                  ml: -13,
+                }}
+              >
+                Back
+              </StyledButton>
               <StyledButton
                 variant="contained"
                 onClick={handleReset}
                 sx={{
                   backgroundColor: "#5e62d1",
+                  color: "white",
                   "&:hover": {
                     backgroundColor: "#4a4fbf",
                   },
+                  mr: -13,
                 }}
               >
-                Start Over
+                Finish
               </StyledButton>
             </Box>
-          </>
+          </Box>
         );
       default:
         return null;
@@ -745,7 +917,7 @@ const PaymentTracker = () => {
             currentUserRole === "Guardian") ? (
             <PageContainer>
               <Typography
-                variant="h4"
+                variant="h5"
                 sx={{
                   textAlign: "center",
                   fontWeight: "bold",
@@ -756,7 +928,7 @@ const PaymentTracker = () => {
                 Payment Not Available Yet
               </Typography>
               <Typography
-                variant="body1"
+                variant="h6"
                 sx={{
                   textAlign: "center",
                   fontFamily: "'Poppins', sans-serif",
@@ -869,11 +1041,13 @@ const PaymentTracker = () => {
                 Babysitter Action Required
               </Typography>
               <Typography
-                variant="body1"
+                variant="h6"
                 sx={{
+                  mt: 2,
+                  mb: 4,
                   textAlign: "center",
                   fontFamily: "'Poppins', sans-serif",
-                  marginBottom: "20px",
+                  fontSize: "1.1rem",
                 }}
               >
                 The payment is now pending babysitter confirmation. Please
@@ -881,32 +1055,130 @@ const PaymentTracker = () => {
               </Typography>
               <Card
                 sx={{
-                  mt: 3,
-                  p: 3,
-                  borderRadius: "10px",
-                  boxShadow: 3,
+                  mt: 4,
+                  p: 4,
+                  borderRadius: "15px",
+                  boxShadow: 10,
                   backgroundColor: "#ffffff",
+                  border: "none",
+                  width: 800,
+                  margin: "auto",
+                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                  overflow: "hidden",
+                  position: "relative",
                 }}
               >
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    sx={{ marginBottom: "10px", textAlign: "center" }}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    backgroundImage:
+                      "linear-gradient(135deg, #5e62d1, #3f51b5)",
+                    borderRadius: "15px",
+                    zIndex: -1,
+                  }}
+                />
+                <CardContent sx={{ paddingBottom: "16px" }}>
+                  <Box
+                    sx={{
+                      backgroundImage:
+                        "linear-gradient(135deg, #5e62d1, #3f51b5)",
+                      borderRadius: "10px",
+                      padding: "12px",
+                      marginBottom: "20px",
+                    }}
                   >
-                    Verification Details
-                  </Typography>
-                  <Divider sx={{ marginBottom: "10px" }} />
-                  <Typography variant="body2" sx={{ marginBottom: "10px" }}>
-                    <strong>Amount:</strong> ${agreement.amount || "N/A"}
-                  </Typography>
-                  <Typography variant="body2" sx={{ marginBottom: "10px" }}>
-                    <strong>Description:</strong>{" "}
-                    {agreement.description || "N/A"}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Verification Code:</strong>{" "}
-                    {agreement.verificationCode || "Pending Generation"}
-                  </Typography>
+                    <Typography
+                      variant="h5"
+                      sx={{
+                        fontWeight: "bold",
+                        fontSize: "1.5rem",
+                        color: "white",
+                        fontFamily: "'Poppins', sans-serif",
+                        textAlign: "center",
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      Digital Voucher
+                    </Typography>
+                  </Box>
+                  <Divider sx={{ mt: 3, mb: 3, borderColor: "#e0e0e0" }} />
+                  {agreement && (
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            mb: 2,
+                            fontWeight: 600,
+                            fontSize: "1rem",
+                            color: "#333333",
+                            fontFamily: "'Poppins', sans-serif",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1, // added gap between icon and text
+                          }}
+                        >
+                          <AttachMoneyIcon sx={{ color: "#5e62d1" }} />
+                          <strong>Amount:</strong> {agreement.amount || "N/A"}€
+                        </Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            mb: 2,
+                            fontWeight: 600,
+                            fontSize: "1rem",
+                            color: "#333333",
+                            fontFamily: "'Poppins', sans-serif",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1, // added gap between icon and text
+                          }}
+                        >
+                          <LocationOnIcon sx={{ color: "#5e62d1" }} />
+                          <strong>Area:</strong> {agreement.area || "N/A"}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            mb: 2,
+                            fontWeight: 600,
+                            fontSize: "1rem",
+                            color: "#333333",
+                            fontFamily: "'Poppins', sans-serif",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1, // added gap between icon and text
+                          }}
+                        >
+                          <AccessTimeIcon sx={{ color: "#5e62d1" }} />
+                          <strong>Service Period:</strong> 1 Month
+                        </Typography>
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            mb: 2,
+                            fontWeight: 600,
+                            fontSize: "1rem",
+                            color: "#333333",
+                            fontFamily: "'Poppins', sans-serif",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1, // added gap between icon and text
+                          }}
+                        >
+                          <PlaceIcon sx={{ color: "#5e62d1" }} />
+                          <strong>Service Location:</strong>{" "}
+                          {agreement.babysittingPlace || "N/A"}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  )}
                 </CardContent>
               </Card>
               <Box
@@ -915,10 +1187,37 @@ const PaymentTracker = () => {
                   justifyContent: "center",
                   alignItems: "center",
                   flexDirection: "column",
-                  marginTop: "30px",
+                  mt: 8,
                 }}
               >
                 <StyledButton
+                  onClick={generatePDF}
+                  sx={{
+                    backgroundColor: "white",
+                    color: "#5e62d1",
+                    outline: "1px solid #5e62d1",
+                    borderRadius: "30px",
+                    padding: "8px 16px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    "&:hover": {
+                      backgroundColor: "#f0f4ff",
+                    },
+                  }}
+                >
+                  <DownloadIcon sx={{ mr: 1, fontSize: "20px" }} />{" "}
+                  <span>Download Voucher</span>
+                </StyledButton>
+                <StyledButton
+                  variant="contained"
+                  sx={{
+                    mt: 8,
+                    backgroundColor: "#5e62d1",
+                    "&:hover": {
+                      backgroundColor: "#4a4fbf",
+                    },
+                  }}
                   onClick={async () => {
                     if (!userId1 || !userId2) {
                       console.error(
@@ -984,12 +1283,8 @@ const PaymentTracker = () => {
                       );
                     }
                   }}
-                  sx={{ marginBottom: "20px" }}
                 >
                   Confirm & Verify
-                </StyledButton>
-                <StyledButton onClick={generatePDF}>
-                  Download Virtual Receipt
                 </StyledButton>
               </Box>
             </PageContainer>
