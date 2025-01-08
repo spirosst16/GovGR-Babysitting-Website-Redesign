@@ -165,7 +165,7 @@ const CustomSeparator = () => {
       "/my-agreements-and-applications": "My Agreements & Applications",
       "/application/:userId": "Application Details",
       "/edit-application/:userId": "Edit Application",
-      "/agreement/:userId1/:userId2": "Agreement",
+      "/agreement/:agreementId": "Agreement",
       "/chats": "Messages",
       "/profile": "Profile",
     };
@@ -174,7 +174,7 @@ const CustomSeparator = () => {
     const cleanPath = pathname
       .replace(/\/application\/[^/]+/, "/application/:userId")
       .replace(/\/edit-application\/[^/]+/, "/edit-application/:userId")
-      .replace(/\/agreement\/[^/]+\/[^/]+/, "/agreement/:userId1/:userId2");
+      .replace(/\/agreement\/[^/]+\/[^/]+/, "/agreement/:agreementId");
 
     return mapping[cleanPath] || pathname.replace("/", ""); // Fallback to cleaned pathname
   };
@@ -351,11 +351,13 @@ const BabysittingApplicationDisplay = () => {
         ]);
 
         if (!senderSnapshot.empty) {
+          const docId = senderSnapshot.docs[0].id;
           setAgreementExists(true);
-          setAgreementPath(`agreement/${currentUser.uid}/${userId}`);
+          setAgreementPath(`agreement/${docId}`);
         } else if (!recipientSnapshot.empty) {
+          const docId = recipientSnapshot.docs[0].id;
           setAgreementExists(true);
-          setAgreementPath(`agreement/${userId}/${currentUser.uid}`);
+          setAgreementPath(`agreement/${docId}`);
         } else {
           setAgreementExists(false);
           setAgreementPath(null);
@@ -432,7 +434,7 @@ const BabysittingApplicationDisplay = () => {
 
   const handleCreateAgreement = () => {
     if (currentUser && user) {
-      navigate(`/agreement/${currentUser.uid}/${userId}`, {
+      navigate(`/${agreementPath}`, {
         state: { from: location.pathname },
       });
     }
