@@ -30,7 +30,7 @@ import {
   orderBy,
   limit,
 } from "firebase/firestore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import SearchIcon from "@mui/icons-material/Search";
@@ -187,9 +187,10 @@ const CustomSeparator = () => {
 
 const ChatPage = () => {
   const auth = getAuth();
+  const { state } = useLocation();
   const [currentUser, setCurrentUser] = useState(null);
   const [userList, setUserList] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(state?.selectedUser || null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
