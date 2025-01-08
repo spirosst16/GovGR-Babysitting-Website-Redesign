@@ -79,7 +79,9 @@ const tasks = [
 ];
 
 const PaymentTracker = () => {
-  const { senderId, recipientId } = useParams();
+  const { agreementId } = useParams();
+  const [userId1, setUserId1] = useState(null);
+  const [userId2, setUserId2] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentUserRole, setCurrentUserRole] = useState(null);
   const [userRole, setUserRole] = useState(null);
@@ -161,138 +163,141 @@ const PaymentTracker = () => {
       return;
     }
 
+    if (!agreementId) {
+      console.error("Error: agreementId is undefined");
+      return;
+    }
+
     try {
-      if (!senderId || !recipientId) {
-        console.error("Error: senderId or recipientId is undefined");
-        return;
-      }
+      const agreementRef = doc(FIREBASE_DB, "agreements", agreementId);
+      const agreementDoc = await getDoc(agreementRef);
 
-      const fetchUserData = async (userId) => {
-        console.log("Fetching data for userId:", userId);
-        let userData = null;
+      if (agreementDoc.exists()) {
+        const agreementData = agreementDoc.data();
+        setAgreement(agreementData);
 
-        const babysittersRef = query(
-          collection(FIREBASE_DB, "babysitters"),
-          where("userId", "==", userId)
-        );
-        const babysittersSnapshot = await getDocs(babysittersRef);
+        const fetchUserData = async (userId) => {
+          console.log("Fetching data for userId:", userId);
+          let userData = null;
 
-        if (!babysittersSnapshot.empty) {
-          console.log("User found in babysitters collection.");
-          userData = babysittersSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }))[0];
-        } else {
-          const guardiansRef = query(
-            collection(FIREBASE_DB, "guardians"),
+          const babysittersRef = query(
+            collection(FIREBASE_DB, "babysitters"),
             where("userId", "==", userId)
           );
-          const guardiansSnapshot = await getDocs(guardiansRef);
+          const babysittersSnapshot = await getDocs(babysittersRef);
 
-          if (!guardiansSnapshot.empty) {
-            console.log("User found in guardians collection.");
-            userData = guardiansSnapshot.docs.map((doc) => ({
+          if (!babysittersSnapshot.empty) {
+            console.log("User found in babysitters collection.");
+            userData = babysittersSnapshot.docs.map((doc) => ({
               id: doc.id,
               ...doc.data(),
             }))[0];
-          }
-        }
-
-        if (!userData) {
-          console.error(`User with ID ${userId} not found`);
-          throw new Error(`User with ID ${userId} not found`);
-        }
-        return userData;
-      };
-
-      const [senderData, recipientData] = await Promise.all([
-        fetchUserData(senderId),
-        fetchUserData(recipientId),
-      ]);
-
-      setSender(senderData);
-      setRecipient(recipientData);
-
-      const agreementRef = query(
-        collection(FIREBASE_DB, "agreements"),
-        where("senderId", "==", senderId),
-        where("recipientId", "==", recipientId)
-      );
-
-      const agreementSnapshot = await getDocs(agreementRef);
-      if (!agreementSnapshot.empty) {
-        const agreementData = agreementSnapshot.docs[0].data();
-        const agreementDocRef = doc(
-          FIREBASE_DB,
-          "agreements",
-          agreementSnapshot.docs[0].id
-        );
-
-        setAgreement(agreementData);
-
-        console.log("Agreement data:", agreementData);
-
-        const currentDate = new Date();
-        const lastPaymentDate = new Date(agreementData.lastPaymentDate);
-        const dayDifference = Math.floor(
-          (currentDate - lastPaymentDate) / (1000 * 60 * 60 * 24)
-        );
-        const K = Math.floor(dayDifference / 30);
-
-        if (K >= 1) {
-          let updatedAmount = agreementData.amount;
-          let newLastPaymentDate = new Date(lastPaymentDate);
-
-          if (agreementData.paymentStatus === "not available yet") {
-            updatedAmount = `${K}X`;
-            newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + K);
-
-            await updateDoc(agreementDocRef, {
-              paymentStatus: "pending guardian",
-              amount: updatedAmount,
-              lastPaymentDate: newLastPaymentDate.toISOString(),
-            });
-
-            setAgreement((prev) => ({
-              ...prev,
-              paymentStatus: "pending guardian",
-              amount: updatedAmount,
-              lastPaymentDate: newLastPaymentDate.toISOString(),
-            }));
-
-            console.log(
-              "Payment status updated to pending guardian with amount:",
-              updatedAmount
+          } else {
+            const guardiansRef = query(
+              collection(FIREBASE_DB, "guardians"),
+              where("userId", "==", userId)
             );
-          } else if (
-            agreementData.paymentStatus === "pending guardian" ||
-            agreementData.paymentStatus === "pending babysitter"
-          ) {
-            const previousK =
-              parseInt(agreementData.amount.match(/\d+/)[0], 10) || 0;
-            const newK = previousK + 1;
-            updatedAmount = `${newK}X`;
-            newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + 1);
+            const guardiansSnapshot = await getDocs(guardiansRef);
 
-            await updateDoc(agreementDocRef, {
-              amount: updatedAmount,
-              lastPaymentDate: newLastPaymentDate.toISOString(),
-            });
-
-            setAgreement((prev) => ({
-              ...prev,
-              amount: updatedAmount,
-              lastPaymentDate: newLastPaymentDate.toISOString(),
-            }));
-
-            console.log("Amount updated to:", updatedAmount);
+            if (!guardiansSnapshot.empty) {
+              console.log("User found in guardians collection.");
+              userData = guardiansSnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              }))[0];
+            }
           }
+
+          if (!userData) {
+            console.error(`User with ID ${userId} not found`);
+            throw new Error(`User with ID ${userId} not found`);
+          }
+          return userData;
+        };
+
+        const [senderData, recipientData] = await Promise.all([
+          fetchUserData(agreementData.senderId),
+          fetchUserData(agreementData.recipientId),
+        ]);
+
+        setSender(senderData);
+        setRecipient(recipientData);
+
+        const agreementSnapshot = await getDocs(agreementRef);
+        if (!agreementSnapshot.empty) {
+          const agreementData = agreementSnapshot.docs[0].data();
+          const agreementDocRef = doc(
+            FIREBASE_DB,
+            "agreements",
+            agreementSnapshot.docs[0].id
+          );
+          setUserId1(agreementData.senderId);
+          setUserId2(agreementData.recipientId);
+          setAgreement(agreementData);
+
+          console.log("Agreement data:", agreementData);
+
+          const currentDate = new Date();
+          const lastPaymentDate = new Date(agreementData.lastPaymentDate);
+          const dayDifference = Math.floor(
+            (currentDate - lastPaymentDate) / (1000 * 60 * 60 * 24)
+          );
+          const K = Math.floor(dayDifference / 30);
+
+          if (K >= 1) {
+            let updatedAmount = agreementData.amount;
+            let newLastPaymentDate = new Date(lastPaymentDate);
+
+            if (agreementData.paymentStatus === "not available yet") {
+              updatedAmount = `${K}X`;
+              newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + K);
+
+              await updateDoc(agreementDocRef, {
+                paymentStatus: "pending guardian",
+                amount: updatedAmount,
+                lastPaymentDate: newLastPaymentDate.toISOString(),
+              });
+
+              setAgreement((prev) => ({
+                ...prev,
+                paymentStatus: "pending guardian",
+                amount: updatedAmount,
+                lastPaymentDate: newLastPaymentDate.toISOString(),
+              }));
+
+              console.log(
+                "Payment status updated to pending guardian with amount:",
+                updatedAmount
+              );
+            } else if (
+              agreementData.paymentStatus === "pending guardian" ||
+              agreementData.paymentStatus === "pending babysitter"
+            ) {
+              const previousK =
+                parseInt(agreementData.amount.match(/\d+/)[0], 10) || 0;
+              const newK = previousK + 1;
+              updatedAmount = `${newK}X`;
+              newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + 1);
+
+              await updateDoc(agreementDocRef, {
+                amount: updatedAmount,
+                lastPaymentDate: newLastPaymentDate.toISOString(),
+              });
+
+              setAgreement((prev) => ({
+                ...prev,
+                amount: updatedAmount,
+                lastPaymentDate: newLastPaymentDate.toISOString(),
+              }));
+
+              console.log("Amount updated to:", updatedAmount);
+            }
+          }
+        } else {
+          console.log(
+            "No agreement found for the provided sender and recipient."
+          );
         }
-      } else {
-        console.log(
-          "No agreement found for the provided sender and recipient."
-        );
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -303,7 +308,7 @@ const PaymentTracker = () => {
     if (currentUser) {
       fetchData();
     }
-  }, [currentUser, senderId, recipientId]);
+  }, [currentUser, userId1, userId2]);
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -324,15 +329,15 @@ const PaymentTracker = () => {
     }
 
     try {
-      if (!senderId || !recipientId) {
+      if (!userId1 || !userId2) {
         console.error("Error: senderId or recipientId is undefined");
         return;
       }
 
       const agreementRef = query(
         collection(FIREBASE_DB, "agreements"),
-        where("senderId", "==", senderId),
-        where("recipientId", "==", recipientId)
+        where("senderId", "==", userId1),
+        where("recipientId", "==", userId2)
       );
 
       const agreementSnapshot = await getDocs(agreementRef);
@@ -909,7 +914,7 @@ const PaymentTracker = () => {
               >
                 <StyledButton
                   onClick={async () => {
-                    if (!senderId || !recipientId) {
+                    if (!userId1 || !userId2) {
                       console.error(
                         "Error: senderId or recipientId is undefined"
                       );
@@ -922,8 +927,8 @@ const PaymentTracker = () => {
                     try {
                       const agreementRef = query(
                         collection(FIREBASE_DB, "agreements"),
-                        where("senderId", "==", senderId),
-                        where("recipientId", "==", recipientId)
+                        where("senderId", "==", userId1),
+                        where("recipientId", "==", userId2)
                       );
 
                       const agreementSnapshot = await getDocs(agreementRef);
