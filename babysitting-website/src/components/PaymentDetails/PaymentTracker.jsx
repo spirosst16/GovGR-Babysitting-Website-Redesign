@@ -163,57 +163,69 @@ const PaymentTracker = () => {
       return;
     }
 
-    if (!agreementId) {
-      console.error("Error: agreementId is undefined");
-      return;
-    }
-
     try {
-      const agreementRef = doc(FIREBASE_DB, "agreements", agreementId);
-      const agreementDoc = await getDoc(agreementRef);
+      if (!agreementId) {
+        console.error("Error: agreementId is undefined");
+        return;
+      }
 
-      if (agreementDoc.exists()) {
-        const agreementData = agreementDoc.data();
-        setAgreement(agreementData);
+      const fetchUserData = async (userId) => {
+        console.log("Fetching data for userId:", userId);
+        let userData = null;
 
-        const fetchUserData = async (userId) => {
-          console.log("Fetching data for userId:", userId);
-          let userData = null;
+        const babysittersRef = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("userId", "==", userId)
+        );
+        const babysittersSnapshot = await getDocs(babysittersRef);
 
-          const babysittersRef = query(
-            collection(FIREBASE_DB, "babysitters"),
+        if (!babysittersSnapshot.empty) {
+          console.log("User found in babysitters collection.");
+          userData = babysittersSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))[0];
+        } else {
+          const guardiansRef = query(
+            collection(FIREBASE_DB, "guardians"),
             where("userId", "==", userId)
           );
-          const babysittersSnapshot = await getDocs(babysittersRef);
+          const guardiansSnapshot = await getDocs(guardiansRef);
 
-          if (!babysittersSnapshot.empty) {
-            console.log("User found in babysitters collection.");
-            userData = babysittersSnapshot.docs.map((doc) => ({
+          if (!guardiansSnapshot.empty) {
+            console.log("User found in guardians collection.");
+            userData = guardiansSnapshot.docs.map((doc) => ({
               id: doc.id,
               ...doc.data(),
             }))[0];
-          } else {
-            const guardiansRef = query(
-              collection(FIREBASE_DB, "guardians"),
-              where("userId", "==", userId)
-            );
-            const guardiansSnapshot = await getDocs(guardiansRef);
-
-            if (!guardiansSnapshot.empty) {
-              console.log("User found in guardians collection.");
-              userData = guardiansSnapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-              }))[0];
-            }
           }
+        }
 
-          if (!userData) {
-            console.error(`User with ID ${userId} not found`);
-            throw new Error(`User with ID ${userId} not found`);
-          }
-          return userData;
-        };
+        if (!userData) {
+          console.error(`User with ID ${userId} not found`);
+          throw new Error(`User with ID ${userId} not found`);
+        }
+        return userData;
+      };
+
+      const agreementRef = query(
+        collection(FIREBASE_DB, "agreements"),
+        where("__name__", "==", agreementId)
+      );
+
+      const agreementSnapshot = await getDocs(agreementRef);
+
+      if (!agreementSnapshot.empty) {
+        const agreementData = agreementSnapshot.docs[0].data();
+        const agreementDocRef = doc(
+          FIREBASE_DB,
+          "agreements",
+          agreementSnapshot.docs[0].id
+        );
+
+        setAgreement(agreementData);
+
+        console.log("Agreement data:", agreementData);
 
         const [senderData, recipientData] = await Promise.all([
           fetchUserData(agreementData.senderId),
@@ -223,81 +235,69 @@ const PaymentTracker = () => {
         setSender(senderData);
         setRecipient(recipientData);
 
-        const agreementSnapshot = await getDocs(agreementRef);
-        if (!agreementSnapshot.empty) {
-          const agreementData = agreementSnapshot.docs[0].data();
-          const agreementDocRef = doc(
-            FIREBASE_DB,
-            "agreements",
-            agreementSnapshot.docs[0].id
-          );
-          setUserId1(agreementData.senderId);
-          setUserId2(agreementData.recipientId);
-          setAgreement(agreementData);
+        setUserId1(agreementData.senderId);
+        setUserId2(agreementData.recipientId);
 
-          console.log("Agreement data:", agreementData);
+        const currentDate = new Date();
+        const lastPaymentDate = new Date(agreementData.lastPaymentDate);
+        const dayDifference = Math.floor(
+          (currentDate - lastPaymentDate) / (1000 * 60 * 60 * 24)
+        );
+        const K = Math.floor(dayDifference / 30);
 
-          const currentDate = new Date();
-          const lastPaymentDate = new Date(agreementData.lastPaymentDate);
-          const dayDifference = Math.floor(
-            (currentDate - lastPaymentDate) / (1000 * 60 * 60 * 24)
-          );
-          const K = Math.floor(dayDifference / 30);
+        if (K >= 1) {
+          let updatedAmount = agreementData.amount;
+          let newLastPaymentDate = new Date(lastPaymentDate);
 
-          if (K >= 1) {
-            let updatedAmount = agreementData.amount;
-            let newLastPaymentDate = new Date(lastPaymentDate);
+          if (agreementData.paymentStatus === "not available yet") {
+            updatedAmount = `${K}X`;
+            newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + K);
 
-            if (agreementData.paymentStatus === "not available yet") {
-              updatedAmount = `${K}X`;
-              newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + K);
+            await updateDoc(agreementDocRef, {
+              paymentStatus: "pending guardian",
+              amount: updatedAmount,
+              lastPaymentDate: newLastPaymentDate.toISOString(),
+            });
 
-              await updateDoc(agreementDocRef, {
-                paymentStatus: "pending guardian",
-                amount: updatedAmount,
-                lastPaymentDate: newLastPaymentDate.toISOString(),
-              });
+            setAgreement((prev) => ({
+              ...prev,
+              paymentStatus: "pending guardian",
+              amount: updatedAmount,
+              lastPaymentDate: newLastPaymentDate.toISOString(),
+            }));
 
-              setAgreement((prev) => ({
-                ...prev,
-                paymentStatus: "pending guardian",
-                amount: updatedAmount,
-                lastPaymentDate: newLastPaymentDate.toISOString(),
-              }));
+            console.log(
+              "Payment status updated to pending guardian with amount:",
+              updatedAmount
+            );
+          } else if (
+            agreementData.paymentStatus === "pending guardian" ||
+            agreementData.paymentStatus === "pending babysitter"
+          ) {
+            const previousK =
+              parseInt(agreementData.amount.match(/\d+/)[0], 10) || 0;
+            const newK = previousK + 1;
+            updatedAmount = `${newK}X`;
+            newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + 1);
 
-              console.log(
-                "Payment status updated to pending guardian with amount:",
-                updatedAmount
-              );
-            } else if (
-              agreementData.paymentStatus === "pending guardian" ||
-              agreementData.paymentStatus === "pending babysitter"
-            ) {
-              const previousK =
-                parseInt(agreementData.amount.match(/\d+/)[0], 10) || 0;
-              const newK = previousK + 1;
-              updatedAmount = `${newK}X`;
-              newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + 1);
+            await updateDoc(agreementDocRef, {
+              amount: updatedAmount,
+              lastPaymentDate: newLastPaymentDate.toISOString(),
+            });
 
-              await updateDoc(agreementDocRef, {
-                amount: updatedAmount,
-                lastPaymentDate: newLastPaymentDate.toISOString(),
-              });
+            setAgreement((prev) => ({
+              ...prev,
+              amount: updatedAmount,
+              lastPaymentDate: newLastPaymentDate.toISOString(),
+            }));
 
-              setAgreement((prev) => ({
-                ...prev,
-                amount: updatedAmount,
-                lastPaymentDate: newLastPaymentDate.toISOString(),
-              }));
-
-              console.log("Amount updated to:", updatedAmount);
-            }
+            console.log("Amount updated to:", updatedAmount);
           }
-        } else {
-          console.log(
-            "No agreement found for the provided sender and recipient."
-          );
         }
+      } else {
+        console.log(
+          "No agreement found for the provided sender and recipient."
+        );
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -308,7 +308,7 @@ const PaymentTracker = () => {
     if (currentUser) {
       fetchData();
     }
-  }, [currentUser, userId1, userId2]);
+  }, [currentUser, agreementId]);
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -329,15 +329,9 @@ const PaymentTracker = () => {
     }
 
     try {
-      if (!userId1 || !userId2) {
-        console.error("Error: senderId or recipientId is undefined");
-        return;
-      }
-
       const agreementRef = query(
         collection(FIREBASE_DB, "agreements"),
-        where("senderId", "==", userId1),
-        where("recipientId", "==", userId2)
+        where("__name__", "==", agreementId)
       );
 
       const agreementSnapshot = await getDocs(agreementRef);
@@ -385,14 +379,26 @@ const PaymentTracker = () => {
 
   const generatePDF = () => {
     const doc = new jsPDF();
+
+    doc.setFont("Poppins", "bold");
+    doc.setFontSize(20);
+    doc.text("Digital Payment Voucher", 70, 20);
+
+    doc.setLineWidth(0.5);
+    doc.line(10, 40, 200, 40);
+
     doc.setFont("Poppins", "normal");
     doc.setFontSize(14);
-    doc.text("Digital Payment Voucher", 10, 10);
     if (agreement) {
-      doc.text(`Amount: $${agreement.amount || "N/A"}`, 10, 30);
-      doc.text(`Description: ${agreement.description || "N/A"}`, 10, 40);
-      doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 50);
+      doc.text(`Amount: $${agreement.amount || "N/A"}`, 10, 50);
+      doc.text(`Description: ${agreement.description || "N/A"}`, 10, 60);
+      doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 70);
     }
+
+    doc.setFontSize(12);
+    doc.text("Thank you for using our service!", 10, 90);
+    doc.text("For inquiries, contact us at info@babysitters.com", 10, 100);
+
     doc.save("PaymentVoucher.pdf");
   };
 
