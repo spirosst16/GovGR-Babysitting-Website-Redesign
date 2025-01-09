@@ -52,6 +52,7 @@ const BabysitterCard = styled(Card)({
   "&:hover": {
     transform: "translateY(-3px)",
     boxShadow: "0 16px 30px rgba(0, 0, 0, 0.1)",
+    cursor: "pointer",
   },
 });
 

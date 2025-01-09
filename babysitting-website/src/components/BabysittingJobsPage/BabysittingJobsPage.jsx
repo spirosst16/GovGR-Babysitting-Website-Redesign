@@ -52,6 +52,7 @@ const GuardianCard = styled(Card)({
   "&:hover": {
     transform: "translateY(-3px)",
     boxShadow: "0 16px 30px rgba(0, 0, 0, 0.1)",
+    cursor: "pointer",
   },
 });
 
@@ -287,7 +288,11 @@ const BabysittingJobsPage = () => {
   }, []);
 
   const handleFilterChange = (key, value) => {
-    setFilters((prevFilters) => ({ ...prevFilters, [key]: value }));
+    setFilters((prevFilters) => {
+      const updatedFilters = { ...prevFilters, [key]: value };
+      applyFilters(updatedFilters);
+      return updatedFilters;
+    });
   };
 
   const applyFilters = () => {
@@ -362,444 +367,401 @@ const BabysittingJobsPage = () => {
       <>
         <CustomSeparator />
         <Box
-          style={{
-            backgroundColor: "#f4f4f4",
-            padding: 0,
-            margin: 0,
-            minHeight: "100vh",
+          sx={{
             display: "flex",
-            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
+            backgroundColor: "#f4f4f4",
           }}
         >
-          <Typography
-            variant="h4"
-            style={{
-              fontFamily: "Poppins, sans-serif",
-              marginBottom: "30px",
-              textAlign: "center",
-              color: "#000",
-              marginTop: "100px",
-              fontWeight: "600",
-            }}
-          >
-            Search for babysitting jobs
-          </Typography>
-
           <Box
-            style={{
+            sx={{
+              width: "300px",
+              padding: "20px",
+              paddingTop: "100px",
               display: "flex",
-              justifyContent: "center",
-              gap: "10px",
-              alignItems: "center",
+              flexDirection: "column",
+              gap: "20px",
             }}
           >
-            <TextField
-              label="Search by Area"
-              variant="outlined"
-              value={filters.area}
-              onChange={(e) => handleFilterChange("area", e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  applyFilters();
-                }
-              }}
-              fullWidth
+            <Typography
+              variant="h6"
               sx={{
-                maxWidth: "500px",
-                borderRadius: "25px",
-                "& .MuiOutlinedInput-root": {
-                  borderRadius: "25px",
-                  "& fieldset": {
-                    borderColor: "#ccc",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#5e62d1",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: "rgba(0, 0, 0, 0.6)",
-                },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: "#5e62d1",
-                },
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "bold",
+                color: "#333",
+                textAlign: "center",
               }}
-            />
-
-            <Tooltip title="Search" arrow>
-              <IconButton
-                onClick={() => applyFilters()}
-                style={{
-                  backgroundColor: "#5e62d1",
-                  color: "#fff",
-                  padding: "10px",
-                  borderRadius: "50%",
-                  transition: "transform 0.2s, background-color 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#4248a6";
-                  e.currentTarget.style.transform = "scale(1.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#5e62d1";
-                  e.currentTarget.style.transform = "scale(1)";
-                }}
-              >
-                <SearchIcon />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title="Filters" arrow>
-              <IconButton
-                onClick={() => setOpenFilterDialog(true)}
-                style={{
-                  backgroundColor: "#5e62d1",
-                  color: "#fff",
-                  padding: "10px",
-                  borderRadius: "50%",
-                  transition: "transform 0.2s, background-color 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#4248a6";
-                  e.currentTarget.style.transform = "scale(1.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#5e62d1";
-                  e.currentTarget.style.transform = "scale(1)";
-                }}
-              >
-                <FilterAltIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-
-          <Box
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexWrap: "wrap",
-              marginTop: "20px",
-              gap: "10px",
-            }}
-          >
-            {filters.area && (
-              <Chip
-                label={`Area: ${filters.area}`}
-                onDelete={() => handleFilterChange("area", "")}
-                style={{
-                  backgroundColor: "#5e62d1",
-                  color: "#fff",
-                }}
-              />
-            )}
-            {filters.availability.map((option, index) => (
-              <Chip
-                key={index}
-                label={`Availability: ${option}`}
-                onDelete={() =>
-                  handleFilterChange(
-                    "availability",
-                    filters.availability.filter((item) => item !== option)
-                  )
-                }
-                style={{
-                  backgroundColor: "#5e62d1",
-                  color: "#fff",
-                }}
-              />
-            ))}
-            {filters.babysittingPlace.map((option, index) => (
-              <Chip
-                key={index}
-                label={`Babysitting Place: ${option}`}
-                onDelete={() =>
-                  handleFilterChange(
-                    "babysittingPlace",
-                    filters.babysittingPlace.filter((item) => item !== option)
-                  )
-                }
-                style={{
-                  backgroundColor: "#5e62d1",
-                  color: "#fff",
-                }}
-              />
-            ))}
-            {filters.childAges.map((option, index) => (
-              <Chip
-                key={index}
-                label={`Child Age: ${option}`}
-                onDelete={() =>
-                  handleFilterChange(
-                    "childAges",
-                    filters.childAges.filter((item) => item !== option)
-                  )
-                }
-                style={{
-                  backgroundColor: "#5e62d1",
-                  color: "#fff",
-                }}
-              />
-            ))}
-            {filters.jobType && (
-              <Chip
-                label={`Job Type: ${filters.jobType}`}
-                onDelete={() => handleFilterChange("jobType", "")}
-                style={{
-                  backgroundColor: "#5e62d1",
-                  color: "#fff",
-                }}
-              />
-            )}
-          </Box>
-
-          <Box
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexWrap: "wrap",
-              marginTop: "10px",
-            }}
-          >
-            {Array.isArray(displayGuardians) ? (
-              displayGuardians.map((guardian) => (
-                <GuardianCard
-                  key={guardian.userId}
-                  onClick={() =>
-                    navigate(`/application/${guardian.userId}`, {
-                      state: {
-                        from: location.pathname,
+            >
+              Filters
+            </Typography>
+            {[
+              {
+                label: "Availability",
+                value: filters.availability,
+                options: availabilityOptions,
+                multiple: true,
+                onChange: (e) =>
+                  handleFilterChange("availability", e.target.value),
+              },
+              {
+                label: "Babysitting Place",
+                value: filters.babysittingPlace,
+                options: babysittingPlaceOptions,
+                multiple: true,
+                onChange: (e) =>
+                  handleFilterChange("babysittingPlace", e.target.value),
+              },
+              {
+                label: "Child Ages",
+                value: filters.childAges,
+                options: childAgeOptions,
+                multiple: true,
+                onChange: (e) =>
+                  handleFilterChange("childAges", e.target.value),
+              },
+              {
+                label: "Job Type",
+                value: filters.jobType,
+                options: jobTypeOptions,
+                multiple: false,
+                onChange: (e) => handleFilterChange("jobType", e.target.value),
+              },
+            ].map(({ label, value, options, multiple, onChange }, index) => {
+              const labelId = `${label
+                .toLowerCase()
+                .replace(/\s+/g, "-")}-label`;
+              return (
+                <FormControl
+                  fullWidth
+                  sx={{ mb: 2 }}
+                  key={index}
+                  variant="outlined"
+                >
+                  <InputLabel
+                    id={labelId}
+                    sx={{
+                      "&.Mui-focused": {
+                        color: "#5e62d1",
                       },
-                    })
+                    }}
+                  >
+                    {label}
+                  </InputLabel>
+                  <Select
+                    labelId={labelId}
+                    value={value}
+                    onChange={onChange}
+                    multiple={multiple}
+                    label={label}
+                    renderValue={(selected) =>
+                      Array.isArray(selected) ? selected.join(", ") : selected
+                    }
+                    sx={{
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "rgba(0, 0, 0, 0.23)",
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "rgba(0, 0, 0, 0.5)",
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#5e62d1",
+                      },
+                    }}
+                  >
+                    {options.map((option) => (
+                      <MenuItem key={option} value={option}>
+                        {multiple && (
+                          <Checkbox
+                            checked={value.includes(option)}
+                            sx={{
+                              color: "#5e62d1",
+                              "&.Mui-checked": {
+                                color: "#5e62d1",
+                              },
+                            }}
+                          />
+                        )}
+                        <ListItemText primary={option} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              );
+            })}
+            <Button
+              onClick={applyFilters}
+              variant="contained"
+              sx={{
+                backgroundColor: "#5e62d1",
+                color: "#ffffff",
+                "&:hover": {
+                  backgroundColor: "#4a54c2",
+                },
+                textTransform: "none",
+                borderRadius: "25px",
+              }}
+            >
+              Apply Filters
+            </Button>
+            <Button
+              onClick={() =>
+                setFilters({
+                  area: "",
+                  availability: [],
+                  babysittingPlace: [],
+                  childAges: [],
+                  jobType: "",
+                })
+              }
+              variant="outlined"
+              sx={{
+                backgroundColor: "#ffffff",
+                color: "#5e62d1",
+                border: "1px solid #5e62d1",
+                "&:hover": {
+                  backgroundColor: "#f0f4ff",
+                },
+                textTransform: "none",
+                borderRadius: "25px",
+              }}
+            >
+              Clear Filters
+            </Button>
+          </Box>
+
+          <Box
+            sx={{
+              flex: 1,
+              paddingTop: "100px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+            }}
+          >
+            <Typography
+              variant="h4"
+              sx={{
+                fontFamily: "Poppins, sans-serif",
+                fontWeight: "bold",
+                textAlign: "center",
+                mb: 3,
+              }}
+            >
+              Search For Babysitting Job
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <TextField
+                label="Search by Area"
+                variant="outlined"
+                value={filters.area}
+                onChange={(e) => handleFilterChange("area", e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    applyFilters();
+                  }
+                }}
+                fullWidth
+                sx={{
+                  maxWidth: "500px",
+                  borderRadius: "25px",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "25px",
+                    "& fieldset": {
+                      borderColor: "#ccc",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#5e62d1",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "rgba(0, 0, 0, 0.6)",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#5e62d1",
+                  },
+                }}
+              />
+
+              <Tooltip title="Search" arrow>
+                <IconButton
+                  onClick={() => applyFilters()}
+                  style={{
+                    backgroundColor: "#5e62d1",
+                    color: "#fff",
+                    padding: "10px",
+                    borderRadius: "50%",
+                    transition: "transform 0.2s, background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#4248a6";
+                    e.currentTarget.style.transform = "scale(1.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#5e62d1";
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
+                >
+                  <SearchIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
+
+            <Box
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "10px",
+              }}
+            >
+              {filters.area && (
+                <Chip
+                  label={`Area: ${filters.area}`}
+                  onDelete={() => handleFilterChange("area", "")}
+                  style={{
+                    backgroundColor: "#5e62d1",
+                    color: "#fff",
+                  }}
+                />
+              )}
+              {filters.availability.map((option, index) => (
+                <Chip
+                  key={index}
+                  label={`Availability: ${option}`}
+                  onDelete={() =>
+                    handleFilterChange(
+                      "availability",
+                      filters.availability.filter((item) => item !== option)
+                    )
                   }
                   style={{
-                    cursor: "pointer",
-                  }}
-                >
-                  <AvatarWrapper src={guardian.photo || ""} />
-                  <CardContentWrapper>
-                    <Typography
-                      variant="h6"
-                      style={{
-                        fontFamily: "Poppins, sans-serif",
-                        color: "#000",
-                        fontWeight: "600",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      {`${guardian.firstName} ${guardian.lastName}`}
-                    </Typography>
-                    <Typography
-                      style={{
-                        color: "#888",
-                        fontFamily: "Poppins, sans-serif",
-                        marginBottom: "10px",
-                        fontSize: "14px",
-                      }}
-                    >
-                      {guardian.preferredArea}
-                    </Typography>
-
-                    <Box
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      <Rating
-                        name={`rating-${guardian.id}`}
-                        value={guardian.rating}
-                        precision={0.5}
-                        readOnly
-                        size="small"
-                      />
-                    </Box>
-                  </CardContentWrapper>
-                </GuardianCard>
-              ))
-            ) : (
-              <Typography
-                style={{
-                  fontFamily: "Poppins, sans-serif",
-                  color: "#888",
-                  fontStyle: "italic",
-                  textAlign: "center",
-                }}
-              >
-                {displayGuardians}
-              </Typography>
-            )}
-          </Box>
-          <Dialog
-            open={openFilterDialog}
-            onClose={() => setOpenFilterDialog(false)}
-            maxWidth="md"
-          >
-            <DialogTitle sx={{ fontFamily: "Poppins, sans-serif" }}>
-              Apply Filters
-            </DialogTitle>
-            <DialogContent>
-              {[
-                {
-                  label: "Availability",
-                  value: filters.availability,
-                  options: availabilityOptions,
-                  multiple: true,
-                  onChange: (e) =>
-                    handleFilterChange("availability", e.target.value),
-                },
-                {
-                  label: "Babysitting Place",
-                  value: filters.babysittingPlace,
-                  options: babysittingPlaceOptions,
-                  multiple: true,
-                  onChange: (e) =>
-                    handleFilterChange("babysittingPlace", e.target.value),
-                },
-                {
-                  label: "Child Ages",
-                  value: filters.childAges,
-                  options: childAgeOptions,
-                  multiple: true,
-                  onChange: (e) =>
-                    handleFilterChange("childAges", e.target.value),
-                },
-                {
-                  label: "Job Type",
-                  value: filters.jobType,
-                  options: jobTypeOptions,
-                  multiple: false,
-                  onChange: (e) =>
-                    handleFilterChange("jobType", e.target.value),
-                },
-              ].map(({ label, value, options, multiple, onChange }, index) => {
-                const labelId = `${label
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")}-label`;
-                return (
-                  <FormControl
-                    fullWidth
-                    sx={{ mb: 2, mt: 1 }}
-                    key={index}
-                    variant="outlined"
-                  >
-                    <InputLabel
-                      id={labelId}
-                      sx={{
-                        "&.Mui-focused": {
-                          color: "#5e62d1",
-                        },
-                      }}
-                    >
-                      {label}
-                    </InputLabel>
-                    <Select
-                      labelId={labelId}
-                      value={value}
-                      onChange={onChange}
-                      multiple={multiple}
-                      label={label}
-                      renderValue={(selected) =>
-                        Array.isArray(selected) ? selected.join(", ") : selected
-                      }
-                      sx={{
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "rgba(0, 0, 0, 0.23)",
-                        },
-                        "&:hover .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "rgba(0, 0, 0, 0.5)",
-                        },
-                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                          borderColor: "#5e62d1",
-                        },
-                      }}
-                    >
-                      {options.map((option) => (
-                        <MenuItem key={option} value={option}>
-                          {multiple && (
-                            <Checkbox
-                              checked={value.includes(option)}
-                              sx={{
-                                color: "#5e62d1",
-                                "&.Mui-checked": {
-                                  color: "#5e62d1",
-                                },
-                              }}
-                            />
-                          )}
-                          <ListItemText primary={option} />
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                );
-              })}
-            </DialogContent>
-            <DialogActions>
-              {[
-                {
-                  label: "Apply Filters",
-                  onClick: applyFilters,
-                  variant: "contained",
-                  style: {
                     backgroundColor: "#5e62d1",
-                    color: "white",
-                  },
-                  hover: {
-                    backgroundColor: "#4a54c2",
-                  },
-                },
-                {
-                  label: "Clear Filters",
-                  onClick: () =>
-                    setFilters({
-                      area: "",
-                      availability: [],
-                      babysittingPlace: [],
-                      childAges: [],
-                      jobType: "",
-                    }),
-                  variant: "outlined",
-                  style: {
-                    backgroundColor: "white",
-                    color: "#5e62d1",
-                    border: "1px solid #5e62d1",
-                  },
-                  hover: {
-                    backgroundColor: "#f0f4ff",
-                  },
-                },
-                {
-                  label: "Cancel",
-                  onClick: () => setOpenFilterDialog(false),
-                  variant: "outlined",
-                  style: {
-                    backgroundColor: "white",
-                    color: "#5e62d1",
-                    border: "1px solid #5e62d1",
-                  },
-                  hover: {
-                    backgroundColor: "#f0f4ff",
-                  },
-                },
-              ].map(({ label, onClick, variant, style, hover }, index) => (
-                <Button
+                    color: "#fff",
+                  }}
+                />
+              ))}
+              {filters.babysittingPlace.map((option, index) => (
+                <Chip
                   key={index}
-                  onClick={onClick}
-                  variant={variant}
+                  label={`Babysitting Place: ${option}`}
+                  onDelete={() =>
+                    handleFilterChange(
+                      "babysittingPlace",
+                      filters.babysittingPlace.filter((item) => item !== option)
+                    )
+                  }
+                  style={{
+                    backgroundColor: "#5e62d1",
+                    color: "#fff",
+                  }}
+                />
+              ))}
+              {filters.childAges.map((option, index) => (
+                <Chip
+                  key={index}
+                  label={`Child Age: ${option}`}
+                  onDelete={() =>
+                    handleFilterChange(
+                      "childAges",
+                      filters.childAges.filter((item) => item !== option)
+                    )
+                  }
+                  style={{
+                    backgroundColor: "#5e62d1",
+                    color: "#fff",
+                  }}
+                />
+              ))}
+              {filters.jobType && (
+                <Chip
+                  label={`Job Type: ${filters.jobType}`}
+                  onDelete={() => handleFilterChange("jobType", "")}
+                  style={{
+                    backgroundColor: "#5e62d1",
+                    color: "#fff",
+                  }}
+                />
+              )}
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 3,
+              }}
+            >
+              {Array.isArray(displayGuardians) ? (
+                displayGuardians.map((guardian) => (
+                  <GuardianCard
+                    key={guardian.userId}
+                    onClick={() =>
+                      navigate(`/application/${guardian.userId}`, {
+                        state: { from: location.pathname },
+                      })
+                    }
+                  >
+                    <AvatarWrapper src={guardian.photo || ""} />
+                    <CardContentWrapper>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontFamily: "Poppins, sans-serif",
+                          color: "#000",
+                          fontWeight: "600",
+                          textAlign: "center",
+                        }}
+                      >
+                        {`${guardian.firstName} ${guardian.lastName}`}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontFamily: "Poppins, sans-serif",
+                          color: "#888",
+                          mb: 1,
+                          textAlign: "center",
+                        }}
+                      >
+                        {guardian.preferredArea}
+                      </Typography>
+                      <Box sx={{ display: "flex", justifyContent: "center" }}>
+                        <Rating
+                          name={`rating-${guardian.id}`}
+                          value={guardian.rating}
+                          precision={0.5}
+                          readOnly
+                          size="small"
+                        />
+                      </Box>
+                    </CardContentWrapper>
+                  </GuardianCard>
+                ))
+              ) : (
+                <Typography
                   sx={{
-                    borderRadius: "30px",
-                    textTransform: "none",
-                    ...style,
-                    "&:hover": hover,
+                    fontFamily: "Poppins, sans-serif",
+                    color: "#888",
+                    fontStyle: "italic",
                   }}
                 >
-                  {label}
-                </Button>
-              ))}
-            </DialogActions>
-          </Dialog>
+                  {displayGuardians}
+                </Typography>
+              )}
+            </Box>
+          </Box>
         </Box>
 
         <ApplicationSectionWrapper>
