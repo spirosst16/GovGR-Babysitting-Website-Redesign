@@ -382,7 +382,7 @@ const BabysittersPage = () => {
             sx={{
               width: "300px",
               padding: "20px",
-              paddingTop: "50px",
+              paddingTop: "100px",
               display: "flex",
               flexDirection: "column",
               gap: "20px",
