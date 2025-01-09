@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Container,
   Typography,
@@ -9,9 +9,12 @@ import {
   Button,
   Rating,
   TextField,
+  IconButton,
+  Tooltip,
   CircularProgress,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import SearchIcon from "@mui/icons-material/Search";
+import { Link, useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
@@ -57,6 +60,8 @@ const WelcomePage = () => {
   const [role, setRole] = useState("");
   const [loading, setLoading] = useState(true);
   const [firstName, setFirstName] = useState("");
+  const navigate = useNavigate();
+  const areaInputRef = useRef(null);
 
   useEffect(() => {
     const logoutUser = async () => {
@@ -164,6 +169,7 @@ const WelcomePage = () => {
                 fontFamily: "Poppins, sans-serif",
                 marginBottom: "20px",
                 fontSize: "3rem",
+                fontWeight: "500",
               }}
             >
               Babysitters
@@ -175,22 +181,76 @@ const WelcomePage = () => {
                 marginBottom: "30px",
               }}
             >
-              Connecting Families with Trusted Babysitters
+              Search for babysitters in your area
             </Typography>
-            <Button
-              variant="contained"
-              component={Link}
-              to="/register"
-              style={{
-                backgroundColor: "#5e62d1",
-                fontFamily: "Poppins, sans-serif",
-                fontSize: "1.2rem",
-                borderRadius: "30px",
-                textTransform: "none",
-              }}
+            <Box
+              display="flex"
+              alignItems="center"
+              gap="10px"
+              style={{ maxWidth: "500px", marginTop: "20px" }}
             >
-              Get started for free
-            </Button>
+              <TextField
+                inputRef={areaInputRef}
+                label="Enter your area"
+                variant="outlined"
+                fullWidth
+                onKeyDown={(e) => {
+                  if (
+                    e.key === "Enter" &&
+                    areaInputRef.current.value.trim() !== ""
+                  ) {
+                    navigate("/babysitters", {
+                      state: { area: areaInputRef.current.value.trim() },
+                    });
+                  }
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: "30px",
+                    "& fieldset": {
+                      borderColor: "#ccc",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#5e62d1",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    color: "rgba(0, 0, 0, 0.6)",
+                  },
+                  "& .MuiInputLabel-root.Mui-focused": {
+                    color: "#5e62d1",
+                  },
+                }}
+              />
+              <Tooltip title="Search" arrow>
+                <IconButton
+                  onClick={() => {
+                    if (areaInputRef.current.value.trim() !== "") {
+                      navigate("/babysitters", {
+                        state: { area: areaInputRef.current.value.trim() },
+                      });
+                    }
+                  }}
+                  style={{
+                    backgroundColor: "#5e62d1",
+                    color: "#fff",
+                    padding: "10px",
+                    borderRadius: "50%",
+                    transition: "transform 0.2s, background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#4248a6";
+                    e.currentTarget.style.transform = "scale(1.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#5e62d1";
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
+                >
+                  <SearchIcon />
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
           <Box style={{ maxWidth: "45%" }}>
             <img

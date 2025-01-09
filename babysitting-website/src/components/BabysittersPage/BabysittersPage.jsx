@@ -199,6 +199,12 @@ const BabysittersPage = () => {
   const [openFilterDialog, setOpenFilterDialog] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  useEffect(() => {
+    if (location.state?.area) {
+      setFilters((prev) => ({ ...prev, area: location.state.area }));
+      applyFilters();
+    }
+  }, [location.state]);
 
   const availabilityOptions = [
     "Monday Morning",
