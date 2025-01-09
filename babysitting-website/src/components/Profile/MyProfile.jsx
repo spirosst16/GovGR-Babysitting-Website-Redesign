@@ -337,7 +337,7 @@ const ProfilePage = () => {
               marginLeft: "250px",
               display: "flex",
               flexDirection: "column",
-              alignItems: "center", // Center all content horizontally
+              alignItems: "center",
             }}
           >
             {/* Profile Picture */}
@@ -685,7 +685,11 @@ const ProfilePage = () => {
           >
             <Typography
               variant="h6"
-              sx={{ marginBottom: "20px", fontWeight: "bold" }}
+              sx={{
+                marginBottom: "20px",
+                fontWeight: "bold",
+                fontFamily: "Poppins, sans-serif",
+              }}
             >
               My Reviews
             </Typography>
@@ -721,11 +725,18 @@ const ProfilePage = () => {
                   <Box sx={{ flex: 1 }}>
                     <Typography
                       variant="body1"
-                      sx={{ fontWeight: "bold", fontSize: "16px" }}
+                      sx={{
+                        fontWeight: "bold",
+                        fontSize: "16px",
+                        fontFamily: "Poppins, sans-serif",
+                      }}
                     >
                       {`${reviewer?.firstName} ${reviewer?.lastName}`}
                     </Typography>
-                    <Typography variant="body2" sx={{ color: "#555" }}>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#555", fontFamily: "Poppins, sans-serif" }}
+                    >
                       {review.reviewText}
                     </Typography>
                   </Box>
@@ -735,7 +746,10 @@ const ProfilePage = () => {
                 </Box>
               ))
             ) : (
-              <Typography variant="body2" sx={{ color: "#888" }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "#888", fontFamily: "Poppins, sans-serif" }}
+              >
                 No reviews available.
               </Typography>
             )}
@@ -784,10 +798,12 @@ const ProfilePage = () => {
               flex: 2,
               padding: "20px",
               backgroundColor: "#fff",
-              justifyContent: "center",
               borderRadius: "10px",
               boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
               marginLeft: "250px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
             }}
           >
             {/* Profile Picture */}
@@ -796,10 +812,12 @@ const ProfilePage = () => {
                 src={profileData.photo}
                 alt={profileData.name}
                 sx={{
-                  width: 140,
-                  height: 140,
+                  width: 200,
+                  height: 200,
                   margin: "0 auto",
                   marginBottom: "10px",
+                  borderRadius: "50%",
+                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
                 }}
               />
               <Typography
@@ -817,14 +835,12 @@ const ProfilePage = () => {
             </Box>
 
             {/* Editable Form */}
-            <Box>
+            <Box sx={{ width: "100%", textAlign: "center" }}>
               <Typography
                 variant="body1"
                 sx={{
                   display: "flex",
-                  alignItems: "baseline",
-
-                  marginLeft: "100px",
+                  marginLeft: "10%",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
@@ -842,9 +858,11 @@ const ProfilePage = () => {
                 }
                 value={profileData.city || ""}
                 sx={{
-                  width: "500px",
+                  display: "flex",
+                  width: "80%",
+                  marginLeft: "10%",
                   marginBottom: "15px",
-                  marginLeft: "100px",
+
                   fontFamily: "Poppins, sans-serif",
                 }}
               />
@@ -852,7 +870,7 @@ const ProfilePage = () => {
               <Typography
                 sx={{
                   display: "flex",
-                  marginLeft: "100px",
+                  marginLeft: "10%",
                   marginTop: "20px",
                   alignItems: "baseline",
                   fontFamily: "Poppins, sans-serif",
@@ -874,15 +892,17 @@ const ProfilePage = () => {
                 value={profileData.numberOfChildren || ""}
                 sx={{
                   marginBottom: "15px",
-                  marginLeft: "100px",
-                  width: "500px",
+                  display: "flex",
+                  width: "80%",
+                  marginLeft: "10%",
                   fontFamily: "Poppins, sans-serif",
                 }}
               />
 
               <Typography
                 sx={{
-                  marginLeft: "100px",
+                  display: "flex",
+                  marginLeft: "10%",
                   marginTop: "20px",
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
@@ -905,8 +925,9 @@ const ProfilePage = () => {
                 value={profileData.childrenDescription || ""}
                 sx={{
                   marginBottom: "15px",
-                  marginLeft: "100px",
-                  width: "500px",
+                  display: "flex",
+                  width: "80%",
+                  marginLeft: "10%",
                   fontFamily: "Poppins, sans-serif",
                 }}
               />
@@ -914,9 +935,9 @@ const ProfilePage = () => {
               <Typography
                 sx={{
                   display: "flex",
-                  alignItems: "baseline",
+                  marginLeft: "10%",
                   marginTop: "20px",
-                  marginLeft: "100px",
+
                   fontFamily: "Poppins, sans-serif",
                   fontWeight: "bold",
                 }}
@@ -930,7 +951,6 @@ const ProfilePage = () => {
                   gap: "10px",
                   flexWrap: "wrap",
                   marginBottom: "15px",
-                  marginLeft: "100px",
                 }}
               >
                 <StyledTextField
@@ -956,7 +976,12 @@ const ProfilePage = () => {
                       },
                     },
                   }}
-                  sx={{ mb: 2, width: "500px" }}
+                  sx={{
+                    mb: 2,
+                    display: "flex",
+                    width: "80%",
+                    marginLeft: "10%",
+                  }}
                 >
                   {ageGroups.map((ageGroup, index) => (
                     <MenuItem
@@ -1015,34 +1040,76 @@ const ProfilePage = () => {
               height: "fit-content",
             }}
           >
-            <Typography variant="h6" sx={{ marginBottom: "20px" }}>
+            <Typography
+              variant="h6"
+              sx={{
+                marginBottom: "20px",
+                fontWeight: "bold",
+                fontFamily: "Poppins, sans-serif",
+              }}
+            >
               My Reviews
             </Typography>
-            {reviews.map((review, index) => (
-              <Box
-                key={index}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  marginBottom: "15px",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  backgroundColor: "#f5f5f5",
-                }}
-              >
-                <Avatar sx={{ width: 40, height: 40 }}>
-                  {review.reviewer.charAt(0)}
-                </Avatar>
-                <Box>
-                  <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                    {review.reviewer}
-                  </Typography>
-                  <Typography variant="body2">{review.text}</Typography>
+            {reviews.length > 0 ? (
+              reviews.map(({ reviewer, review }, index) => (
+                <Box
+                  key={index}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "15px",
+                    marginBottom: "20px",
+                    padding: "15px",
+                    borderRadius: "8px",
+                    backgroundColor: "#f9f9f9",
+                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  {/* Avatar */}
+                  <Avatar
+                    sx={{
+                      width: 50,
+                      height: 50,
+                      backgroundColor: reviewer?.photo
+                        ? "transparent"
+                        : "#1976d2",
+                      color: reviewer?.photo ? "inherit" : "#fff",
+                    }}
+                    src={reviewer?.photo || undefined}
+                  ></Avatar>
+
+                  {/* Reviewer Info */}
+                  <Box sx={{ flex: 1 }}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                        fontSize: "16px",
+                        fontFamily: "Poppins, sans-serif",
+                      }}
+                    >
+                      {`${reviewer?.firstName} ${reviewer?.lastName}`}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "#555", fontFamily: "Poppins, sans-serif" }}
+                    >
+                      {review.reviewText}
+                    </Typography>
+                  </Box>
+
+                  {/* Rating */}
+                  <Rating value={review.rating} readOnly size="small" />
                 </Box>
-                <Rating value={review.rating || 0} readOnly size="small" />
-              </Box>
-            ))}
+              ))
+            ) : (
+              <Typography
+                variant="body2"
+                sx={{ color: "#888", fontFamily: "Poppins, sans-serif" }}
+              >
+                No reviews available.
+              </Typography>
+            )}
           </Box>
         </Box>
       </Box>
