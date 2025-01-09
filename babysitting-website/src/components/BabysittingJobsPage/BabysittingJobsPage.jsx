@@ -40,7 +40,7 @@ import "../../style.css";
 const GuardianCard = styled(Card)({
   width: "250px",
   height: "380px",
-  margin: "20px",
+  margin: "-15px 20px",
   boxShadow: "0 8px 15px rgba(0, 0, 0, 0.15)",
   borderRadius: "15px",
   overflow: "hidden",
