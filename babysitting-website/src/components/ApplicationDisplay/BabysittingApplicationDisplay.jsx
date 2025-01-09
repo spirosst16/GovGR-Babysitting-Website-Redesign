@@ -72,7 +72,6 @@ const ApplicationSection = styled(Box)({
   display: "flex",
   flexDirection: "column",
   gap: "20px",
-  alignItems: "center",
 });
 
 const ScheduleSection = styled(Box)({
@@ -532,6 +531,17 @@ const BabysittingApplicationDisplay = () => {
     }
   };
 
+  const handleSendMessage = async () => {
+    if (!user.id) {
+      alert("No valid profile data to save.");
+      return;
+    }
+
+    navigate(`/chats`, {
+      state: { selectedUser: user }, // Passing selectedUser as state
+    });
+  };
+
   const handleAlertClose = () => {
     setAlert({ ...alert, open: false });
   };
@@ -574,8 +584,8 @@ const BabysittingApplicationDisplay = () => {
               <Avatar
                 src={user.photo || DefaultUserImage}
                 sx={{
-                  width: 140,
-                  height: 140,
+                  width: 200,
+                  height: 200,
                   margin: "auto",
                   borderRadius: "50%",
                   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
@@ -613,95 +623,137 @@ const BabysittingApplicationDisplay = () => {
                   size="large"
                 />
               </ProfileInfo>
+              <Button
+                variant="contained"
+                sx={{
+                  color: "#ffffff",
+                  backgroundColor: "#5e62d1",
+                  borderRadius: "30px",
+                  textTransform: "none",
+                  fontSize: "1rem",
+                  fontFamily: "Poppins, sans-serif",
+                  "&:hover": {
+                    backgroundColor: "#3c3fad",
+                  },
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  mt: 2,
+                }}
+                onClick={handleSendMessage}
+              >
+                Message
+              </Button>
             </ProfileSection>
 
             <ApplicationSection>
-              <Typography
-                variant="h6"
+              <Box
                 sx={{
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-              >
-                <Box component="span" sx={{ fontWeight: "bold" }}>
-                  Area:
-                </Box>{" "}
-                <Box component="span" sx={{ fontWeight: "normal" }}>
-                  {application.area}
-                </Box>
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-              >
-                <Box component="span" sx={{ fontWeight: "bold" }}>
-                  Job Type:
-                </Box>{" "}
-                <Box component="span" sx={{ fontWeight: "normal" }}>
-                  {application.jobType}
-                </Box>
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-              >
-                <Box component="span" sx={{ fontWeight: "bold" }}>
-                  Work Location:
-                </Box>{" "}
-                <Box component="span" sx={{ fontWeight: "normal" }}>
-                  {application.babysittingPlace.join(", ")}
-                </Box>
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  fontFamily: "'Poppins', sans-serif",
                   display: "flex",
-                  alignItems: "center",
+                  flexWrap: "wrap",
                   justifyContent: "space-between",
+                  gap: 3,
                 }}
               >
-                <Box
-                  component="span"
-                  sx={{
-                    fontWeight: "bold",
-                    whiteSpace: "nowrap",
-                    marginRight: "16px",
-                  }}
-                >
-                  Child Ages:
+                {/* Left Column: Area and Job Type */}
+                <Box sx={{ flex: 1, minWidth: "45%" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontFamily: "'Poppins', sans-serif",
+                      marginBottom: "16px", // Added spacing between contents
+                    }}
+                  >
+                    <Box component="span" sx={{ fontWeight: "bold" }}>
+                      Area:
+                    </Box>{" "}
+                    <Box component="span" sx={{ fontWeight: "normal" }}>
+                      {application.area}
+                    </Box>
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontFamily: "'Poppins', sans-serif",
+                      marginBottom: "16px", // Added spacing between contents
+                    }}
+                  >
+                    <Box component="span" sx={{ fontWeight: "bold" }}>
+                      Job Type:
+                    </Box>{" "}
+                    <Box component="span" sx={{ fontWeight: "normal" }}>
+                      {application.jobType}
+                    </Box>
+                  </Typography>
                 </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: "8px",
-                    justifyContent: "flex-start",
-                    flexWrap: "wrap",
-                    flex: 1,
-                  }}
-                >
-                  {application.childAges
-                    .slice()
-                    .sort((a, b) => a - b)
-                    .map((age, index) => (
-                      <ButtonStyle key={index}>{age}</ButtonStyle>
-                    ))}
+
+                {/* Right Column: Work Location and Child Ages */}
+                <Box sx={{ flex: 1, minWidth: "45%" }}>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontFamily: "'Poppins', sans-serif",
+                      marginBottom: "16px", // Added spacing between contents
+                    }}
+                  >
+                    <Box component="span" sx={{ fontWeight: "bold" }}>
+                      Work Location:
+                    </Box>{" "}
+                    <Box component="span" sx={{ fontWeight: "normal" }}>
+                      {application.babysittingPlace.join(", ")}
+                    </Box>
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontFamily: "'Poppins', sans-serif",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        marginBottom: "16px", // Added spacing between contents
+                      }}
+                    >
+                      <Box
+                        component="span"
+                        sx={{ fontWeight: "bold", whiteSpace: "nowrap" }}
+                      >
+                        Child Ages:
+                      </Box>
+                      <Box
+                        sx={{
+                          display: "inline-flex",
+                          gap: "8px",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        {application.childAges
+                          .slice()
+                          .sort((a, b) => a - b)
+                          .map((age, index) => (
+                            <ButtonStyle key={index}>{age}</ButtonStyle>
+                          ))}
+                      </Box>
+                    </Box>
+                  </Typography>
                 </Box>
-              </Typography>
+              </Box>
+
+              {/* Availability Schedule */}
               <Typography
                 variant="h6"
                 sx={{
                   fontWeight: "bold",
                   fontFamily: "'Poppins', sans-serif",
-                  marginTop: "30px",
+                  marginTop: "10px",
+                  marginBottom: "-30px",
                 }}
               >
                 Availability Schedule
               </Typography>
-
               <ScheduleSection>
                 {[
                   "Monday",
@@ -718,7 +770,7 @@ const BabysittingApplicationDisplay = () => {
                       sx={{
                         textAlign: "center",
                         fontWeight: "bold",
-                        marginBottom: "20px",
+                        marginBottom: "10px",
                         fontFamily: "'Poppins', sans-serif",
                       }}
                     >
@@ -733,9 +785,7 @@ const BabysittingApplicationDisplay = () => {
                           )}
                         >
                           <Typography
-                            sx={{
-                              fontFamily: "'Poppins', sans-serif",
-                            }}
+                            sx={{ fontFamily: "'Poppins', sans-serif" }}
                           >
                             {timeSlot}
                           </Typography>
@@ -745,14 +795,11 @@ const BabysittingApplicationDisplay = () => {
                   </Box>
                 ))}
               </ScheduleSection>
-              {currentUser?.uid === application.userId &&
-                application.status === "temporary" && (
-                  <Box
-                    sx={{
-                      textAlign: "center",
-                      marginTop: "30px",
-                    }}
-                  >
+
+              {/* Buttons */}
+              <Box sx={{ textAlign: "center", marginTop: "30px" }}>
+                {currentUser?.uid === application.userId &&
+                  application.status === "temporary" && (
                     <Button
                       variant="contained"
                       onClick={() =>
@@ -772,43 +819,45 @@ const BabysittingApplicationDisplay = () => {
                           backgroundColor: "#4a54c1",
                         },
                         fontFamily: "'Poppins', sans-serif",
+                        margin: "10px auto",
                       }}
                     >
                       Edit Application
                     </Button>
-                  </Box>
-                )}
-              {currentUserRole &&
-                viewedUserRole &&
-                currentUserRole !== viewedUserRole && (
-                  <Button
-                    variant="contained"
-                    onClick={() =>
-                      agreementExists
-                        ? navigate(`/${agreementPath}`, {
-                            state: {
-                              from: location.pathname,
-                            },
-                          })
-                        : handleCreateAgreement()
-                    }
-                    sx={{
-                      backgroundColor: "#5e62d1",
-                      fontSize: "1rem",
-                      borderRadius: "30px",
-                      padding: "12px 30px",
-                      textTransform: "none",
-                      "&:hover": {
-                        backgroundColor: "#4a54c1",
-                      },
-                      fontFamily: "'Poppins', sans-serif",
-                    }}
-                  >
-                    {agreementExists ? "Inspect Agreement" : "Create Agreement"}
-                  </Button>
-                )}
-              {currentUser?.uid === application.userId && (
-                <Box sx={{ textAlign: "center", marginTop: "30px" }}>
+                  )}
+                {currentUserRole &&
+                  viewedUserRole &&
+                  currentUserRole !== viewedUserRole && (
+                    <Button
+                      variant="contained"
+                      onClick={() =>
+                        agreementExists
+                          ? navigate(`/${agreementPath}`, {
+                              state: {
+                                from: location.pathname,
+                              },
+                            })
+                          : handleCreateAgreement()
+                      }
+                      sx={{
+                        backgroundColor: "#5e62d1",
+                        fontSize: "1rem",
+                        borderRadius: "30px",
+                        padding: "12px 30px",
+                        textTransform: "none",
+                        "&:hover": {
+                          backgroundColor: "#4a54c1",
+                        },
+                        fontFamily: "'Poppins', sans-serif",
+                        margin: "10px auto",
+                      }}
+                    >
+                      {agreementExists
+                        ? "Inspect Agreement"
+                        : "Create Agreement"}
+                    </Button>
+                  )}
+                {currentUser?.uid === application.userId && (
                   <Button
                     variant="contained"
                     onClick={handleDeleteApplication}
@@ -822,12 +871,13 @@ const BabysittingApplicationDisplay = () => {
                         backgroundColor: "#b71c1c",
                       },
                       fontFamily: "'Poppins', sans-serif",
+                      margin: "10px auto",
                     }}
                   >
                     Delete Application
                   </Button>
-                </Box>
-              )}
+                )}
+              </Box>
             </ApplicationSection>
           </InfoSection>
         </ContentWrapper>
