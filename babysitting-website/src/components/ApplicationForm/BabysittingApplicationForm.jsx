@@ -1493,6 +1493,7 @@ const BabysittingApplicationForm = () => {
                       onClick={(e) => handleSubmit(e, "temporary")}
                       variant="contained"
                       sx={{
+                        textTransform: "none",
                         borderRadius: "30px",
                         outline: "1px solid #5e62d1",
                         backgroundColor: "white",
@@ -1504,11 +1505,10 @@ const BabysittingApplicationForm = () => {
                     >
                       Temporary Save
                     </Button>
-                    <Button
+                    <StyledButton
                       onClick={(e) => handleSubmit(e, "submitted")}
                       variant="contained"
                       sx={{
-                        borderRadius: "30px",
                         backgroundColor: "#5e62d1",
                         "&:hover": {
                           backgroundColor: "#4a4fbf",
@@ -1516,7 +1516,7 @@ const BabysittingApplicationForm = () => {
                       }}
                     >
                       Final Submit
-                    </Button>
+                    </StyledButton>
                   </Box>
                 </>
               )}
