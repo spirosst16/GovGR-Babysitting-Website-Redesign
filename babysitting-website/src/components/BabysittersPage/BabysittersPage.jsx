@@ -538,7 +538,6 @@ const BabysittersPage = () => {
           <Box
             sx={{
               flex: 1,
-              paddingTop: "100px",
               display: "flex",
               flexDirection: "column",
               gap: 3,
