@@ -79,17 +79,6 @@ const ApplicationSectionWrapper = styled(Box)({
   padding: "20px",
 });
 
-const FilterBox = styled(Box)({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  gap: "20px",
-});
-
-const FilterDialog = styled(Dialog)({
-  padding: "20px",
-});
-
 const CustomSeparator = () => {
   const [userRole, setUserRole] = useState(null);
   const navigate = useNavigate();
@@ -196,15 +185,8 @@ const BabysittersPage = () => {
     jobType: "",
   });
   const [filteredBabysitters, setFilteredBabysitters] = useState([]);
-  const [openFilterDialog, setOpenFilterDialog] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  useEffect(() => {
-    if (location.state?.area) {
-      setFilters((prev) => ({ ...prev, area: location.state.area }));
-      applyFilters();
-    }
-  }, [location.state]);
 
   const availabilityOptions = [
     "Monday Morning",
@@ -293,31 +275,38 @@ const BabysittersPage = () => {
   }, []);
 
   const handleFilterChange = (key, value) => {
-    setFilters((prevFilters) => ({ ...prevFilters, [key]: value }));
+    setFilters((prevFilters) => {
+      const updatedFilters = { ...prevFilters, [key]: value };
+      applyFilters(updatedFilters);
+      return updatedFilters;
+    });
   };
 
-  const applyFilters = () => {
+  const applyFilters = (currentFilters = filters) => {
     const filtered = babysitters.filter((babysitter) => {
       const matchesArea =
-        !filters.area ||
+        !currentFilters.area ||
         babysitter.preferredArea
           .toLowerCase()
-          .includes(filters.area.toLowerCase());
+          .includes(currentFilters.area.toLowerCase());
       const matchesAvailability =
-        filters.availability.length === 0 ||
-        filters.availability.some((time) =>
+        currentFilters.availability.length === 0 ||
+        currentFilters.availability.some((time) =>
           babysitter.availability?.includes(time)
         );
       const matchesPlace =
-        filters.babysittingPlace.length === 0 ||
-        filters.babysittingPlace.some((place) =>
+        currentFilters.babysittingPlace.length === 0 ||
+        currentFilters.babysittingPlace.some((place) =>
           babysitter.babysittingPlace?.includes(place)
         );
       const matchesChildAges =
-        filters.childAges.length === 0 ||
-        filters.childAges.some((age) => babysitter.childAges?.includes(age));
+        currentFilters.childAges.length === 0 ||
+        currentFilters.childAges.some((age) =>
+          babysitter.childAges?.includes(age)
+        );
       const matchesJobType =
-        !filters.jobType || babysitter.jobType === filters.jobType;
+        !currentFilters.jobType ||
+        babysitter.jobType === currentFilters.jobType;
 
       return (
         matchesArea &&
@@ -329,7 +318,6 @@ const BabysittersPage = () => {
     });
 
     setFilteredBabysitters(filtered);
-    setOpenFilterDialog(false);
   };
 
   const hasFiltersApplied =
@@ -348,6 +336,20 @@ const BabysittersPage = () => {
   } else {
     displayBabysitters = babysitters;
   }
+
+  useEffect(() => {
+    if (!loading && babysitters.length > 0) {
+      if (location.state?.area) {
+        setFilters((prev) => {
+          const updatedFilters = { ...prev, area: location.state.area };
+          applyFilters(updatedFilters);
+          return updatedFilters;
+        });
+      } else {
+        applyFilters(filters);
+      }
+    }
+  }, [location.state, babysitters, loading]);
 
   if (loading) {
     return (
@@ -376,11 +378,11 @@ const BabysittersPage = () => {
             backgroundColor: "#f4f4f4",
           }}
         >
-          {/* Filters Section */}
           <Box
             sx={{
               width: "300px",
               padding: "20px",
+              paddingTop: "50px",
               display: "flex",
               flexDirection: "column",
               gap: "20px",
@@ -532,17 +534,15 @@ const BabysittersPage = () => {
             </Button>
           </Box>
 
-          {/* Main Content Section */}
           <Box
             sx={{
               flex: 1,
-              padding: "20px",
+              paddingTop: "100px",
               display: "flex",
               flexDirection: "column",
               gap: 3,
             }}
           >
-            {/* Page Title */}
             <Typography
               variant="h4"
               sx={{
@@ -555,7 +555,6 @@ const BabysittersPage = () => {
               Find Your Babysitter
             </Typography>
 
-            {/* Search Section */}
             <Box
               sx={{
                 display: "flex",
@@ -571,7 +570,7 @@ const BabysittersPage = () => {
                 onChange={(e) => handleFilterChange("area", e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    applyFilters(); // Trigger search on Enter
+                    applyFilters();
                   }
                 }}
                 fullWidth
@@ -598,7 +597,7 @@ const BabysittersPage = () => {
 
               <Tooltip title="Search" arrow>
                 <IconButton
-                  onClick={() => applyFilters()} // Trigger search on click
+                  onClick={() => applyFilters()}
                   style={{
                     backgroundColor: "#5e62d1",
                     color: "#fff",
@@ -620,7 +619,85 @@ const BabysittersPage = () => {
               </Tooltip>
             </Box>
 
-            {/* Babysitter Cards Section */}
+            <Box
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: "10px",
+              }}
+            >
+              {filters.area && (
+                <Chip
+                  label={`Area: ${filters.area}`}
+                  onDelete={() => handleFilterChange("area", "")}
+                  style={{
+                    backgroundColor: "#5e62d1",
+                    color: "#fff",
+                  }}
+                />
+              )}
+              {filters.availability.map((option, index) => (
+                <Chip
+                  key={index}
+                  label={`Availability: ${option}`}
+                  onDelete={() =>
+                    handleFilterChange(
+                      "availability",
+                      filters.availability.filter((item) => item !== option)
+                    )
+                  }
+                  style={{
+                    backgroundColor: "#5e62d1",
+                    color: "#fff",
+                  }}
+                />
+              ))}
+              {filters.babysittingPlace.map((option, index) => (
+                <Chip
+                  key={index}
+                  label={`Babysitting Place: ${option}`}
+                  onDelete={() =>
+                    handleFilterChange(
+                      "babysittingPlace",
+                      filters.babysittingPlace.filter((item) => item !== option)
+                    )
+                  }
+                  style={{
+                    backgroundColor: "#5e62d1",
+                    color: "#fff",
+                  }}
+                />
+              ))}
+              {filters.childAges.map((option, index) => (
+                <Chip
+                  key={index}
+                  label={`Child Age: ${option}`}
+                  onDelete={() =>
+                    handleFilterChange(
+                      "childAges",
+                      filters.childAges.filter((item) => item !== option)
+                    )
+                  }
+                  style={{
+                    backgroundColor: "#5e62d1",
+                    color: "#fff",
+                  }}
+                />
+              ))}
+              {filters.jobType && (
+                <Chip
+                  label={`Job Type: ${filters.jobType}`}
+                  onDelete={() => handleFilterChange("jobType", "")}
+                  style={{
+                    backgroundColor: "#5e62d1",
+                    color: "#fff",
+                  }}
+                />
+              )}
+            </Box>
+
             <Box
               sx={{
                 display: "flex",
