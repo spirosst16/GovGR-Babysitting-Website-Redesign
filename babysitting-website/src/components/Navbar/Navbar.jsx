@@ -205,16 +205,6 @@ const Navbar = () => {
             { to: "/babysitters", label: "Babysitters" },
             { to: "/babysitting-jobs", label: "Babysitting Jobs" },
             { to: "/how-it-works", label: "How it works" },
-            {
-              to: "/my-agreements-and-applications",
-              label: "My Agreements & Applications",
-              requiresLogin: true,
-            },
-            {
-              to: "/chats",
-              label: "Messages",
-              requiresLogin: true,
-            },
           ].map(
             ({ to, label, requiresLogin }) =>
               (!requiresLogin || isLoggedIn) && (
@@ -264,6 +254,22 @@ const Navbar = () => {
                   }}
                 >
                   Profile
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleMenuClose();
+                    navigate("/my-agreements-and-applications");
+                  }}
+                >
+                  Dashboard
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleMenuClose();
+                    navigate("/chats");
+                  }}
+                >
+                  Messages
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
