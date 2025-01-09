@@ -15,17 +15,17 @@ import { FIREBASE_DB } from "../../config/firebase";
 import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 
-const LogoContainer = styled("div")(({ isLoggedIn }) => ({
+const LogoContainer = styled("div")(() => ({
   position: "absolute",
   top: "10px",
   left: "20px",
   display: "flex",
   alignItems: "center",
   gap: "10px",
-  cursor: isLoggedIn ? "pointer" : "default",
-  pointerEvents: isLoggedIn ? "auto" : "none",
+  cursor: "pointer",
+  pointerEvents: "auto",
   "&:hover": {
-    cursor: isLoggedIn ? "pointer" : "default",
+    cursor: "pointer",
   },
 }));
 
@@ -183,7 +183,7 @@ const Navbar = () => {
       sx={{ background: "transparent", boxShadow: "none" }}
     >
       <Toolbar>
-        <LogoContainer onClick={handleLogoClick} isLoggedIn={isLoggedIn}>
+        <LogoContainer onClick={handleLogoClick}>
           <Logo>
             <LogoImage
               src={require("../../assets/baby-picture.png")}

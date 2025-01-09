@@ -9,7 +9,7 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Container,
   TextField,
@@ -57,6 +57,7 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
   const checkUserRoleAndNavigate = async (uid) => {
     try {
@@ -68,6 +69,7 @@ const LoginForm = () => {
 
       if (!babysitterSnapshot.empty) {
         navigate("/babysitting-jobs");
+        navigate(location.state?.from || "/babysitting-jobs");
         return;
       }
 
@@ -78,7 +80,7 @@ const LoginForm = () => {
       const guardianSnapshot = await getDocs(guardianQuery);
 
       if (!guardianSnapshot.empty) {
-        navigate("/babysitters");
+        navigate(location.state?.from || "/babysitters");
         return;
       }
 
@@ -132,7 +134,12 @@ const LoginForm = () => {
           fontFamily: "Poppins, sans-serif",
         }}
       >
-        <LogoContainer>
+        <LogoContainer
+          onClick={() => navigate("/")}
+          sx={{
+            cursor: "pointer",
+          }}
+        >
           <Logo>
             <LogoImage
               src={require("../../assets/baby-picture.png")}
