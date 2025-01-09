@@ -292,7 +292,7 @@ const MyAgreementsAndApplicationsPage = () => {
   const [currentTab, setCurrentTab] = useState(0);
   const [agreements, setAgreements] = useState([]);
   const [applications, setApplications] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
   const [isBabysitter, setIsBabysitter] = useState(false);
   const [paymentReadyAgreements, setPaymentReadyAgreements] = useState([]);
@@ -313,14 +313,14 @@ const MyAgreementsAndApplicationsPage = () => {
   useEffect(() => {
     const fetchCurrentUserData = async () => {
       if (!userId) return;
-      setIsLoading(true);
+      setLoading(true);
       try {
         const userData = await fetchUserData(userId);
         setCurrentUser(userData);
       } catch (error) {
         console.error("Error fetching current user data:", error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
@@ -330,7 +330,7 @@ const MyAgreementsAndApplicationsPage = () => {
   const fetchUserData = async (userId) => {
     try {
       let userData = null;
-
+      setLoading(true);
       const babysittersRef = query(
         collection(FIREBASE_DB, "babysitters"),
         where("userId", "==", userId)
@@ -352,9 +352,11 @@ const MyAgreementsAndApplicationsPage = () => {
       }
 
       if (!userData) throw new Error(`User with ID ${userId} not found`);
+      setLoading(false);
       return userData;
     } catch (error) {
       console.error("Error fetching user data:", error);
+      setLoading(false);
       return null;
     }
   };
@@ -362,7 +364,7 @@ const MyAgreementsAndApplicationsPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!userId) return;
-      setIsLoading(true);
+      setLoading(true);
       try {
         const senderAgreementsRef = query(
           collection(FIREBASE_DB, "agreements"),
@@ -414,7 +416,7 @@ const MyAgreementsAndApplicationsPage = () => {
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
@@ -567,17 +569,18 @@ const MyAgreementsAndApplicationsPage = () => {
   };
 
   const renderTabContent = () => {
-    if (isLoading) {
-      return (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="50vh"
-        >
-          <CircularProgress />
-        </Box>
-      );
+    if (loading) {
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#f4f4f4",
+        }}
+      >
+        <CircularProgress sx={{ color: "#5e62d1" }} />
+      </Box>;
     }
 
     if (currentTab === 0) {
@@ -940,64 +943,79 @@ const MyAgreementsAndApplicationsPage = () => {
       );
     }
   };
-
-  return (
-    <Container>
-      <CustomSeparator />
-      <Header>
-        <Typography
-          variant="h4"
-          style={{ fontFamily: "Poppins, sans-serif", fontWeight: "600" }}
-        >
-          My Agreements & Applications
-        </Typography>
-        <Typography
-          variant="h6"
-          style={{ fontFamily: "Poppins, sans-serif", marginTop: "10px" }}
-        >
-          Manage your applications and job history seamlessly.
-        </Typography>
-      </Header>
-
-      <TabContainer>
-        <TabContainer>
-          <StyledTabs
-            value={currentTab}
-            onChange={handleTabChange}
-            TabIndicatorProps={{
-              style: {
-                backgroundColor: "#5e62d1",
-              },
-            }}
-            sx={{
-              "& .MuiTab-root": {
-                color: "grey",
-                fontFamily: "Poppins, sans-serif",
-                fontSize: "1.4rem",
-                fontWeight: "100",
-                textTransform: "none",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-              },
-              "& .Mui-selected": {
-                color: "#5e62d1 !important",
-              },
-              "& .MuiTab-wrapper": {
-                flexDirection: "row",
-              },
-            }}
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#f4f4f4",
+        }}
+      >
+        <CircularProgress sx={{ color: "#5e62d1" }} />
+      </Box>
+    );
+  } else {
+    return (
+      <Container>
+        <CustomSeparator />
+        <Header>
+          <Typography
+            variant="h4"
+            style={{ fontFamily: "Poppins, sans-serif", fontWeight: "600" }}
           >
-            <StyledTab label="Agreements" icon={<WorkOutlineIcon />} />
-            <StyledTab label="Applications" icon={<DoneIcon />} />
-            <StyledTab label="History" icon={<HistoryIcon />} />
-          </StyledTabs>
-        </TabContainer>
-      </TabContainer>
+            My Agreements & Applications
+          </Typography>
+          <Typography
+            variant="h6"
+            style={{ fontFamily: "Poppins, sans-serif", marginTop: "10px" }}
+          >
+            Manage your applications and job history seamlessly.
+          </Typography>
+        </Header>
 
-      {renderTabContent()}
-    </Container>
-  );
+        <TabContainer>
+          <TabContainer>
+            <StyledTabs
+              value={currentTab}
+              onChange={handleTabChange}
+              TabIndicatorProps={{
+                style: {
+                  backgroundColor: "#5e62d1",
+                },
+              }}
+              sx={{
+                "& .MuiTab-root": {
+                  color: "grey",
+                  fontFamily: "Poppins, sans-serif",
+                  fontSize: "1.4rem",
+                  fontWeight: "100",
+                  textTransform: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                },
+                "& .Mui-selected": {
+                  color: "#5e62d1 !important",
+                },
+                "& .MuiTab-wrapper": {
+                  flexDirection: "row",
+                },
+              }}
+            >
+              <StyledTab label="Agreements" icon={<WorkOutlineIcon />} />
+              <StyledTab label="Applications" icon={<DoneIcon />} />
+              <StyledTab label="History" icon={<HistoryIcon />} />
+            </StyledTabs>
+          </TabContainer>
+        </TabContainer>
+
+        {renderTabContent()}
+      </Container>
+    );
+  }
 };
 
 export default MyAgreementsAndApplicationsPage;

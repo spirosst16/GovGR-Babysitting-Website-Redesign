@@ -14,6 +14,11 @@ import {
   getDocs,
   deleteDoc,
 } from "firebase/firestore";
+import {
+  Box,
+
+  CircularProgress,
+} from "@mui/material";
 import { onAuthStateChanged } from "firebase/auth";
 import Navbar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
@@ -93,9 +98,20 @@ function App() {
   );
 
   if (loading) {
-    return <div>Loading...</div>;
-  }
-
+    return (
+        <Box
+            sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                backgroundColor: "#f4f4f4",
+            }}
+        >
+            <CircularProgress sx={{ color: "#5e62d1" }} />
+        </Box>
+    );
+}
   return (
     <>
       {!shouldHideNavbarAndFooter && <Navbar user={user} />}

@@ -14,6 +14,7 @@ import {
   Breadcrumbs,
   Link,
   Stack,
+  CircularProgress,
 } from "@mui/material";
 import { borderRadius, styled } from "@mui/system";
 import SendIcon from "@mui/icons-material/Send";
@@ -192,6 +193,7 @@ const ChatPage = () => {
   const [userList, setUserList] = useState([]);
   const [selectedUser, setSelectedUser] = useState(state?.selectedUser || null);
   const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [newMessage, setNewMessage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const messagesEndRef = useRef(null);
@@ -206,6 +208,7 @@ const ChatPage = () => {
   useEffect(() => {
     if (currentUser) {
       const fetchUsers = async () => {
+        setLoading(true);
         const babysittersRef = collection(FIREBASE_DB, "babysitters");
         const guardiansRef = collection(FIREBASE_DB, "guardians");
         const [babysittersSnapshot, guardiansSnapshot] = await Promise.all([
@@ -239,8 +242,10 @@ const ChatPage = () => {
               const lastMessage = lastMessageSnapshot.docs[0]?.data() || {
                 timestamp: 0,
               };
+              setLoading(false);
               return { ...user, lastMessageTimestamp: lastMessage.timestamp };
             }
+            setLoading(false);
             return null;
           })
         );
@@ -260,6 +265,7 @@ const ChatPage = () => {
 
   useEffect(() => {
     if (selectedUser && currentUser) {
+      setLoading(true);
       const chatId = [currentUser.uid, selectedUser.userId].sort().join("-");
 
       const messagesRef = collection(FIREBASE_DB, `chats/${chatId}/messages`);
@@ -275,15 +281,17 @@ const ChatPage = () => {
         }));
         setMessages(newMessages);
       });
-
+      setLoading(false);
       return () => unsubscribe();
     }
   }, [selectedUser, currentUser]);
 
   const scrollToBottom = () => {
+    setLoading(true);
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -389,182 +397,199 @@ const ChatPage = () => {
       console.log("No message or user selected.");
     }
   };
-
-  return (
-    <ChatContainer>
-      <CustomSeparator />
-      <Box display="flex" height="100%">
-        <UserListContainer>
-          <Box padding="10px" marginTop="30px">
-            <StyledTextField
-              fullWidth
-              variant="outlined"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleSearch();
-                }
-              }}
-              placeholder="Search by name"
-              InputProps={{
-                endAdornment: (
-                  <Tooltip title="Search" arrow>
-                    <IconButton
-                      onClick={handleSearch}
-                      style={{
-                        backgroundColor: "#5e62d1",
-                        color: "#fff",
-                        padding: "10px",
-                        borderRadius: "50%",
-                        transition: "transform 0.2s, background-color 0.2s",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#4248a6";
-                        e.currentTarget.style.transform = "scale(1.1)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#5e62d1";
-                        e.currentTarget.style.transform = "scale(1)";
-                      }}
-                    >
-                      <SearchIcon />
-                    </IconButton>
-                  </Tooltip>
-                ),
-              }}
-            />
-          </Box>
-          <List>
-            {userList.map((user) => (
-              <ListItem
-                button="true"
-                key={user.id}
-                selected={selectedUser?.userId === user.userId}
-                onClick={() => setSelectedUser(user)}
-                sx={{
-                  backgroundColor:
-                    selectedUser?.userId === user.userId
-                      ? "#d1d4f6"
-                      : "inherit",
-                }}
-              >
-                <ListItemAvatar>
-                  <Avatar src={user.photo || DefaultUserImage} />
-                </ListItemAvatar>
-                <ListItemText
-                  primary={`${user.firstName} ${user.lastName}`}
-                  secondary={user.lastMessage}
-                />
-              </ListItem>
-            ))}
-          </List>
-        </UserListContainer>
-        <MessageListContainer>
-          <Messages>
-            {messages.length === 0 && selectedUser ? (
-              <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                justifyContent="center"
-                height="100%"
-                textAlign="center"
-              >
-                <Avatar
-                  src={selectedUser.photo}
-                  sx={{ width: 120, height: 120, mb: 2 }}
-                />
-                <Typography variant="h6">
-                  {selectedUser.firstName} {selectedUser.lastName}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  No messages yet. Start the conversation!
-                </Typography>
-              </Box>
-            ) : (
-              messages.map((message) => (
-                <Box
-                  key={message.id}
-                  display="flex"
-                  justifyContent={
-                    message.senderId === currentUser.uid
-                      ? "flex-end"
-                      : "flex-start"
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#f4f4f4",
+        }}
+      >
+        <CircularProgress sx={{ color: "#5e62d1" }} />
+      </Box>
+    );
+  } else {
+    return (
+      <ChatContainer>
+        <CustomSeparator />
+        <Box display="flex" height="100%">
+          <UserListContainer>
+            <Box padding="10px" marginTop="30px">
+              <StyledTextField
+                fullWidth
+                variant="outlined"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
                   }
-                  marginBottom="10px"
+                }}
+                placeholder="Search by name"
+                InputProps={{
+                  endAdornment: (
+                    <Tooltip title="Search" arrow>
+                      <IconButton
+                        onClick={handleSearch}
+                        style={{
+                          backgroundColor: "#5e62d1",
+                          color: "#fff",
+                          padding: "10px",
+                          borderRadius: "50%",
+                          transition: "transform 0.2s, background-color 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#4248a6";
+                          e.currentTarget.style.transform = "scale(1.1)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#5e62d1";
+                          e.currentTarget.style.transform = "scale(1)";
+                        }}
+                      >
+                        <SearchIcon />
+                      </IconButton>
+                    </Tooltip>
+                  ),
+                }}
+              />
+            </Box>
+            <List>
+              {userList.map((user) => (
+                <ListItem
+                  button="true"
+                  key={user.id}
+                  selected={selectedUser?.userId === user.userId}
+                  onClick={() => setSelectedUser(user)}
+                  sx={{
+                    backgroundColor:
+                      selectedUser?.userId === user.userId
+                        ? "#d1d4f6"
+                        : "inherit",
+                  }}
                 >
-                  {" "}
+                  <ListItemAvatar>
+                    <Avatar src={user.photo || DefaultUserImage} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={`${user.firstName} ${user.lastName}`}
+                    secondary={user.lastMessage}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          </UserListContainer>
+          <MessageListContainer>
+            <Messages>
+              {messages.length === 0 && selectedUser ? (
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  justifyContent="center"
+                  height="100%"
+                  textAlign="center"
+                >
+                  <Avatar
+                    src={selectedUser.photo}
+                    sx={{ width: 120, height: 120, mb: 2 }}
+                  />
+                  <Typography variant="h6">
+                    {selectedUser.firstName} {selectedUser.lastName}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    No messages yet. Start the conversation!
+                  </Typography>
+                </Box>
+              ) : (
+                messages.map((message) => (
                   <Box
-                    sx={{
-                      backgroundColor:
-                        message.senderId === currentUser.uid
-                          ? "#5e62d1"
-                          : "#ddd",
-                      color:
-                        message.senderId === currentUser.uid ? "#fff" : "#000",
-                      padding: "10px",
-                      borderRadius: "10px",
-                      maxWidth: "70%",
-                      wordWrap: "break-word",
-                    }}
+                    key={message.id}
+                    display="flex"
+                    justifyContent={
+                      message.senderId === currentUser.uid
+                        ? "flex-end"
+                        : "flex-start"
+                    }
+                    marginBottom="10px"
                   >
                     {" "}
-                    <Typography>{message.text}</Typography>{" "}
-                    <Typography
-                      variant="caption"
+                    <Box
                       sx={{
-                        marginTop: "2px",
+                        backgroundColor:
+                          message.senderId === currentUser.uid
+                            ? "#5e62d1"
+                            : "#ddd",
                         color:
                           message.senderId === currentUser.uid
-                            ? "#d3d3d3"
-                            : "555",
+                            ? "#fff"
+                            : "#000",
+                        padding: "10px",
+                        borderRadius: "10px",
+                        maxWidth: "70%",
+                        wordWrap: "break-word",
                       }}
                     >
                       {" "}
-                      {format(
-                        new Date(message.timestamp),
-                        "dd/MM/yyyy hh:mm a"
-                      )}{" "}
-                    </Typography>{" "}
-                  </Box>{" "}
-                </Box>
-              ))
-            )}
-            <div ref={messagesEndRef} />
-          </Messages>
-          <InputContainer>
-            <StyledTextField
-              fullWidth
-              variant="outlined"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  sendMessage();
-                }
-              }}
-              placeholder="Type your message"
-            />
-            <IconButton
-              onClick={sendMessage}
-              sx={{
-                color: "#5e62d1",
-                padding: "10px",
-                transition: "all 0.3s ease-in-out",
-                "&:hover": {
-                  color: "#4a54c1",
-                  transform: "scale(1.1)",
-                },
-              }}
-            >
-              <SendIcon />
-            </IconButton>
-          </InputContainer>
-        </MessageListContainer>
-      </Box>
-    </ChatContainer>
-  );
+                      <Typography>{message.text}</Typography>{" "}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          marginTop: "2px",
+                          color:
+                            message.senderId === currentUser.uid
+                              ? "#d3d3d3"
+                              : "555",
+                        }}
+                      >
+                        {" "}
+                        {format(
+                          new Date(message.timestamp),
+                          "dd/MM/yyyy hh:mm a"
+                        )}{" "}
+                      </Typography>{" "}
+                    </Box>{" "}
+                  </Box>
+                ))
+              )}
+              <div ref={messagesEndRef} />
+            </Messages>
+            <InputContainer>
+              <StyledTextField
+                fullWidth
+                variant="outlined"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    sendMessage();
+                  }
+                }}
+                placeholder="Type your message"
+              />
+              <IconButton
+                onClick={sendMessage}
+                sx={{
+                  color: "#5e62d1",
+                  padding: "10px",
+                  transition: "all 0.3s ease-in-out",
+                  "&:hover": {
+                    color: "#4a54c1",
+                    transform: "scale(1.1)",
+                  },
+                }}
+              >
+                <SendIcon />
+              </IconButton>
+            </InputContainer>
+          </MessageListContainer>
+        </Box>
+      </ChatContainer>
+    );
+  }
 };
 
 export default ChatPage;

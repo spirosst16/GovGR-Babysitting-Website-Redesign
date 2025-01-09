@@ -9,6 +9,7 @@ import {
   Button,
   Rating,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import { styled } from "@mui/system";
@@ -54,6 +55,7 @@ const WelcomePage = () => {
   const [babysitters, setBabysitters] = useState([]);
   const [user, setUser] = useState(null);
   const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(true);
   const [firstName, setFirstName] = useState("");
 
   useEffect(() => {
@@ -70,6 +72,7 @@ const WelcomePage = () => {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
     const fetchBabysitters = async () => {
       try {
         const babysittersCollectionRef = collection(FIREBASE_DB, "babysitters");
@@ -79,8 +82,10 @@ const WelcomePage = () => {
           ...doc.data(),
         }));
         setBabysitters(babysittersList);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching babysitters: ", error);
+        setLoading(false);
       }
     };
 
@@ -89,6 +94,7 @@ const WelcomePage = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (authUser) => {
+      setLoading(true);
       if (authUser) {
         setUser(authUser);
         const email = authUser.email;
@@ -122,202 +128,219 @@ const WelcomePage = () => {
         };
 
         checkRole();
+        setLoading(false);
       } else {
         setUser(null);
         setRole("");
         setFirstName("");
+        setLoading(false);
       }
     });
 
     return () => unsubscribe();
   }, []);
-
-  return (
-    <>
-      <HeroSection>
-        <Box style={{ maxWidth: "50%" }}>
-          <Typography
-            variant="h1"
-            style={{
-              fontFamily: "Poppins, sans-serif",
-              marginBottom: "20px",
-              fontSize: "3rem",
-            }}
-          >
-            Babysitters
-          </Typography>
-          <Typography
-            variant="h5"
-            style={{
-              fontFamily: "Poppins, sans-serif",
-              marginBottom: "30px",
-            }}
-          >
-            Connecting Families with Trusted Babysitters
-          </Typography>
-          <Button
-            variant="contained"
-            component={Link}
-            to="/register"
-            style={{
-              backgroundColor: "#5e62d1",
-              fontFamily: "Poppins, sans-serif",
-              fontSize: "1.2rem",
-              borderRadius: "30px",
-              textTransform: "none",
-            }}
-          >
-            Get started for free
-          </Button>
-        </Box>
-        <Box style={{ maxWidth: "45%" }}>
-          <img
-            src={BabysitterImage}
-            alt="Babysitter"
-            style={{ width: "70%", borderRadius: "10px" }}
-          />
-        </Box>
-      </HeroSection>
-
-      {babysitters.length > 0 && (
-        <>
-          <TitleWrapper>
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#f4f4f4",
+        }}
+      >
+        <CircularProgress sx={{ color: "#5e62d1" }} />
+      </Box>
+    );
+  } else {
+    return (
+      <>
+        <HeroSection>
+          <Box style={{ maxWidth: "50%" }}>
             <Typography
-              variant="h4"
-              style={{ fontFamily: "Poppins, sans-serif", color: "#fff" }}
-            >
-              Browse Babysitters
-            </Typography>
-          </TitleWrapper>
-
-          <CardWrapper>
-            <Box display="flex" justifyContent="center" flexWrap="wrap">
-              {babysitters
-                .sort((a, b) => b.rating - a.rating)
-                .slice(0, 4)
-                .map((babysitter) => (
-                  <BabysitterCard key={babysitter.id}>
-                    <CardContent style={{ textAlign: "center" }}>
-                      <Avatar
-                        src={babysitter.photo || ""}
-                        style={{
-                          margin: "10px auto",
-                          width: "80px",
-                          height: "80px",
-                        }}
-                      />
-                      <Typography
-                        variant="h6"
-                        style={{
-                          fontFamily: "Poppins, sans-serif",
-                          color: "#000",
-                        }}
-                      >
-                        {`${babysitter.firstName} ${babysitter.lastName}`}
-                      </Typography>
-                      <Typography
-                        style={{
-                          color: "#888",
-                          fontFamily: "Poppins, sans-serif",
-                        }}
-                      >
-                        {babysitter.city}
-                      </Typography>
-                      <Rating
-                        name={`rating-${babysitter.id}`}
-                        value={babysitter.rating}
-                        precision={0.5}
-                        readOnly
-                        size="large"
-                      />
-                    </CardContent>
-                  </BabysitterCard>
-                ))}
-            </Box>
-          </CardWrapper>
-        </>
-      )}
-
-      <Container style={{ margin: "50px auto" }}>
-        <Typography
-          variant="h4"
-          style={{
-            textAlign: "center",
-            marginBottom: "30px",
-            fontFamily: "Poppins, sans-serif",
-          }}
-        >
-          Find Babysitters or jobs, fast and easy!
-        </Typography>
-        <Box display="flex" flexDirection="column" alignItems="center">
-          {["Search", "Contact", "Childcare Services"].map((step, index) => (
-            <Box
-              key={index}
+              variant="h1"
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                textAlign: "left",
-                margin: "20px 0",
-                maxWidth: "600px",
-                width: "100%",
-                position: "relative",
-                paddingLeft: "70px",
+                fontFamily: "Poppins, sans-serif",
+                marginBottom: "20px",
+                fontSize: "3rem",
               }}
             >
+              Babysitters
+            </Typography>
+            <Typography
+              variant="h5"
+              style={{
+                fontFamily: "Poppins, sans-serif",
+                marginBottom: "30px",
+              }}
+            >
+              Connecting Families with Trusted Babysitters
+            </Typography>
+            <Button
+              variant="contained"
+              component={Link}
+              to="/register"
+              style={{
+                backgroundColor: "#5e62d1",
+                fontFamily: "Poppins, sans-serif",
+                fontSize: "1.2rem",
+                borderRadius: "30px",
+                textTransform: "none",
+              }}
+            >
+              Get started for free
+            </Button>
+          </Box>
+          <Box style={{ maxWidth: "45%" }}>
+            <img
+              src={BabysitterImage}
+              alt="Babysitter"
+              style={{ width: "70%", borderRadius: "10px" }}
+            />
+          </Box>
+        </HeroSection>
+
+        {babysitters.length > 0 && (
+          <>
+            <TitleWrapper>
+              <Typography
+                variant="h4"
+                style={{ fontFamily: "Poppins, sans-serif", color: "#fff" }}
+              >
+                Browse Babysitters
+              </Typography>
+            </TitleWrapper>
+
+            <CardWrapper>
+              <Box display="flex" justifyContent="center" flexWrap="wrap">
+                {babysitters
+                  .sort((a, b) => b.rating - a.rating)
+                  .slice(0, 4)
+                  .map((babysitter) => (
+                    <BabysitterCard key={babysitter.id}>
+                      <CardContent style={{ textAlign: "center" }}>
+                        <Avatar
+                          src={babysitter.photo || ""}
+                          style={{
+                            margin: "10px auto",
+                            width: "80px",
+                            height: "80px",
+                          }}
+                        />
+                        <Typography
+                          variant="h6"
+                          style={{
+                            fontFamily: "Poppins, sans-serif",
+                            color: "#000",
+                          }}
+                        >
+                          {`${babysitter.firstName} ${babysitter.lastName}`}
+                        </Typography>
+                        <Typography
+                          style={{
+                            color: "#888",
+                            fontFamily: "Poppins, sans-serif",
+                          }}
+                        >
+                          {babysitter.city}
+                        </Typography>
+                        <Rating
+                          name={`rating-${babysitter.id}`}
+                          value={babysitter.rating}
+                          precision={0.5}
+                          readOnly
+                          size="large"
+                        />
+                      </CardContent>
+                    </BabysitterCard>
+                  ))}
+              </Box>
+            </CardWrapper>
+          </>
+        )}
+
+        <Container style={{ margin: "50px auto" }}>
+          <Typography
+            variant="h4"
+            style={{
+              textAlign: "center",
+              marginBottom: "30px",
+              fontFamily: "Poppins, sans-serif",
+            }}
+          >
+            Find Babysitters or jobs, fast and easy!
+          </Typography>
+          <Box display="flex" flexDirection="column" alignItems="center">
+            {["Search", "Contact", "Childcare Services"].map((step, index) => (
               <Box
+                key={index}
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  width: "50px",
-                  height: "50px",
-                  backgroundColor: "#5e62d1",
-                  color: "white",
-                  fontWeight: "bold",
-                  borderRadius: "50%",
-                  fontFamily: "Poppins, sans-serif",
-                  fontSize: "24px",
-                  position: "absolute",
-                  left: "0",
+                  justifyContent: "flex-start",
+                  textAlign: "left",
+                  margin: "20px 0",
+                  maxWidth: "600px",
+                  width: "100%",
+                  position: "relative",
+                  paddingLeft: "70px",
                 }}
               >
-                {index + 1}
-              </Box>
-              <Box>
-                <Typography
+                <Box
                   style={{
-                    fontFamily: "Poppins, sans-serif",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "50px",
+                    height: "50px",
+                    backgroundColor: "#5e62d1",
+                    color: "white",
                     fontWeight: "bold",
-                    marginBottom: "5px",
+                    borderRadius: "50%",
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: "24px",
+                    position: "absolute",
+                    left: "0",
                   }}
                 >
-                  {step}
-                </Typography>
-                {index === 0 && (
-                  <Typography style={{ fontFamily: "Poppins, sans-serif" }}>
-                    Use filters based on your needs and check recommended
-                    profiles.
+                  {index + 1}
+                </Box>
+                <Box>
+                  <Typography
+                    style={{
+                      fontFamily: "Poppins, sans-serif",
+                      fontWeight: "bold",
+                      marginBottom: "5px",
+                    }}
+                  >
+                    {step}
                   </Typography>
-                )}
-                {index === 1 && (
-                  <Typography style={{ fontFamily: "Poppins, sans-serif" }}>
-                    Send messages, rate members, and schedule a meet-up.
-                  </Typography>
-                )}
-                {index === 2 && (
-                  <Typography style={{ fontFamily: "Poppins, sans-serif" }}>
-                    Book childcare, make payments or get paid, and download
-                    receipts for your expenses.
-                  </Typography>
-                )}
+                  {index === 0 && (
+                    <Typography style={{ fontFamily: "Poppins, sans-serif" }}>
+                      Use filters based on your needs and check recommended
+                      profiles.
+                    </Typography>
+                  )}
+                  {index === 1 && (
+                    <Typography style={{ fontFamily: "Poppins, sans-serif" }}>
+                      Send messages, rate members, and schedule a meet-up.
+                    </Typography>
+                  )}
+                  {index === 2 && (
+                    <Typography style={{ fontFamily: "Poppins, sans-serif" }}>
+                      Book childcare, make payments or get paid, and download
+                      receipts for your expenses.
+                    </Typography>
+                  )}
+                </Box>
               </Box>
-            </Box>
-          ))}
-        </Box>
-      </Container>
-    </>
-  );
+            ))}
+          </Box>
+        </Container>
+      </>
+    );
+  }
 };
 
 export default WelcomePage;
