@@ -12,7 +12,7 @@ import {
   Alert,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import '../../style.css';
+import "../../style.css";
 
 // Logo components
 const LogoContainer = styled("div")({
@@ -54,44 +54,47 @@ const RegistrationForm = () => {
   const navigate = useNavigate();
 
   const handleRegistration = async (role) => {
-	try {
-	  const userCredential = await createUserWithEmailAndPassword(
-		FIREBASE_AUTH,
-		email,
-		password
-	  );
-	  const { uid } = userCredential.user;
-  
-	  try {
-		const userDocRef = doc(FIREBASE_DB, "users", uid);
-		await setDoc(userDocRef, {
-		  email,
-		  password,
-		  role,
-		});
-	  } catch (dbError) {
-		console.error("Firestore error:", dbError);
-		setError("Failed to write to Firestore.");
-		return;
-	  }
-  
-	  const path = role === "Babysitter" ? "/babysitter-form" : "/guardian-form";
-  
-	  navigate(path, { state: { email, password } });
-	} catch (error) {
-	  console.error(error);
-  
-	  if (error.code === "auth/email-already-in-use") {
-		setError("This email is already in use.");
-	  } else if (error.code === "auth/invalid-email") {
-		setError("The email address is not valid.");
-	  } else if (error.code === "auth/weak-password") {
-		setError("The password is too weak.");
-	  } else {
-		setError(`An error occurred while registering as a ${role}. Please try again.`);
-	  }
-	}
-  };  
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        FIREBASE_AUTH,
+        email,
+        password
+      );
+      const { uid } = userCredential.user;
+
+      try {
+        const userDocRef = doc(FIREBASE_DB, "users", uid);
+        await setDoc(userDocRef, {
+          email,
+          password,
+          role,
+        });
+      } catch (dbError) {
+        console.error("Firestore error:", dbError);
+        setError("Failed to write to Firestore.");
+        return;
+      }
+
+      const path =
+        role === "Babysitter" ? "/babysitter-form" : "/guardian-form";
+
+      navigate(path, { state: { email, password } });
+    } catch (error) {
+      console.error(error);
+
+      if (error.code === "auth/email-already-in-use") {
+        setError("This email is already in use.");
+      } else if (error.code === "auth/invalid-email") {
+        setError("The email address is not valid.");
+      } else if (error.code === "auth/weak-password") {
+        setError("The password is too weak.");
+      } else {
+        setError(
+          `An error occurred while registering as a ${role}. Please try again.`
+        );
+      }
+    }
+  };
 
   return (
     <>
@@ -110,9 +113,17 @@ const RegistrationForm = () => {
           fontFamily: "Poppins, sans-serif",
         }}
       >
-        <LogoContainer>
+        <LogoContainer
+          onClick={() => navigate("/")}
+          sx={{
+            cursor: "pointer",
+          }}
+        >
           <Logo>
-            <LogoImage src={require("../../assets/baby-picture.png")} alt="Baby" />
+            <LogoImage
+              src={require("../../assets/baby-picture.png")}
+              alt="Baby"
+            />
           </Logo>
           <LogoText>Babysitters</LogoText>
         </LogoContainer>
@@ -151,16 +162,16 @@ const RegistrationForm = () => {
               sx={{
                 mb: 2,
                 fontFamily: "Poppins, sans-serif",
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#5e62d1',
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#5e62d1",
                   },
                 },
-                '& .MuiInputLabel-root': {
-                  fontFamily: 'Poppins, sans-serif',
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Poppins, sans-serif",
                 },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#5e62d1',
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#5e62d1",
                 },
               }}
             />
@@ -174,16 +185,16 @@ const RegistrationForm = () => {
               sx={{
                 mb: 2,
                 fontFamily: "Poppins, sans-serif",
-                '& .MuiOutlinedInput-root': {
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#5e62d1',
+                "& .MuiOutlinedInput-root": {
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#5e62d1",
                   },
                 },
-                '& .MuiInputLabel-root': {
-                  fontFamily: 'Poppins, sans-serif',
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Poppins, sans-serif",
                 },
-                '& .MuiInputLabel-root.Mui-focused': {
-                  color: '#5e62d1',
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: "#5e62d1",
                 },
               }}
             />
@@ -199,12 +210,12 @@ const RegistrationForm = () => {
                 onClick={() => handleRegistration("Babysitter")}
                 variant="contained"
                 sx={{
-                  backgroundColor: '#5e62d1',
-                  '&:hover': { backgroundColor: '#4a51a4' },
+                  backgroundColor: "#5e62d1",
+                  "&:hover": { backgroundColor: "#4a51a4" },
                   mb: 1,
                   fontFamily: "Poppins, sans-serif",
-                  borderRadius: '20px',
-                  textTransform: 'none'
+                  borderRadius: "20px",
+                  textTransform: "none",
                 }}
               >
                 Register as Babysitter
@@ -213,12 +224,12 @@ const RegistrationForm = () => {
                 onClick={() => handleRegistration("Guardian")}
                 variant="contained"
                 sx={{
-                  backgroundColor: '#5e62d1',
-                  '&:hover': { backgroundColor: '#4a51a4' },
+                  backgroundColor: "#5e62d1",
+                  "&:hover": { backgroundColor: "#4a51a4" },
                   mb: 1,
                   fontFamily: "Poppins, sans-serif",
-                  borderRadius: '20px',
-                  textTransform: 'none'
+                  borderRadius: "20px",
+                  textTransform: "none",
                 }}
               >
                 Register as Guardian
@@ -229,27 +240,27 @@ const RegistrationForm = () => {
               textAlign="center"
               sx={{ mt: 2, fontFamily: "Poppins, sans-serif" }}
             >
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link
                 to="/login"
                 style={{
-                  textDecoration: 'none',
-                  color: '#5e62d1',
-                  borderRadius: '0',
-                  transition: 'all 0.3s',
-                  padding: '2px 6px',
+                  textDecoration: "none",
+                  color: "#5e62d1",
+                  borderRadius: "0",
+                  transition: "all 0.3s",
+                  padding: "2px 6px",
                 }}
                 onMouseOver={(e) => {
-                  e.target.style.textDecoration = 'underline';
-                  e.target.style.color = '#4845a2';
-                  e.target.style.borderRadius = '30px';
-                  e.target.style.backgroundColor = 'rgba(94, 98, 209, 0.1)';
+                  e.target.style.textDecoration = "underline";
+                  e.target.style.color = "#4845a2";
+                  e.target.style.borderRadius = "30px";
+                  e.target.style.backgroundColor = "rgba(94, 98, 209, 0.1)";
                 }}
                 onMouseOut={(e) => {
-                  e.target.style.textDecoration = 'none';
-                  e.target.style.color = '#5e62d1';
-                  e.target.style.borderRadius = '0';
-                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.textDecoration = "none";
+                  e.target.style.color = "#5e62d1";
+                  e.target.style.borderRadius = "0";
+                  e.target.style.backgroundColor = "transparent";
                 }}
               >
                 Login
