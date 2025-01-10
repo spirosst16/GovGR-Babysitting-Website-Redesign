@@ -292,6 +292,7 @@ const AgreementPage = () => {
     endingDate: "",
     additionalNotes: "",
     amount: "",
+    vouchersClaimed: 0,
   });
   const [errors, setErrors] = useState({
     area: false,
@@ -466,6 +467,7 @@ const AgreementPage = () => {
         paymentStatus: "unknown",
         lastPaymentDate: formValues.startingDate,
         amount: formValues.jobType === "Part-time" ? "300" : "500",
+        vouchersClaimed: 0,
       });
 
       setStatus("pending");

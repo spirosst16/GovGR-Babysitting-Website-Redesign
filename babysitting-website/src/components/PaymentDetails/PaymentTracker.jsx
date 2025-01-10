@@ -95,6 +95,8 @@ const steps = [
 ];
 
 const PaymentTracker = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { agreementId } = useParams();
   const [userId1, setUserId1] = useState(null);
   const [userId2, setUserId2] = useState(null);
@@ -265,30 +267,21 @@ const PaymentTracker = () => {
         const K = Math.floor(dayDifference / 30);
 
         if (K >= 1) {
-          let updatedAmount = agreementData.amount;
           let newLastPaymentDate = new Date(lastPaymentDate);
 
           if (agreementData.paymentStatus === "not available yet") {
-            updatedAmount = `${K}X`;
             newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + K);
 
             await updateDoc(agreementDocRef, {
               paymentStatus: "pending guardian",
-              amount: updatedAmount,
               lastPaymentDate: newLastPaymentDate.toISOString(),
             });
 
             setAgreement((prev) => ({
               ...prev,
               paymentStatus: "pending guardian",
-              amount: updatedAmount,
               lastPaymentDate: newLastPaymentDate.toISOString(),
             }));
-
-            console.log(
-              "Payment status updated to pending guardian with amount:",
-              updatedAmount
-            );
           } else if (
             agreementData.paymentStatus === "pending guardian" ||
             agreementData.paymentStatus === "pending babysitter"
@@ -296,21 +289,16 @@ const PaymentTracker = () => {
             const previousK =
               parseInt(agreementData.amount.match(/\d+/)[0], 10) || 0;
             const newK = previousK + 1;
-            updatedAmount = `${newK}X`;
             newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + 1);
 
             await updateDoc(agreementDocRef, {
-              amount: updatedAmount,
               lastPaymentDate: newLastPaymentDate.toISOString(),
             });
 
             setAgreement((prev) => ({
               ...prev,
-              amount: updatedAmount,
               lastPaymentDate: newLastPaymentDate.toISOString(),
             }));
-
-            console.log("Amount updated to:", updatedAmount);
           }
         }
       } else {
@@ -391,6 +379,7 @@ const PaymentTracker = () => {
       await updatePaymentStatusToPendingBabysitter();
       setCurrentStep(0);
       setWorkConfirmed(false);
+      navigate("/my-dashboard");
     } catch (error) {
       console.error("Error resetting and updating status:", error.message);
     }
