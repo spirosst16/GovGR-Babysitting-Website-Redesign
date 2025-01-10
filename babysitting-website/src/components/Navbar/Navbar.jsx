@@ -258,7 +258,7 @@ const Navbar = () => {
                 <MenuItem
                   onClick={() => {
                     handleMenuClose();
-                    navigate("/my-agreements-and-applications");
+                    navigate("/my-dashboard");
                   }}
                 >
                   Dashboard

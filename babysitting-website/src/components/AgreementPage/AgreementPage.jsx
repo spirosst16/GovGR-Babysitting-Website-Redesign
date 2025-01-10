@@ -199,7 +199,7 @@ const CustomSeparator = () => {
       "/babysitting-jobs": "Babysitting Jobs",
       "/how-it-works": "How It Works",
       "/babysitting-application": "Babysitting Application",
-      "/my-agreements-and-applications": "My Agreements & Applications",
+      "/my-dashboard": "My Dashboard",
       "/application/:userId": "Application Details",
       "/edit-application/:userId": "Edit Application",
       "/agreement/:agreementId": "Agreement",
@@ -547,7 +547,7 @@ const AgreementPage = () => {
 
       setStatus("");
       console.log("Agreement declined and deleted.");
-      navigate("/my-agreements-and-applications");
+      navigate("/my-dashboard");
     } catch (error) {
       console.error("Error declining agreement:", error);
       setAlert({

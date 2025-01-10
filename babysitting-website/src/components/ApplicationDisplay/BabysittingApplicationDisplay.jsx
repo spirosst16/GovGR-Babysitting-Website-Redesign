@@ -165,7 +165,7 @@ const CustomSeparator = () => {
       "/babysitting-jobs": "Babysitting Jobs",
       "/how-it-works": "How It Works",
       "/babysitting-application": "Babysitting Application",
-      "/my-agreements-and-applications": "My Agreements & Applications",
+      "/my-dashboard": "My Dashboard",
       "/application/:userId": "Application Details",
       "/edit-application/:userId": "Edit Application",
       "/agreement/:agreementId": "Agreement",
@@ -520,7 +520,7 @@ const BabysittingApplicationDisplay = () => {
         application.id
       );
       await deleteDoc(applicationDocRef);
-      navigate("/my-agreements-and-applications");
+      navigate("/my-dashboard");
     } catch (error) {
       console.error("Error deleting application: ", error);
       setAlert({

@@ -191,7 +191,7 @@ const CustomSeparator = () => {
         fontFamily: "Poppins, sans-serif",
       }}
     >
-      My Agreements & Applications
+      My Dashboard
     </Link>,
   ];
 
@@ -287,7 +287,7 @@ const CompactWeeklySchedule = ({ availability }) => {
   );
 };
 
-const MyAgreementsAndApplicationsPage = () => {
+const MyDashboard = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   const [agreements, setAgreements] = useState([]);
@@ -961,20 +961,6 @@ const MyAgreementsAndApplicationsPage = () => {
     return (
       <Container>
         <CustomSeparator />
-        <Header>
-          <Typography
-            variant="h4"
-            style={{ fontFamily: "Poppins, sans-serif", fontWeight: "600" }}
-          >
-            My Agreements & Applications
-          </Typography>
-          <Typography
-            variant="h6"
-            style={{ fontFamily: "Poppins, sans-serif", marginTop: "10px" }}
-          >
-            Manage your applications and job history seamlessly.
-          </Typography>
-        </Header>
 
         <TabContainer>
           <TabContainer>
@@ -1018,4 +1004,4 @@ const MyAgreementsAndApplicationsPage = () => {
   }
 };
 
-export default MyAgreementsAndApplicationsPage;
+export default MyDashboard;
