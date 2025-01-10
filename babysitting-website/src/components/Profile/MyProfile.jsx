@@ -186,8 +186,7 @@ const ProfilePage = () => {
                     id: doc.id,
                     ...doc.data(),
                   }))[0];
-                  console.log("Reviewer: ", reviewer);
-                  // Combine review data with reviewer data
+
                   return {
                     reviewer,
                     review: reviewData,
@@ -216,27 +215,7 @@ const ProfilePage = () => {
       }
     };
 
-    // const fetchReviews = async () => {
-    //   try {
-    //     // Mock data for reviews
-    //     setReviews([
-    //       {
-    //         reviewer: "Guardian Name 1",
-    //         text: "Review 1",
-    //         rating: 4,
-    //       },
-    //       {
-    //         reviewer: "Guardian Name 2",
-    //         text: "Review 2",
-    //         rating: 5,
-    //       },
-    //     ]);
-    //   } catch (error) {
-    //     console.error("Error fetching reviews:", error);
-    //   }
-    // };
     fetchProfileData(userId);
-    // fetchReviews();
   }, [userId]);
 
   if (loading) {
