@@ -285,12 +285,13 @@ const AgreementPage = () => {
   const [loading, setLoading] = useState(true);
   const [formValues, setFormValues] = useState({
     area: "",
+    jobType: "",
     weeklySchedule: [],
     babysittingPlace: "",
     startingDate: "",
     endingDate: "",
     additionalNotes: "",
-    amount: "X",
+    amount: "",
   });
   const [errors, setErrors] = useState({
     area: false,
@@ -370,6 +371,7 @@ const AgreementPage = () => {
           setUserId2(agreementData.recipientId);
           setFormValues({
             area: agreementData.area || "",
+            jobType: agreementData.jobType || "",
             weeklySchedule: agreementData.weeklySchedule || [],
             babysittingPlace: agreementData.babysittingPlace || "",
             startingDate: agreementData.startingDate || "",
@@ -421,6 +423,7 @@ const AgreementPage = () => {
   const validateForm = () => {
     let formErrors = {
       area: !formValues.area,
+      jobType: !formValues.jobType,
       weeklySchedule: formValues.weeklySchedule.length === 0,
       babysittingPlace: formValues.babysittingPlace.length === 0,
       startingDate: !formValues.startingDate,
@@ -462,6 +465,7 @@ const AgreementPage = () => {
         ...formValues,
         paymentStatus: "unknown",
         lastPaymentDate: formValues.startingDate,
+        amount: formValues.jobType === "Part-time" ? "300" : "500",
       });
 
       setStatus("pending");
@@ -703,6 +707,53 @@ const AgreementPage = () => {
                 sx={{ fontFamily: "'Poppins', sans-serif" }}
               />
 
+              <FormControl component="fieldset">
+                <FormLabel
+                  component="legend"
+                  sx={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: "20px",
+                    "&.Mui-focused": {
+                      color: "#5e62d1",
+                    },
+                  }}
+                >
+                  Job Type *
+                </FormLabel>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: 2,
+                  }}
+                >
+                  <FormControlLabel
+                    control={
+                      <StyledRadio
+                        checked={formValues.jobType === "Part-time"}
+                        onChange={() =>
+                          setFormValues({ ...formValues, jobType: "Part-time" })
+                        }
+                      />
+                    }
+                    label="Part-time"
+                    sx={{ fontFamily: "'Poppins', sans-serif" }}
+                  />
+                  <FormControlLabel
+                    control={
+                      <StyledRadio
+                        checked={formValues.jobType === "Full-time"}
+                        onChange={() =>
+                          setFormValues({ ...formValues, jobType: "Full-time" })
+                        }
+                      />
+                    }
+                    label="Full-time"
+                    sx={{ fontFamily: "'Poppins', sans-serif" }}
+                  />
+                </Box>
+              </FormControl>
+
               <FormControl>
                 <FormLabel
                   component="legend"
@@ -880,6 +931,18 @@ const AgreementPage = () => {
                 </Box>{" "}
                 <Box component="span" sx={{ fontWeight: "normal" }}>
                   {formValues.area}
+                </Box>
+              </Typography>
+
+              <Typography
+                variant="h6"
+                sx={{ fontFamily: "'Poppins', sans-serif" }}
+              >
+                <Box component="span" sx={{ fontWeight: "bold" }}>
+                  Job Type:
+                </Box>{" "}
+                <Box component="span" sx={{ fontWeight: "normal" }}>
+                  {formValues.jobType}
                 </Box>
               </Typography>
 
