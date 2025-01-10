@@ -184,7 +184,7 @@ const GuardianInfoForm = () => {
     e.preventDefault();
 
     for (const key in formValues) {
-      if (formValues[key] === "") {
+      if (formValues[key] === "" && key !== "photo") {
         setAlert({
           open: true,
           message: `Please fill out the ${key} field.`,
@@ -211,6 +211,7 @@ const GuardianInfoForm = () => {
 
       await addDoc(guardiansCollectionRef, {
         ...formValues,
+        photo: formValues.photo || defaultProfile,
         userId: currentUser.uid,
       });
 
@@ -529,7 +530,7 @@ const GuardianInfoForm = () => {
                     fontFamily: "Poppins, sans-serif",
                   }}
                 >
-                  Upload Photo
+                  Upload Photo (Optional)
                 </Typography>
                 <Box
                   sx={{
