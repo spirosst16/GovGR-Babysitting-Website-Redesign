@@ -542,7 +542,12 @@ const BabysittingApplicationDisplay = () => {
       alert("No valid user.");
       return;
     }
-
+    if (currentUser === null) {
+      navigate("/login", {
+        state: { selectedUser: user, from: "/chats" },
+      });
+      return;
+    }
     navigate(`/chats`, {
       state: { selectedUser: user }, // Passing selectedUser as state
     });

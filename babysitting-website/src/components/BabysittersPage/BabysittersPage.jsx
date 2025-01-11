@@ -176,6 +176,7 @@ const CustomSeparator = () => {
 
 const BabysittersPage = () => {
   const [babysitters, setBabysitters] = useState([]);
+  const [userRole, setUserRole] = useState(null);
   const [babysittingApplications, setBabysittingApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
@@ -222,6 +223,40 @@ const BabysittersPage = () => {
   const babysittingPlaceOptions = ["Family's House", "Babysitter's House"];
   const childAgeOptions = ["0-1", "2-3", "4-5", "6-12", "13-17"];
   const jobTypeOptions = ["Part-time", "Full-time"];
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email;
+
+        // Check if user is a babysitter
+        const babysitterQuery = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("email", "==", email)
+        );
+        const babysitterSnapshot = await getDocs(babysitterQuery);
+        if (!babysitterSnapshot.empty) {
+          setUserRole("babysitter");
+          return;
+        }
+
+        // Check if user is a guardian
+        const guardianQuery = query(
+          collection(FIREBASE_DB, "guardians"),
+          where("email", "==", email)
+        );
+        const guardianSnapshot = await getDocs(guardianQuery);
+        if (!guardianSnapshot.empty) {
+          setUserRole("guardian");
+          return;
+        }
+      }
+      setUserRole(null); // Not logged in
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -338,6 +373,18 @@ const BabysittersPage = () => {
   } else {
     displayBabysitters = babysitters;
   }
+
+  const handleApplication = async () => {
+    if (userRole === null) {
+      navigate("/login", {
+        state: { from: "/babysitting-application" },
+      });
+      return;
+    }
+    navigate(`/babysitting-application`, {
+      state: { from: location.pathname },
+    });
+  };
 
   useEffect(() => {
     if (!loading && babysitters.length > 0) {
@@ -812,11 +859,7 @@ const BabysittersPage = () => {
               fontWeight: "600",
               fontSize: "16px",
             }}
-            onClick={() =>
-              navigate(`/babysitting-application`, {
-                state: { from: location.pathname },
-              })
-            }
+            onClick={handleApplication}
           >
             Create an application now
           </Button>

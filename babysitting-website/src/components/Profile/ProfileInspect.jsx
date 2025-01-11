@@ -17,7 +17,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   collection,
   query,
@@ -105,6 +105,8 @@ const ProfileInspect = () => {
   const [userId, setUserId] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const navigate = useNavigate();
+  const currentLocation = useLocation();
+
   const { profileUserID } = useParams();
   const [profileData, setProfileData] = useState({
     city: "",
@@ -262,8 +264,14 @@ const ProfileInspect = () => {
       return;
     }
 
+    if (userId === null) {
+      navigate("/login", {
+        state: { selectedUser: profileData, from: "/chats" },
+      });
+      return;
+    }
     navigate(`/chats`, {
-      state: { selectedUser: profileData }, // Passing selectedUser as state
+      state: { selectedUser: profileData },
     });
   };
 
