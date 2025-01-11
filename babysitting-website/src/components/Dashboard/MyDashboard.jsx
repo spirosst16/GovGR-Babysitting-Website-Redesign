@@ -23,7 +23,13 @@ import PaymentsIcon from "@mui/icons-material/Payments";
 import HistoryIcon from "@mui/icons-material/History";
 import DoneIcon from "@mui/icons-material/Done";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 
 const Container = styled(Box)({
@@ -88,7 +94,7 @@ const CardHeader = styled(Box)({
 
 const StatusChip = styled(Box)(({ status }) => ({
   backgroundColor:
-    status === "temporary"
+    status === "temporary" || status === "pending"
       ? "#FFC107"
       : status === "active"
       ? "#4CAF50"
@@ -394,13 +400,25 @@ const MyDashboard = () => {
         const fetchedAgreements = await Promise.all(
           agreementsSnap.map(async (doc) => {
             const agreement = doc.data();
+            const agreementId = doc.id;
+
+            const isExpired =
+              new Date(agreement.endingDate) < new Date() &&
+              agreement.status === "accepted";
+
+            if (isExpired) {
+              await updateDoc(doc.ref, { status: "history" });
+              agreement.status = "history";
+            }
+
             const otherUserId =
               agreement.senderId === userId
                 ? agreement.recipientId
                 : agreement.senderId;
             const otherUser = await fetchUserData(otherUserId);
+
             return {
-              id: doc.id,
+              id: agreementId,
               ...agreement,
               otherUser,
             };
@@ -585,129 +603,220 @@ const MyDashboard = () => {
     }
 
     if (currentTab === 0) {
-      const filteredAgreements = agreements.filter(
-        (agreement) => new Date(agreement.endingDate) <= new Date()
+      const activeAgreements = agreements.filter(
+        (agreement) =>
+          agreement.status === "accepted" || agreement.status === "pending"
       );
+
+      const historicalAgreements = agreements.filter(
+        (agreement) => agreement.status === "history"
+      );
+
       return (
         <>
           {renderNotifications()}
           <Grid
             container
-            spacing={3}
+            spacing={4}
             justifyContent="center"
-            alignItems="center"
-            wrap="wrap"
+            alignItems="flex-start"
           >
-            {agreements.length > 0 ? (
-              agreements
-                .filter(
-                  (agreement) =>
-                    !filteredAgreements.some((fa) => fa.id === agreement.id)
-                )
-                .map((agreement) => (
-                  <Grid item xs={12} sm={6} md={4} key={agreement.id}>
-                    <ApplicationCard
-                      onClick={() => navigate(`/agreement/${agreement.id}`)}
-                      style={{
-                        cursor: "pointer",
-                      }}
-                    >
-                      <CardContent>
-                        <CardHeader>
-                          <Box display="flex" alignItems="center">
-                            {agreement.otherUser && (
-                              <>
-                                <Avatar
-                                  src={agreement.otherUser.photo || ""}
-                                  alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
-                                  style={{
-                                    marginBottom: "10px",
-                                    marginRight: "6px",
-                                    width: "65px",
-                                    height: "65px",
-                                  }}
-                                />
-                                <Typography variant="h6" fontWeight={600}>
-                                  {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
-                                </Typography>
-                              </>
-                            )}
-                          </Box>
-                          <StatusChip status={agreement.status}>
-                            {agreement.status}
-                          </StatusChip>
-                        </CardHeader>
-                        <Typography
-                          variant="body1"
-                          marginLeft="20px"
-                          marginTop="10px"
-                        >
-                          <strong>Babysitting Place:</strong>{" "}
-                          {agreement.babysittingPlace}
-                        </Typography>
-                        <CompactWeeklySchedule
-                          availability={agreement.weeklySchedule}
-                        />
-                        <ProgressContainer>
-                          {agreement.status === "accepted" && (
+            {/* Active Agreements Section */}
+            <Grid item xs={12} md={6}>
+              <Typography
+                variant="h5"
+                sx={{
+                  textAlign: "center",
+                  marginBottom: "20px",
+                  fontFamily: "Poppins, sans-serif",
+                }}
+              >
+                Active
+              </Typography>
+              <Grid container spacing={3} justifyContent={"center"}>
+                {activeAgreements.length > 0 ? (
+                  activeAgreements.map((agreement) => (
+                    <Grid item xs={12} sm={6} md={8} key={agreement.id}>
+                      <ApplicationCard
+                        onClick={() => navigate(`/agreement/${agreement.id}`)}
+                        style={{
+                          cursor: "pointer",
+                        }}
+                      >
+                        <CardContent>
+                          <CardHeader>
                             <Box display="flex" alignItems="center">
-                              <CircularProgress
-                                variant="determinate"
-                                value={calculateProgress(
-                                  agreement.startingDate,
-                                  agreement.endingDate
-                                )}
-                                size={40}
-                                thickness={4}
-                              />
-                              <Typography
-                                variant="body1"
-                                style={{ marginLeft: "16px" }}
-                              >
-                                {Math.round(
-                                  calculateProgress(
+                              {agreement.otherUser && (
+                                <>
+                                  <Avatar
+                                    src={agreement.otherUser.photo || ""}
+                                    alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                                    style={{
+                                      marginBottom: "10px",
+                                      marginRight: "6px",
+                                      width: "65px",
+                                      height: "65px",
+                                    }}
+                                  />
+                                  <Typography variant="h6" fontWeight={600}>
+                                    {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                                  </Typography>
+                                </>
+                              )}
+                            </Box>
+                            <StatusChip status={agreement.status}>
+                              {agreement.status.charAt(0).toUpperCase() +
+                                agreement.status.slice(1)}
+                            </StatusChip>
+                          </CardHeader>
+                          <Typography
+                            variant="body1"
+                            marginLeft="20px"
+                            marginTop="10px"
+                          >
+                            <strong>Babysitting Place:</strong>{" "}
+                            {agreement.babysittingPlace}
+                          </Typography>
+                          <CompactWeeklySchedule
+                            availability={agreement.weeklySchedule}
+                          />
+                          <ProgressContainer>
+                            {agreement.status === "accepted" && (
+                              <Box display="flex" alignItems="center">
+                                <CircularProgress
+                                  variant="determinate"
+                                  value={calculateProgress(
                                     agreement.startingDate,
                                     agreement.endingDate
-                                  )
-                                )}
-                                % Complete
-                              </Typography>
-                            </Box>
-                          )}
-                        </ProgressContainer>
-                      </CardContent>
-                    </ApplicationCard>
+                                  )}
+                                  size={40}
+                                  thickness={4}
+                                />
+                                <Typography
+                                  variant="body1"
+                                  style={{ marginLeft: "16px" }}
+                                >
+                                  {Math.round(
+                                    calculateProgress(
+                                      agreement.startingDate,
+                                      agreement.endingDate
+                                    )
+                                  )}
+                                  % Complete
+                                </Typography>
+                              </Box>
+                            )}
+                          </ProgressContainer>
+                        </CardContent>
+                      </ApplicationCard>
+                    </Grid>
+                  ))
+                ) : (
+                  <Grid
+                    container
+                    justifyContent="center"
+                    sx={{ marginTop: "16px" }}
+                  >
+                    <Grid item xs={12} sm={6} md={8}>
+                      <ApplicationCard
+                        onClick={() => {
+                          const roleSpecificPath = isBabysitter
+                            ? "/babysitting-jobs"
+                            : "/babysitters";
+                          navigate(roleSpecificPath);
+                        }}
+                        style={{
+                          cursor: "pointer",
+                          border: "2px dashed #9E9E9E",
+                          textAlign: "center",
+                          padding: "20px",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <AddCircleOutlineIcon
+                          style={{ fontSize: 50, color: "#9E9E9E" }}
+                        />
+                        <Typography variant="body1" color="textSecondary">
+                          Browse {isBabysitter ? "Guardians" : "Babysitters"}
+                        </Typography>
+                      </ApplicationCard>
+                    </Grid>
                   </Grid>
-                ))
-            ) : (
-              <Grid item xs={12} sm={6} md={4}>
-                <ApplicationCard
-                  onClick={() => {
-                    const roleSpecificPath = isBabysitter
-                      ? "/babysitting-jobs"
-                      : "/babysitters";
-                    navigate(roleSpecificPath);
-                  }}
-                  style={{
-                    cursor: "pointer",
-                    border: "2px dashed #9E9E9E",
-                    textAlign: "center",
-                    padding: "20px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <AddCircleOutlineIcon
-                    style={{ fontSize: 50, color: "#9E9E9E" }}
-                  />
-                  <Typography variant="body1" color="textSecondary">
-                    Browse {isBabysitter ? "Guardians" : "Babysitters"}
-                  </Typography>
-                </ApplicationCard>
+                )}
               </Grid>
-            )}
+            </Grid>
+
+            {/* History Agreements Section */}
+            <Grid item xs={12} md={6}>
+              <Typography
+                variant="h5"
+                sx={{
+                  textAlign: "center",
+                  marginBottom: "20px",
+                  fontFamily: "Poppins, sans-serif",
+                }}
+              >
+                History
+              </Typography>
+              <Grid container spacing={3} justifyContent={"center"}>
+                {historicalAgreements.length > 0 ? (
+                  historicalAgreements.map((agreement) => (
+                    <Grid item xs={12} sm={6} md={8} key={agreement.id}>
+                      <ApplicationCard
+                        onClick={() => navigate(`/agreement/${agreement.id}`)}
+                        style={{
+                          cursor: "pointer",
+                        }}
+                      >
+                        <CardContent>
+                          <CardHeader>
+                            <Box display="flex" alignItems="center">
+                              {agreement.otherUser && (
+                                <>
+                                  <Avatar
+                                    src={agreement.otherUser.photo || ""}
+                                    alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                                    style={{
+                                      marginBottom: "10px",
+                                      marginRight: "6px",
+                                      width: "65px",
+                                      height: "65px",
+                                    }}
+                                  />
+                                  <Typography variant="h6" fontWeight={600}>
+                                    {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
+                                  </Typography>
+                                </>
+                              )}
+                            </Box>
+                            <StatusChip status="history">History</StatusChip>
+                          </CardHeader>
+                          <Typography
+                            variant="body1"
+                            marginLeft="20px"
+                            marginTop="10px"
+                          >
+                            <strong>Babysitting Place:</strong>{" "}
+                            {agreement.babysittingPlace}
+                          </Typography>
+                        </CardContent>
+                      </ApplicationCard>
+                    </Grid>
+                  ))
+                ) : (
+                  <Typography
+                    variant="body1"
+                    color="textSecondary"
+                    sx={{ textAlign: "center", marginTop: "20px" }}
+                  >
+                    No history found.
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
           </Grid>
         </>
       );
@@ -936,7 +1045,7 @@ const MyDashboard = () => {
                   color="textSecondary"
                   sx={{ textAlign: "center", marginTop: "20px" }}
                 >
-                  No historical applications found.
+                  No history found.
                 </Typography>
               )}
             </Grid>

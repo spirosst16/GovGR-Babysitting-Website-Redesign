@@ -240,7 +240,7 @@ const Navbar = () => {
                 >
                   {!userPhoto && userInitials}
                 </Avatar>
-                <span>▼</span>
+                <span>{Boolean(anchorEl) ? "▲" : "▼"}</span>{" "}
               </DropdownButton>
               <Menu
                 anchorEl={anchorEl}
