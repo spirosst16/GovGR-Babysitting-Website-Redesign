@@ -21,6 +21,7 @@ import {
   query,
   where,
   doc,
+  updateDoc,
   deleteDoc,
   addDoc,
   getDoc,
@@ -519,7 +520,9 @@ const BabysittingApplicationDisplay = () => {
         "babysittingApplications",
         application.id
       );
-      await deleteDoc(applicationDocRef);
+      await updateDoc(applicationDocRef, {
+        status: "history",
+      });
       navigate("/my-dashboard");
     } catch (error) {
       console.error("Error deleting application: ", error);
