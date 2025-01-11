@@ -68,7 +68,7 @@ const LoginForm = () => {
       const babysitterSnapshot = await getDocs(babysitterQuery);
 
       if (!babysitterSnapshot.empty) {
-        navigate(location.state?.from || "/babysitting-jobs", {
+        navigate(location.state?.from || "/my-dashboard", {
           state: { selectedUser: location.state?.selectedUser },
         });
         return;
@@ -81,7 +81,7 @@ const LoginForm = () => {
       const guardianSnapshot = await getDocs(guardianQuery);
 
       if (!guardianSnapshot.empty) {
-        navigate(location.state?.from || "/babysitters", {
+        navigate(location.state?.from || "/my-dashboard", {
           state: { selectedUser: location.state?.selectedUser },
         });
         return;
