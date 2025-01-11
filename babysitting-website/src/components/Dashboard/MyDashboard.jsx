@@ -88,7 +88,7 @@ const CardHeader = styled(Box)({
 
 const StatusChip = styled(Box)(({ status }) => ({
   backgroundColor:
-    status === "draft"
+    status === "temporary"
       ? "#FFC107"
       : status === "active"
       ? "#4CAF50"
@@ -759,9 +759,7 @@ const MyDashboard = () => {
                         <Typography variant="h6" fontWeight={600}>
                           {submittedApplication.area}
                         </Typography>
-                        <StatusChip status={submittedApplication.status}>
-                          {submittedApplication.status}
-                        </StatusChip>
+                        <StatusChip status="active">Active</StatusChip>
                       </CardHeader>
                       <Typography
                         variant="body1"
@@ -1141,7 +1139,7 @@ const MyDashboard = () => {
             >
               <StyledTab label="Agreements" icon={<WorkOutlineIcon />} />
               <StyledTab label="Applications" icon={<DoneIcon />} />
-              <StyledTab label="Payment" icon={<PaymentsIcon />} />
+              <StyledTab label="Payments" icon={<PaymentsIcon />} />
             </StyledTabs>
           </TabContainer>
         </TabContainer>

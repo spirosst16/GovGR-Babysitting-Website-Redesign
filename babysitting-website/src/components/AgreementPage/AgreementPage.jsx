@@ -593,7 +593,13 @@ const AgreementPage = () => {
           <Box>
             <StyledButton onClick={handleAccept}>Accept</StyledButton>
             <StyledButton
-              sx={{ backgroundColor: "red", marginLeft: "10px" }}
+              sx={{
+                backgroundColor: "red",
+                "&:hover": {
+                  backgroundColor: "#b71c1c",
+                },
+                marginLeft: "10px",
+              }}
               onClick={handleDecline}
             >
               Decline

@@ -475,13 +475,13 @@ const BabysittingApplicationDisplay = () => {
   }
 
   const handleCreateAgreement = async () => {
-    if (currentUser && user) {
+    if (currentUser && application) {
       try {
         // Create a new agreement with "temporary" status
         const newAgreementRef = await addDoc(
           collection(FIREBASE_DB, "agreements"),
           {
-            recipientId: user.uid,
+            recipientId: application.userId,
             senderId: currentUser.uid,
             status: "",
           }
