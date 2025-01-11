@@ -380,9 +380,9 @@ const BabysittingApplicationDisplay = () => {
 
     fetchAgreement();
   }, [currentUser, userId]);
-  const handleAvatar = async () => {
+  const handleProfile = async () => {
     if (!user.id) {
-      alert("No valid profile data to save.");
+      alert("No valid user.");
       return;
     }
     if (currentUser === null) {
@@ -536,7 +536,7 @@ const BabysittingApplicationDisplay = () => {
 
   const handleSendMessage = async () => {
     if (!user.id) {
-      alert("No valid profile data to save.");
+      alert("No valid user.");
       return;
     }
 
@@ -596,7 +596,7 @@ const BabysittingApplicationDisplay = () => {
                     cursor: "pointer",
                   },
                 }}
-                onClick={handleAvatar}
+                onClick={handleProfile}
               />
               <ProfileInfo>
                 <Typography
@@ -626,27 +626,59 @@ const BabysittingApplicationDisplay = () => {
                   size="large"
                 />
               </ProfileInfo>
-              <Button
-                variant="contained"
+
+              <Box
                 sx={{
-                  color: "#ffffff",
-                  backgroundColor: "#5e62d1",
-                  borderRadius: "30px",
-                  textTransform: "none",
-                  fontSize: "1rem",
-                  fontFamily: "Poppins, sans-serif",
-                  "&:hover": {
-                    backgroundColor: "#3c3fad",
-                  },
                   display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  mt: 2,
+                  gap: "16px", // Adjust spacing between buttons as needed
+                  justifyContent: "center", // Align buttons horizontally
+                  alignItems: "center", // Align buttons vertically
+                  mt: 2, // Add spacing above the buttons
                 }}
-                onClick={handleSendMessage}
               >
-                Message
-              </Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    color: "#ffffff",
+                    backgroundColor: "#5e62d1",
+                    borderRadius: "30px",
+                    textTransform: "none",
+                    fontSize: "1rem",
+                    fontFamily: "Poppins, sans-serif",
+                    "&:hover": {
+                      backgroundColor: "#3c3fad",
+                    },
+                    display:
+                      currentUserRole === null ||
+                      currentUserRole !== viewedUserRole
+                        ? "flex"
+                        : "none",
+                    gap: "0.5rem",
+                  }}
+                  onClick={handleSendMessage}
+                >
+                  Message
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    color: "#ffffff",
+                    backgroundColor: "#5e62d1",
+                    borderRadius: "30px",
+                    textTransform: "none",
+                    fontSize: "1rem",
+                    fontFamily: "Poppins, sans-serif",
+                    "&:hover": {
+                      backgroundColor: "#3c3fad",
+                    },
+
+                    gap: "0.5rem",
+                  }}
+                  onClick={handleProfile}
+                >
+                  Inspect {`${user.firstName}`}'s Profile
+                </Button>
+              </Box>
             </ProfileSection>
 
             <ApplicationSection>
