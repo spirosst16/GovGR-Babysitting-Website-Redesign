@@ -89,9 +89,9 @@ const PageContainer = styled(Container)({
 });
 
 const steps = [
-  "Confirm Monthly Work Completion",
+  "Payment Details",
   "Generate Digital Voucher",
-  "Finalize Payment Process",
+  "Review Babysitter",
 ];
 
 const PaymentTracker = () => {
@@ -280,23 +280,6 @@ const PaymentTracker = () => {
             setAgreement((prev) => ({
               ...prev,
               paymentStatus: "pending guardian",
-              lastPaymentDate: newLastPaymentDate.toISOString(),
-            }));
-          } else if (
-            agreementData.paymentStatus === "pending guardian" ||
-            agreementData.paymentStatus === "pending babysitter"
-          ) {
-            const previousK =
-              parseInt(agreementData.amount.match(/\d+/)[0], 10) || 0;
-            const newK = previousK + 1;
-            newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + 1);
-
-            await updateDoc(agreementDocRef, {
-              lastPaymentDate: newLastPaymentDate.toISOString(),
-            });
-
-            setAgreement((prev) => ({
-              ...prev,
               lastPaymentDate: newLastPaymentDate.toISOString(),
             }));
           }

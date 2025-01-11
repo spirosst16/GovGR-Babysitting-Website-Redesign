@@ -19,6 +19,7 @@ import { styled } from "@mui/system";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import WorkOutlineIcon from "@mui/icons-material/WorkOutline";
+import PaymentsIcon from "@mui/icons-material/Payments";
 import HistoryIcon from "@mui/icons-material/History";
 import DoneIcon from "@mui/icons-material/Done";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -714,21 +715,23 @@ const MyDashboard = () => {
       const filteredApplications = applications.filter(
         (application) => new Date(application.endingDate) <= new Date()
       );
+
+      const currentApplications = applications.filter(
+        (application) =>
+          !filteredApplications.some((fa) => fa.id === application.id)
+      );
+
       return (
-        <Grid
-          container
-          spacing={3}
-          justifyContent="center"
-          alignItems="center"
-          wrap="wrap"
-        >
-          {applications.length > 0 ? (
-            applications
-              .filter(
-                (application) =>
-                  !filteredApplications.some((fa) => fa.id === application.id)
-              )
-              .map((application) => (
+        <>
+          <Grid
+            container
+            spacing={3}
+            justifyContent="center"
+            alignItems="center"
+            wrap="wrap"
+          >
+            {currentApplications.length > 0 ? (
+              currentApplications.map((application) => (
                 <Grid item xs={12} sm={6} md={4} key={application.id}>
                   <ApplicationCard
                     onClick={() =>
@@ -769,31 +772,92 @@ const MyDashboard = () => {
                   </ApplicationCard>
                 </Grid>
               ))
-          ) : (
-            <Grid item xs={12} sm={6} md={4}>
-              <ApplicationCard
-                onClick={() => navigate("/babysitting-application")}
-                style={{
-                  cursor: "pointer",
-                  border: "2px dashed #9E9E9E",
+            ) : (
+              <Grid item xs={12} sm={6} md={4}>
+                <ApplicationCard
+                  onClick={() => navigate("/babysitting-application")}
+                  style={{
+                    cursor: "pointer",
+                    border: "2px dashed #9E9E9E",
+                    textAlign: "center",
+                    padding: "20px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <AddCircleOutlineIcon
+                    style={{ fontSize: 50, color: "#9E9E9E" }}
+                  />
+                  <Typography variant="body1" color="textSecondary">
+                    Create Application
+                  </Typography>
+                </ApplicationCard>
+              </Grid>
+            )}
+          </Grid>
+
+          {/* Historical Applications Section */}
+          {filteredApplications.length > 0 && (
+            <>
+              <Typography
+                variant="h5"
+                sx={{
                   textAlign: "center",
-                  padding: "20px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  fontWeight: "bold",
+                  marginTop: "40px",
                 }}
               >
-                <AddCircleOutlineIcon
-                  style={{ fontSize: 50, color: "#9E9E9E" }}
-                />
-                <Typography variant="body1" color="textSecondary">
-                  Create Application
-                </Typography>
-              </ApplicationCard>
-            </Grid>
+                Historical Applications
+              </Typography>
+              <Grid
+                container
+                spacing={3}
+                justifyContent="center"
+                alignItems="center"
+                wrap="wrap"
+              >
+                {filteredApplications.map((application) => (
+                  <Grid item xs={12} sm={6} md={4} key={application.id}>
+                    <ApplicationCard
+                      onClick={() =>
+                        navigate(`/application/${application.userId}`)
+                      }
+                      style={{
+                        cursor: "pointer",
+                      }}
+                    >
+                      <CardContent>
+                        <CardHeader>
+                          <Typography variant="h6" fontWeight={600}>
+                            {application.area}
+                          </Typography>
+                          <StatusChip status="history">History</StatusChip>
+                        </CardHeader>
+                        <Typography
+                          variant="body1"
+                          marginLeft="20px"
+                          marginTop="10px"
+                        >
+                          <strong>Job Type:</strong> {application.jobType}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          marginLeft="20px"
+                          marginTop="10px"
+                        >
+                          <strong>Babysitting Place:</strong>{" "}
+                          {application.babysittingPlace}
+                        </Typography>
+                      </CardContent>
+                    </ApplicationCard>
+                  </Grid>
+                ))}
+              </Grid>
+            </>
           )}
-        </Grid>
+        </>
       );
     } else if (currentTab === 2) {
       const filteredAgreements = agreements.filter(
@@ -993,7 +1057,7 @@ const MyDashboard = () => {
             >
               <StyledTab label="Agreements" icon={<WorkOutlineIcon />} />
               <StyledTab label="Applications" icon={<DoneIcon />} />
-              <StyledTab label="History" icon={<HistoryIcon />} />
+              <StyledTab label="Payment" icon={<PaymentsIcon />} />
             </StyledTabs>
           </TabContainer>
         </TabContainer>
