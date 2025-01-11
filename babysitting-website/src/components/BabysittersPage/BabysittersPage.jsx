@@ -264,6 +264,7 @@ const BabysittersPage = () => {
             };
           });
 
+        setBabysittingApplications(applicationsList);
         setBabysitters(combinedData);
         setLoading(false);
       } catch (error) {
@@ -711,11 +712,21 @@ const BabysittersPage = () => {
                 displayBabysitters.map((babysitter) => (
                   <BabysitterCard
                     key={babysitter.userId}
-                    onClick={() =>
-                      navigate(`/application/${babysitter.userId}`, {
-                        state: { from: location.pathname },
-                      })
-                    }
+                    onClick={() => {
+                      const application = babysittingApplications.find(
+                        (app) => app.userId === babysitter.userId
+                      );
+
+                      if (application) {
+                        navigate(`/application/${application.id}`, {
+                          state: { from: location.pathname },
+                        });
+                      } else {
+                        console.error(
+                          "No application found for this babysitter."
+                        );
+                      }
+                    }}
                   >
                     <AvatarWrapper src={babysitter.photo || ""} />
                     <CardContentWrapper>

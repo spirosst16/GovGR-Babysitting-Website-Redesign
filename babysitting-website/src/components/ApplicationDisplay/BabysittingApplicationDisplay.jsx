@@ -244,7 +244,7 @@ const CustomSeparator = () => {
 const BabysittingApplicationDisplay = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { userId } = useParams();
+  const { applicationId } = useParams();
   const [user, setUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
@@ -282,10 +282,22 @@ const BabysittingApplicationDisplay = () => {
         setLoading(true);
         let userData = null;
 
+        const applicationRef = query(
+          collection(FIREBASE_DB, "babysittingApplications"),
+          where("__name__", "==", applicationId)
+        );
+        const applicationSnapshot = await getDocs(applicationRef);
+        const applicationData = applicationSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))[0];
+
+        setApplication(applicationData);
+
         // Check in "babysitters" collection
         const babysittersRef = query(
           collection(FIREBASE_DB, "babysitters"),
-          where("userId", "==", userId)
+          where("userId", "==", applicationData.userId)
         );
         const babysittersSnapshot = await getDocs(babysittersRef);
         if (!babysittersSnapshot.empty) {
@@ -298,7 +310,7 @@ const BabysittingApplicationDisplay = () => {
           // Check in "guardians" collection
           const guardiansRef = query(
             collection(FIREBASE_DB, "guardians"),
-            where("userId", "==", userId)
+            where("userId", "==", applicationData.userId)
           );
           const guardiansSnapshot = await getDocs(guardiansRef);
           if (!guardiansSnapshot.empty) {
@@ -312,18 +324,7 @@ const BabysittingApplicationDisplay = () => {
 
         if (!userData) throw new Error("User not found");
 
-        const applicationRef = query(
-          collection(FIREBASE_DB, "babysittingApplications"),
-          where("userId", "==", userId)
-        );
-        const applicationSnapshot = await getDocs(applicationRef);
-        const applicationData = applicationSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))[0];
-
         setUser(userData);
-        setApplication(applicationData);
       } catch (error) {
         console.error("Error fetching data: ", error);
       } finally {
@@ -332,11 +333,11 @@ const BabysittingApplicationDisplay = () => {
     };
 
     fetchUserAndApplication();
-  }, [userId]);
+  }, [applicationId]);
 
   useEffect(() => {
     const fetchAgreement = async () => {
-      if (!currentUser || !userId) return;
+      if (!currentUser || !application) return;
 
       try {
         setLoading(true);
@@ -345,12 +346,12 @@ const BabysittingApplicationDisplay = () => {
         const senderQuery = query(
           agreementsRef,
           where("senderId", "==", currentUser.uid),
-          where("recipientId", "==", userId)
+          where("recipientId", "==", application.userId)
         );
 
         const recipientQuery = query(
           agreementsRef,
-          where("senderId", "==", userId),
+          where("senderId", "==", application.userId),
           where("recipientId", "==", currentUser.uid)
         );
 
@@ -379,7 +380,8 @@ const BabysittingApplicationDisplay = () => {
     };
 
     fetchAgreement();
-  }, [currentUser, userId]);
+  }, [currentUser, application]);
+
   const handleProfile = async () => {
     if (!user.id) {
       alert("No valid user.");
@@ -438,8 +440,9 @@ const BabysittingApplicationDisplay = () => {
   }, []);
 
   useEffect(() => {
-    fetchUserRole(userId, setViewedUserRole);
-  }, [userId]);
+    if (!application) return;
+    fetchUserRole(application.userId, setViewedUserRole);
+  }, [application]);
 
   if (!user || !application)
     return (
@@ -478,7 +481,7 @@ const BabysittingApplicationDisplay = () => {
         const newAgreementRef = await addDoc(
           collection(FIREBASE_DB, "agreements"),
           {
-            recipientId: userId,
+            recipientId: user.uid,
             senderId: currentUser.uid,
             status: "",
           }
@@ -838,7 +841,7 @@ const BabysittingApplicationDisplay = () => {
                     <Button
                       variant="contained"
                       onClick={() =>
-                        navigate(`/edit-application/${userId}`, {
+                        navigate(`/edit-application/${applicationId}`, {
                           state: {
                             from: location.pathname,
                           },
@@ -892,26 +895,27 @@ const BabysittingApplicationDisplay = () => {
                         : "Create Agreement"}
                     </Button>
                   )}
-                {currentUser?.uid === application.userId && (
-                  <Button
-                    variant="contained"
-                    onClick={handleDeleteApplication}
-                    sx={{
-                      backgroundColor: "#d32f2f",
-                      fontSize: "1rem",
-                      borderRadius: "30px",
-                      padding: "12px 30px",
-                      textTransform: "none",
-                      "&:hover": {
-                        backgroundColor: "#b71c1c",
-                      },
-                      fontFamily: "'Poppins', sans-serif",
-                      margin: "10px auto",
-                    }}
-                  >
-                    Delete Application
-                  </Button>
-                )}
+                {currentUser?.uid === application.userId &&
+                  application.status !== "history" && (
+                    <Button
+                      variant="contained"
+                      onClick={handleDeleteApplication}
+                      sx={{
+                        backgroundColor: "#d32f2f",
+                        fontSize: "1rem",
+                        borderRadius: "30px",
+                        padding: "12px 30px",
+                        textTransform: "none",
+                        "&:hover": {
+                          backgroundColor: "#b71c1c",
+                        },
+                        fontFamily: "'Poppins', sans-serif",
+                        margin: "10px auto",
+                      }}
+                    >
+                      Delete Application
+                    </Button>
+                  )}
               </Box>
             </ApplicationSection>
           </InfoSection>

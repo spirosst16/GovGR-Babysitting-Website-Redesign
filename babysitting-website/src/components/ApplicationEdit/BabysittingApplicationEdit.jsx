@@ -256,7 +256,7 @@ const EditApplicationForm = () => {
 
   const navigate = useNavigate();
   const [isFocused, setIsFocused] = useState(false);
-  const { userId } = useParams();
+  const { applicationId } = useParams();
   const [user, setUser] = useState(null);
   const [application, setApplication] = useState(null);
   const [alert, setAlert] = useState({
@@ -270,10 +270,21 @@ const EditApplicationForm = () => {
       try {
         let userData = null;
 
+        // Fetch application data
+        const applicationRef = query(
+          collection(FIREBASE_DB, "babysittingApplications"),
+          where("__name__", "==", applicationId)
+        );
+        const applicationSnapshot = await getDocs(applicationRef);
+        const applicationData = applicationSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))[0];
+
         // Fetch user data
         const babysittersRef = query(
           collection(FIREBASE_DB, "babysitters"),
-          where("userId", "==", userId)
+          where("userId", "==", applicationData.userId)
         );
         const babysittersSnapshot = await getDocs(babysittersRef);
         if (!babysittersSnapshot.empty) {
@@ -284,7 +295,7 @@ const EditApplicationForm = () => {
         } else {
           const guardiansRef = query(
             collection(FIREBASE_DB, "guardians"),
-            where("userId", "==", userId)
+            where("userId", "==", applicationData.userId)
           );
           const guardiansSnapshot = await getDocs(guardiansRef);
           if (!guardiansSnapshot.empty) {
@@ -296,17 +307,6 @@ const EditApplicationForm = () => {
         }
 
         if (!userData) throw new Error("User not found");
-
-        // Fetch application data
-        const applicationRef = query(
-          collection(FIREBASE_DB, "babysittingApplications"),
-          where("userId", "==", userId)
-        );
-        const applicationSnapshot = await getDocs(applicationRef);
-        const applicationData = applicationSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))[0];
 
         setUser(userData);
         setApplication(applicationData);
@@ -325,7 +325,7 @@ const EditApplicationForm = () => {
     };
 
     fetchUserAndApplication();
-  }, [userId]);
+  }, [applicationId]);
 
   if (!user || !application) return null;
 
@@ -394,7 +394,7 @@ const EditApplicationForm = () => {
         message: "Application submitted!",
         severity: "success",
       });
-      navigate(`/application/${userId}`);
+      navigate(`/application/${application.id}`);
     } catch (error) {
       console.error("Error submitting form:", error);
       setAlert({

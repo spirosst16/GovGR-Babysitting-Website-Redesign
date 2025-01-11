@@ -1494,9 +1494,11 @@ const BabysittingApplicationForm = () => {
                       variant="contained"
                       sx={{
                         textTransform: "none",
+                        fontFamily: "'Poppins', sans-serif",
                         borderRadius: "30px",
                         outline: "1px solid #5e62d1",
                         backgroundColor: "white",
+                        fontSize: "1rem",
                         color: "#5e62d1",
                         "&:hover": {
                           backgroundColor: "#fffffe",

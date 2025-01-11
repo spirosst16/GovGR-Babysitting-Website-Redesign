@@ -137,11 +137,11 @@ function App() {
           element={user ? <MyDashboard /> : <Navigate to="/login" />}
         />
         <Route
-          path="/application/:userId"
+          path="/application/:applicationId"
           element={<BabysittingApplicationDisplay />}
         />
         <Route
-          path="/edit-application/:userId"
+          path="/edit-application/:applicationId"
           element={
             user ? <BabysittingApplicationEdit /> : <Navigate to="/login" />
           }

@@ -712,30 +712,43 @@ const MyDashboard = () => {
         </>
       );
     } else if (currentTab === 1) {
-      const filteredApplications = applications.filter(
-        (application) => new Date(application.endingDate) <= new Date()
+      const submittedApplication = applications.find(
+        (application) => application.status === "submitted"
       );
 
-      const currentApplications = applications.filter(
-        (application) =>
-          !filteredApplications.some((fa) => fa.id === application.id)
+      const temporaryApplications = applications.filter(
+        (application) => application.status === "temporary"
+      );
+
+      const historicalApplications = applications.filter(
+        (application) => application.status === "history"
       );
 
       return (
-        <>
-          <Grid
-            container
-            spacing={3}
-            justifyContent="center"
-            alignItems="center"
-            wrap="wrap"
-          >
-            {currentApplications.length > 0 ? (
-              currentApplications.map((application) => (
-                <Grid item xs={12} sm={6} md={4} key={application.id}>
+        <Grid
+          container
+          spacing={4}
+          justifyContent="center"
+          alignItems="flex-start"
+        >
+          {/* Active Section */}
+          <Grid item xs={12} md={4}>
+            <Typography
+              variant="h5"
+              sx={{
+                textAlign: "center",
+                marginBottom: "20px",
+                fontFamily: "Poppins, sans-serif",
+              }}
+            >
+              Active
+            </Typography>
+            <Grid container spacing={3} justifyContent={"center"}>
+              {submittedApplication ? (
+                <Grid item xs={12}>
                   <ApplicationCard
                     onClick={() =>
-                      navigate(`/application/${application.userId}`)
+                      navigate(`/application/${submittedApplication.id}`)
                     }
                     style={{
                       cursor: "pointer",
@@ -744,10 +757,10 @@ const MyDashboard = () => {
                     <CardContent>
                       <CardHeader>
                         <Typography variant="h6" fontWeight={600}>
-                          {application.area}
+                          {submittedApplication.area}
                         </Typography>
-                        <StatusChip status={application.status}>
-                          {application.status}
+                        <StatusChip status={submittedApplication.status}>
+                          {submittedApplication.status}
                         </StatusChip>
                       </CardHeader>
                       <Typography
@@ -755,7 +768,8 @@ const MyDashboard = () => {
                         marginLeft="20px"
                         marginTop="10px"
                       >
-                        <strong>Job Type:</strong> {application.jobType}
+                        <strong>Job Type:</strong>{" "}
+                        {submittedApplication.jobType}
                       </Typography>
                       <Typography
                         variant="body1"
@@ -763,67 +777,126 @@ const MyDashboard = () => {
                         marginTop="10px"
                       >
                         <strong>Babysitting Place:</strong>{" "}
-                        {application.babysittingPlace}
+                        {Array.isArray(submittedApplication.babysittingPlace)
+                          ? submittedApplication.babysittingPlace.join(", ")
+                          : submittedApplication.babysittingPlace}
                       </Typography>
                       <CompactWeeklySchedule
-                        availability={application.availability}
+                        availability={submittedApplication.availability}
                       />
                     </CardContent>
                   </ApplicationCard>
                 </Grid>
-              ))
-            ) : (
-              <Grid item xs={12} sm={6} md={4}>
-                <ApplicationCard
-                  onClick={() => navigate("/babysitting-application")}
-                  style={{
-                    cursor: "pointer",
-                    border: "2px dashed #9E9E9E",
-                    textAlign: "center",
-                    padding: "20px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <AddCircleOutlineIcon
-                    style={{ fontSize: 50, color: "#9E9E9E" }}
-                  />
-                  <Typography variant="body1" color="textSecondary">
-                    Create Application
-                  </Typography>
-                </ApplicationCard>
-              </Grid>
-            )}
+              ) : (
+                <Grid item xs={12}>
+                  <ApplicationCard
+                    onClick={() => navigate("/babysitting-application")}
+                    style={{
+                      cursor: "pointer",
+                      border: "2px dashed #9E9E9E",
+                      textAlign: "center",
+                      padding: "20px",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <AddCircleOutlineIcon
+                      style={{ fontSize: 50, color: "#9E9E9E" }}
+                    />
+                    <Typography variant="body1" color="textSecondary">
+                      Create Application
+                    </Typography>
+                  </ApplicationCard>
+                </Grid>
+              )}
+            </Grid>
           </Grid>
 
-          {/* Historical Applications Section */}
-          {filteredApplications.length > 0 && (
-            <>
-              <Typography
-                variant="h5"
-                sx={{
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  marginTop: "40px",
-                }}
-              >
-                Historical Applications
-              </Typography>
-              <Grid
-                container
-                spacing={3}
-                justifyContent="center"
-                alignItems="center"
-                wrap="wrap"
-              >
-                {filteredApplications.map((application) => (
-                  <Grid item xs={12} sm={6} md={4} key={application.id}>
+          {/* Temporary Section */}
+          <Grid item xs={12} md={4}>
+            <Typography
+              variant="h5"
+              sx={{
+                textAlign: "center",
+                marginBottom: "20px",
+                fontFamily: "Poppins, sans-serif",
+              }}
+            >
+              Temporary
+            </Typography>
+            <Grid container spacing={3} justifyContent={"center"}>
+              {temporaryApplications.length > 0 ? (
+                temporaryApplications.map((application) => (
+                  <Grid item xs={12} key={application.id}>
                     <ApplicationCard
-                      onClick={() =>
-                        navigate(`/application/${application.userId}`)
-                      }
+                      onClick={() => navigate(`/application/${application.id}`)}
+                      style={{
+                        cursor: "pointer",
+                      }}
+                    >
+                      <CardContent>
+                        <CardHeader>
+                          <Typography variant="h6" fontWeight={600}>
+                            {application.area}
+                          </Typography>
+                          <StatusChip status="temporary">Temporary</StatusChip>
+                        </CardHeader>
+                        <Typography
+                          variant="body1"
+                          marginLeft="20px"
+                          marginTop="10px"
+                        >
+                          <strong>Job Type:</strong> {application.jobType}
+                        </Typography>
+                        <Typography
+                          variant="body1"
+                          marginLeft="20px"
+                          marginTop="10px"
+                        >
+                          <strong>Babysitting Place:</strong>{" "}
+                          {Array.isArray(application.babysittingPlace)
+                            ? application.babysittingPlace.join(", ")
+                            : application.babysittingPlace}
+                        </Typography>
+                        <CompactWeeklySchedule
+                          availability={application.availability}
+                        />
+                      </CardContent>
+                    </ApplicationCard>
+                  </Grid>
+                ))
+              ) : (
+                <Typography
+                  variant="body1"
+                  color="textSecondary"
+                  sx={{ textAlign: "center", marginTop: "20px" }}
+                >
+                  No temporary applications found.
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+
+          {/* History Section */}
+          <Grid item xs={12} md={4}>
+            <Typography
+              variant="h5"
+              sx={{
+                textAlign: "center",
+                marginBottom: "20px",
+                fontFamily: "Poppins, sans-serif",
+              }}
+            >
+              History
+            </Typography>
+            <Grid container spacing={3} justifyContent={"center"}>
+              {historicalApplications.length > 0 ? (
+                historicalApplications.map((application) => (
+                  <Grid item xs={12} key={application.id}>
+                    <ApplicationCard
+                      onClick={() => navigate(`/application/${application.id}`)}
                       style={{
                         cursor: "pointer",
                       }}
@@ -848,16 +921,29 @@ const MyDashboard = () => {
                           marginTop="10px"
                         >
                           <strong>Babysitting Place:</strong>{" "}
-                          {application.babysittingPlace}
+                          {Array.isArray(application.babysittingPlace)
+                            ? application.babysittingPlace.join(", ")
+                            : application.babysittingPlace}
                         </Typography>
+                        <CompactWeeklySchedule
+                          availability={application.availability}
+                        />
                       </CardContent>
                     </ApplicationCard>
                   </Grid>
-                ))}
-              </Grid>
-            </>
-          )}
-        </>
+                ))
+              ) : (
+                <Typography
+                  variant="body1"
+                  color="textSecondary"
+                  sx={{ textAlign: "center", marginTop: "20px" }}
+                >
+                  No historical applications found.
+                </Typography>
+              )}
+            </Grid>
+          </Grid>
+        </Grid>
       );
     } else if (currentTab === 2) {
       const filteredAgreements = agreements.filter(
@@ -956,9 +1042,7 @@ const MyDashboard = () => {
               {filteredApplications.map((application) => (
                 <Grid item xs={12} sm={6} md={4} key={application.id}>
                   <ApplicationCard
-                    onClick={() =>
-                      navigate(`/application/${application.userId}`)
-                    }
+                    onClick={() => navigate(`/application/${application.id}`)}
                     style={{
                       cursor: "pointer",
                     }}

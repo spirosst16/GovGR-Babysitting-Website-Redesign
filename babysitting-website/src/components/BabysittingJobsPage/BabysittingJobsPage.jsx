@@ -276,6 +276,7 @@ const BabysittingJobsPage = () => {
             };
           });
 
+        setBabysittingApplications(applicationsList);
         setGuardians(combinedData);
         setLoading(false);
       } catch (error) {
@@ -707,11 +708,21 @@ const BabysittingJobsPage = () => {
                 displayGuardians.map((guardian) => (
                   <GuardianCard
                     key={guardian.userId}
-                    onClick={() =>
-                      navigate(`/application/${guardian.userId}`, {
-                        state: { from: location.pathname },
-                      })
-                    }
+                    onClick={() => {
+                      const application = babysittingApplications.find(
+                        (app) => app.userId === guardian.userId
+                      );
+
+                      if (application) {
+                        navigate(`/application/${application.id}`, {
+                          state: { from: location.pathname },
+                        });
+                      } else {
+                        console.error(
+                          "No application found for this babysitter."
+                        );
+                      }
+                    }}
                   >
                     <AvatarWrapper src={guardian.photo || ""} />
                     <CardContentWrapper>
