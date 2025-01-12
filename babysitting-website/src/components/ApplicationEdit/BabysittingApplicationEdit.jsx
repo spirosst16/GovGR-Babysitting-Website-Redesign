@@ -15,6 +15,7 @@ import {
   Checkbox,
   Grid,
   Rating,
+  CircularProgress,
   Avatar,
   Breadcrumbs,
   Stack,
@@ -154,8 +155,7 @@ const CustomSeparator = () => {
   };
 
   const getHomePath = () => {
-    if (userRole === "guardian") return "/babysitters";
-    if (userRole === "babysitter") return "/babysitting-jobs";
+    if (userRole) return "/my-dashboard";
     return "/";
   };
 
@@ -259,6 +259,7 @@ const EditApplicationForm = () => {
   const { applicationId } = useParams();
   const [user, setUser] = useState(null);
   const [application, setApplication] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState({
     open: false,
     message: "",
@@ -269,7 +270,7 @@ const EditApplicationForm = () => {
     const fetchUserAndApplication = async () => {
       try {
         let userData = null;
-
+        setLoading(true);
         // Fetch application data
         const applicationRef = query(
           collection(FIREBASE_DB, "babysittingApplications"),
@@ -321,11 +322,29 @@ const EditApplicationForm = () => {
         });
       } catch (error) {
         console.error("Error fetching data: ", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserAndApplication();
   }, [applicationId]);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#f4f4f4",
+        }}
+      >
+        <CircularProgress sx={{ color: "#5e62d1" }} />
+      </Box>
+    );
+  }
 
   if (!user || !application) return null;
 
@@ -409,6 +428,21 @@ const EditApplicationForm = () => {
     setAlert({ ...alert, open: false });
   };
 
+  // if (loading) {
+  //   return (
+  //     <Box
+  //       sx={{
+  //         display: "flex",
+  //         justifyContent: "center",
+  //         alignItems: "center",
+  //         height: "100vh",
+  //         backgroundColor: "#f4f4f4",
+  //       }}
+  //     >
+  //       <CircularProgress sx={{ color: "#5e62d1" }} />
+  //     </Box>
+  //   );
+  // } else {
   return (
     <PageContainer>
       <CustomSeparator />
@@ -792,6 +826,7 @@ const EditApplicationForm = () => {
       </Snackbar>
     </PageContainer>
   );
+  // }
 };
 
 export default EditApplicationForm;

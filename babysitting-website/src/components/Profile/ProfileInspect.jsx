@@ -138,9 +138,9 @@ const CustomSeparator = () => {
     return () => unsubscribe();
   }, []);
 
-  const handleNavigate = (path) => {
-    navigate(path);
-  };
+  // const handleNavigate = (path) => {
+  //   navigate(path);
+  // };
 
   const getHomePath = () => {
     if (userRole) return "/my-dashboard";
@@ -182,7 +182,7 @@ const CustomSeparator = () => {
       underline="none"
       key="1"
       color="inherit"
-      onClick={() => handleNavigate(getHomePath())}
+      onClick={() => navigate(getHomePath())}
       sx={{
         "&:hover": { color: "#5e62d1", cursor: "pointer" },
         fontFamily: "Poppins, sans-serif",
@@ -197,7 +197,7 @@ const CustomSeparator = () => {
           underline="none"
           key="2"
           color="inherit"
-          onClick={() => handleNavigate(state?.grandparent)}
+          onClick={() => navigate(state?.grandparent)}
           sx={{
             "&:hover": { color: "#5e62d1", cursor: "pointer" },
             fontFamily: "Poppins, sans-serif",
@@ -211,7 +211,11 @@ const CustomSeparator = () => {
         underline="none"
         key="3"
         color="inherit"
-        onClick={() => handleNavigate(state.from)}
+        onClick={() =>
+          navigate(state.from, {
+            state: { from: state?.grandparent },
+          })
+        }
         sx={{
           "&:hover": { color: "#5e62d1", cursor: "pointer" },
           fontFamily: "Poppins, sans-serif",

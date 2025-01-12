@@ -144,8 +144,8 @@ const CustomSeparator = () => {
   };
 
   const getHomePath = () => {
-    if (userRole === "guardian") return "/babysitters";
-    if (userRole === "babysitter") return "/babysitting-jobs";
+    if (userRole) return "/my-dashboard";
+
     return "/";
   };
 

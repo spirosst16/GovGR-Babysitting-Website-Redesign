@@ -375,12 +375,12 @@ const BabysittersPage = () => {
   const handleApplication = async () => {
     if (userRole === null) {
       navigate("/login", {
-        state: { from: "/babysitting-application" },
+        state: { from: "/babysitting-application", parent: location.pathname },
       });
       return;
     }
     navigate(`/babysitting-application`, {
-      state: { from: location.pathname },
+      state: { from: location.pathname, parent: location.pathname },
     });
   };
 

@@ -69,7 +69,10 @@ const LoginForm = () => {
 
       if (!babysitterSnapshot.empty) {
         navigate(location.state?.from || "/my-dashboard", {
-          state: { selectedUser: location.state?.selectedUser, from: "/login" },
+          state: {
+            selectedUser: location.state?.selectedUser,
+            from: location.state?.parent,
+          },
         });
         return;
       }
@@ -82,7 +85,10 @@ const LoginForm = () => {
 
       if (!guardianSnapshot.empty) {
         navigate(location.state?.from || "/my-dashboard", {
-          state: { selectedUser: location.state?.selectedUser, from: "/login" },
+          state: {
+            selectedUser: location.state?.selectedUser,
+            from: location.state?.parent,
+          },
         });
         return;
       }

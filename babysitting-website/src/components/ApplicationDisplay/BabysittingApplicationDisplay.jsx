@@ -388,7 +388,9 @@ const BabysittingApplicationDisplay = () => {
       return;
     }
     if (currentUser === null) {
-      navigate(`/profile/${user.userId}`);
+      navigate(`/profile/${user.userId}`, {
+        state: { from: location.pathname, grandparent: location.state?.from },
+      });
       return;
     }
     if (currentUser.uid === user.userId) {
@@ -864,7 +866,7 @@ const BabysittingApplicationDisplay = () => {
                           backgroundColor: "#4a54c1",
                         },
                         fontFamily: "'Poppins', sans-serif",
-                        margin: "10px auto",
+                        margin: "10px 10px",
                       }}
                     >
                       Edit Application
