@@ -926,10 +926,29 @@ const PaymentTracker = () => {
               >
                 The payment for this agreement is not available yet. Please wait{" "}
                 <strong>
-                  {Math.ceil(
-                    (new Date(agreement.endingDate) - new Date()) /
-                      (1000 * 60 * 60 * 24)
-                  ) || 0}
+                  {(() => {
+                    const currentDate = new Date();
+                    const endingDate = new Date(agreement.endingDate);
+
+                    const daysInMonth = (date) => {
+                      const year = date.getFullYear();
+                      const month = date.getMonth() + 1;
+                      return new Date(year, month, 0).getDate();
+                    };
+
+                    const remainingDays = Math.ceil(
+                      (endingDate - currentDate) / (1000 * 60 * 60 * 24)
+                    );
+
+                    if (remainingDays > 0) {
+                      const daysInEndingMonth = daysInMonth(endingDate);
+                      return (
+                        remainingDays % daysInEndingMonth || daysInEndingMonth
+                      );
+                    } else {
+                      return 0;
+                    }
+                  })()}
                 </strong>{" "}
                 days until the agreement's end date.
               </Typography>
@@ -1238,18 +1257,26 @@ const PaymentTracker = () => {
 
                         console.log("Agreement data fetched:", agreementData);
 
+                        const currentDate = new Date();
+                        const endingDate = new Date(agreementData.endingDate);
+                        const paymentStatus =
+                          currentDate >= endingDate
+                            ? "completed"
+                            : "not available yet";
+
                         const agreementDocRef = doc(
                           FIREBASE_DB,
                           "agreements",
                           agreementDoc.id
                         );
+
                         await updateDoc(agreementDocRef, {
-                          paymentStatus: "not available yet",
+                          paymentStatus: paymentStatus,
                         });
 
                         setAgreement((prev) => ({
                           ...prev,
-                          paymentStatus: "not available yet",
+                          paymentStatus: paymentStatus,
                         }));
 
                         alert(
