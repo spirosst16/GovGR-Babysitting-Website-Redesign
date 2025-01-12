@@ -382,7 +382,6 @@ const PaymentTracker = () => {
     doc.setFontSize(14);
     if (agreement) {
       doc.text(`Amount: $${agreement.amount || "N/A"}`, 10, 50);
-      doc.text(`Description: ${agreement.description || "N/A"}`, 10, 60);
       doc.text(`Date: ${new Date().toLocaleDateString()}`, 10, 70);
     }
 
@@ -530,8 +529,8 @@ const PaymentTracker = () => {
                     fontFamily: "'Poppins', sans-serif",
                   }}
                 >
-                  <strong>Expiry:</strong> Valid for 6 months from the date of
-                  purchase.
+                  <strong>Payment:</strong> The payment will be completed within
+                  one month, regardless.
                 </Typography>
               </Box>
 
@@ -653,7 +652,7 @@ const PaymentTracker = () => {
                           fontFamily: "'Poppins', sans-serif",
                           display: "flex",
                           alignItems: "center",
-                          gap: 1, // added gap between icon and text
+                          gap: 1,
                         }}
                       >
                         <AttachMoneyIcon sx={{ color: "#5e62d1" }} />
@@ -669,7 +668,7 @@ const PaymentTracker = () => {
                           fontFamily: "'Poppins', sans-serif",
                           display: "flex",
                           alignItems: "center",
-                          gap: 1, // added gap between icon and text
+                          gap: 1,
                         }}
                       >
                         <LocationOnIcon sx={{ color: "#5e62d1" }} />
@@ -687,7 +686,7 @@ const PaymentTracker = () => {
                           fontFamily: "'Poppins', sans-serif",
                           display: "flex",
                           alignItems: "center",
-                          gap: 1, // added gap between icon and text
+                          gap: 1,
                         }}
                       >
                         <AccessTimeIcon sx={{ color: "#5e62d1" }} />
@@ -703,7 +702,7 @@ const PaymentTracker = () => {
                           fontFamily: "'Poppins', sans-serif",
                           display: "flex",
                           alignItems: "center",
-                          gap: 1, // added gap between icon and text
+                          gap: 1,
                         }}
                       >
                         <PlaceIcon sx={{ color: "#5e62d1" }} />
@@ -1128,7 +1127,7 @@ const PaymentTracker = () => {
                             fontFamily: "'Poppins', sans-serif",
                             display: "flex",
                             alignItems: "center",
-                            gap: 1, // added gap between icon and text
+                            gap: 1,
                           }}
                         >
                           <AttachMoneyIcon sx={{ color: "#5e62d1" }} />
@@ -1144,7 +1143,7 @@ const PaymentTracker = () => {
                             fontFamily: "'Poppins', sans-serif",
                             display: "flex",
                             alignItems: "center",
-                            gap: 1, // added gap between icon and text
+                            gap: 1,
                           }}
                         >
                           <LocationOnIcon sx={{ color: "#5e62d1" }} />
@@ -1162,7 +1161,7 @@ const PaymentTracker = () => {
                             fontFamily: "'Poppins', sans-serif",
                             display: "flex",
                             alignItems: "center",
-                            gap: 1, // added gap between icon and text
+                            gap: 1,
                           }}
                         >
                           <AccessTimeIcon sx={{ color: "#5e62d1" }} />
@@ -1178,7 +1177,7 @@ const PaymentTracker = () => {
                             fontFamily: "'Poppins', sans-serif",
                             display: "flex",
                             alignItems: "center",
-                            gap: 1, // added gap between icon and text
+                            gap: 1,
                           }}
                         >
                           <PlaceIcon sx={{ color: "#5e62d1" }} />
