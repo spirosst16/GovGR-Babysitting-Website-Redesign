@@ -1180,8 +1180,10 @@ const MyDashboard = () => {
             }
 
             const isLastMonth =
-              current.getFullYear() === lastFullMonthDate.getFullYear() &&
-              current.getMonth() === lastFullMonthDate.getMonth();
+              agreement.status !== "history"
+                ? current.getFullYear() === lastFullMonthDate.getFullYear() &&
+                  current.getMonth() === lastFullMonthDate.getMonth()
+                : null;
 
             acc[agreement.id].payments.push({
               monthYear,
@@ -1190,6 +1192,10 @@ const MyDashboard = () => {
             });
 
             current.setMonth(current.getMonth() + 1);
+          }
+
+          if (acc[agreement.id] && acc[agreement.id].payments) {
+            acc[agreement.id].payments.reverse();
           }
         }
 
@@ -1230,7 +1236,7 @@ const MyDashboard = () => {
                     key={agreementId}
                     sx={{
                       padding: "20px",
-                      borderRadius: "12px",
+                      borderRadius: "16px",
                       boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
                     }}
                   >
@@ -1248,7 +1254,7 @@ const MyDashboard = () => {
                         sx={{
                           width: 64,
                           height: 64,
-                          border: "2px solid #3f51b5",
+                          border: "2px solid #5e62d1",
                         }}
                       />
                       <Box>
@@ -1256,6 +1262,7 @@ const MyDashboard = () => {
                           variant="h6"
                           sx={{
                             fontWeight: "bold",
+                            color: "#5e62d1",
                           }}
                         >
                           {otherUser?.firstName} {otherUser?.lastName}
@@ -1273,13 +1280,16 @@ const MyDashboard = () => {
                         key={index}
                         sx={{
                           marginBottom: "16px",
-                          padding: "12px",
-                          borderRadius: "8px",
+                          padding: "16px",
+                          borderRadius: "12px",
                           backgroundColor: payment.isLastMonth
-                            ? "#e8f0fe"
-                            : "#f9f9f9",
+                            ? "#f5f5fc"
+                            : "#fafafa",
+                          border: payment.isLastMonth
+                            ? "1px solid #5e62d1"
+                            : "1px solid #e0e0e0",
                           boxShadow: payment.isLastMonth
-                            ? "0 4px 12px rgba(63, 81, 181, 0.2)"
+                            ? "0 4px 12px rgba(94, 98, 209, 0.2)"
                             : "none",
                           display: "flex",
                           justifyContent: "space-between",
@@ -1291,14 +1301,17 @@ const MyDashboard = () => {
                             variant="body1"
                             sx={{
                               fontWeight: "bold",
-                              color: payment.isLastMonth ? "#3f51b5" : "#555",
+                              color: payment.isLastMonth ? "#5e62d1" : "#555",
                             }}
                           >
                             {payment.monthYear}
                           </Typography>
                           <Typography
                             variant="body2"
-                            sx={{ color: "#757575", marginTop: "4px" }}
+                            sx={{
+                              color: "#757575",
+                              marginTop: "4px",
+                            }}
                           >
                             Payment: €{payment.amount.toFixed(2)}
                           </Typography>
@@ -1340,13 +1353,14 @@ const MyDashboard = () => {
                             ) : (
                               <Button
                                 variant="contained"
-                                color={
-                                  paymentStatus === "pending babysitter" &&
-                                  isBabysitter
-                                    ? "primary"
-                                    : "secondary"
-                                }
-                                sx={{ padding: "6px 16px" }}
+                                sx={{
+                                  padding: "8px 20px",
+                                  backgroundColor: "#5e62d1",
+                                  color: "#fff",
+                                  "&:hover": {
+                                    backgroundColor: "#4d56b1",
+                                  },
+                                }}
                                 onClick={() =>
                                   navigate(`/payment/${agreementId}`)
                                 }
@@ -1367,7 +1381,11 @@ const MyDashboard = () => {
             ) : (
               <Typography
                 variant="body1"
-                sx={{ textAlign: "center", opacity: 0.75 }}
+                sx={{
+                  textAlign: "center",
+                  color: "#5e62d1",
+                  opacity: 0.85,
+                }}
               >
                 No payment data available for the selected agreements.
               </Typography>
