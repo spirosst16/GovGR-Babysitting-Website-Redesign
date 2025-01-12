@@ -15,6 +15,7 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
+  Autocomplete,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
@@ -35,6 +36,7 @@ import {
 import { FIREBASE_DB } from "../../config/firebase";
 import "../../style.css";
 import { styled } from "@mui/system";
+import { greekCities } from "../../utils/greekCities";
 
 const StyledTextField = styled(TextField)({
   fontFamily: "'Poppins', sans-serif",
@@ -479,23 +481,33 @@ const ProfilePage = () => {
               >
                 Area:
               </Typography>
-              <StyledTextField
-                variant="outlined"
-                size="small"
-                onChange={(e) =>
-                  setProfileData({
-                    ...profileData,
-                    city: e.target.value,
-                  })
-                }
+              <Autocomplete
+                options={greekCities.sort()}
                 value={profileData.city || ""}
+                onChange={(event, value) =>
+                  setProfileData((prevData) => ({
+                    ...prevData,
+                    city: value,
+                  }))
+                }
+                renderInput={(params) => (
+                  <StyledTextField
+                    {...params}
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      width: "80%",
+                      marginBottom: "15px",
+                      fontFamily: "Poppins, sans-serif",
+                    }}
+                  />
+                )}
                 sx={{
-                  width: "80%",
-                  marginBottom: "15px",
-                  fontFamily: "Poppins, sans-serif",
+                  "& .MuiAutocomplete-inputRoot": {
+                    minHeight: "40px",
+                  },
                 }}
               />
-
               <Typography
                 sx={{
                   display: "flex",
@@ -960,23 +972,33 @@ const ProfilePage = () => {
               >
                 Area
               </Typography>
-              <StyledTextField
-                variant="outlined"
-                size="small"
-                onChange={(e) =>
-                  setProfileData({
-                    ...profileData,
-                    city: e.target.value,
-                  })
-                }
+              <Autocomplete
+                options={greekCities.sort()}
                 value={profileData.city || ""}
+                onChange={(event, value) =>
+                  setProfileData((prevData) => ({
+                    ...prevData,
+                    city: value,
+                  }))
+                }
+                renderInput={(params) => (
+                  <StyledTextField
+                    {...params}
+                    variant="outlined"
+                    size="small"
+                    sx={{
+                      display: "flex",
+                      width: "80%",
+                      marginLeft: "10%",
+                      marginBottom: "15px",
+                      fontFamily: "Poppins, sans-serif",
+                    }}
+                  />
+                )}
                 sx={{
-                  display: "flex",
-                  width: "80%",
-                  marginLeft: "10%",
-                  marginBottom: "15px",
-
-                  fontFamily: "Poppins, sans-serif",
+                  "& .MuiAutocomplete-inputRoot": {
+                    minHeight: "40px",
+                  },
                 }}
               />
 

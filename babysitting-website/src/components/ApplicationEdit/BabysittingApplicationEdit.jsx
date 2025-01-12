@@ -22,6 +22,7 @@ import {
   Link,
   Snackbar,
   Alert,
+  Autocomplete,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import {
@@ -36,6 +37,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { FIREBASE_DB } from "../../config/firebase";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import DefaultUserImage from "../../assets/Babysitter-image.webp";
+import { greekCities } from "../../utils/greekCities";
 
 const PageContainer = styled(Box)({
   backgroundColor: "#f4f4f4",
@@ -488,17 +490,30 @@ const EditApplicationForm = () => {
           </ProfileSection>
           <FormControl fullWidth sx={{ mb: 2 }}>
             <FormLabel sx={{ mb: 1 }}>Preferred Area</FormLabel>
-            <StyledTextField
-              name="area"
-              value={formValues.area}
-              onChange={(e) =>
-                setFormValues({ ...formValues, area: e.target.value })
+            <Autocomplete
+              options={greekCities.sort()}
+              value={formValues.area || ""}
+              onChange={(event, value) =>
+                setFormValues((prevValues) => ({
+                  ...prevValues,
+                  area: value,
+                }))
               }
-              required
-              fullWidth
+              renderInput={(params) => (
+                <StyledTextField
+                  {...params}
+                  variant="outlined"
+                  required
+                  fullWidth
+                />
+              )}
+              sx={{
+                "& .MuiAutocomplete-inputRoot": {
+                  minHeight: "56px",
+                },
+              }}
             />
           </FormControl>
-
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <FormControl component="fieldset" sx={{ mb: 2 }}>
               <FormLabel

@@ -21,6 +21,7 @@ import {
   Link,
   Snackbar,
   Alert,
+  Autocomplete,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -28,6 +29,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { greekCities } from "../../utils/greekCities";
 
 // Logo components
 const LogoContainer = styled("div")({
@@ -434,21 +436,39 @@ const BabysittingApplicationForm = () => {
 
                 <FormControl component="fieldset" fullWidth sx={{ mb: 2 }}>
                   <FormLabel component="legend">Preferred Area</FormLabel>
-                  <StyledTextField
-                    label="Preferred Area"
-                    name="area"
-                    value={formValues.area}
-                    onChange={handleChange}
-                    required
-                    fullWidth
-                    sx={{ mb: 2, mt: 1 }}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    InputLabelProps={{
-                      shrink: false,
-                      style: {
-                        visibility:
-                          formValues.area || isFocused ? "hidden" : "visible",
+                  <Autocomplete
+                    options={greekCities.sort()} // Use sorted list of Greek cities
+                    value={formValues.area || ""}
+                    onChange={(event, value) =>
+                      setFormValues((prevValues) => ({
+                        ...prevValues,
+                        area: value,
+                      }))
+                    }
+                    renderInput={(params) => (
+                      <StyledTextField
+                        {...params}
+                        label="Preferred Area"
+                        variant="outlined"
+                        required
+                        fullWidth
+                        sx={{ mb: 2, mt: 1 }}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        InputLabelProps={{
+                          shrink: false,
+                          style: {
+                            visibility:
+                              formValues.area || isFocused
+                                ? "hidden"
+                                : "visible",
+                          },
+                        }}
+                      />
+                    )}
+                    sx={{
+                      "& .MuiAutocomplete-inputRoot": {
+                        minHeight: "56px", // Match height to other fields
                       },
                     }}
                   />

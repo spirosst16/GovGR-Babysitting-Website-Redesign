@@ -11,6 +11,7 @@ import {
   StepLabel,
   Snackbar,
   Alert,
+  Autocomplete,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -20,6 +21,7 @@ import { collection, addDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import UploadIcon from "@mui/icons-material/Upload";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { greekCities } from "../../utils/greekCities";
 import "../../style.css";
 
 // Logo components
@@ -311,7 +313,12 @@ const BabysitterInfoForm = () => {
           fontFamily: "Poppins, sans-serif",
         }}
       >
-        <LogoContainer>
+        <LogoContainer
+          onClick={() => navigate("/")}
+          sx={{
+            cursor: "pointer",
+          }}
+        >
           <Logo>
             <LogoImage
               src={require("../../assets/baby-picture.png")}
@@ -434,14 +441,49 @@ const BabysitterInfoForm = () => {
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
                   />
-                  <StyledTextField
-                    label="City"
-                    name="city"
-                    value={formValues.city}
-                    onChange={handleChange}
-                    required
-                    fullWidth
-                    sx={{ flex: "1 1 calc(50% - 16px)" }}
+                  <Autocomplete
+                    options={greekCities.sort()}
+                    value={formValues.city || ""}
+                    onChange={(event, value) =>
+                      setFormValues((prevValues) => ({
+                        ...prevValues,
+                        city: value,
+                      }))
+                    }
+                    renderInput={(params) => (
+                      <StyledTextField
+                        {...params}
+                        label="City"
+                        variant="outlined"
+                        required
+                        fullWidth
+                        sx={{
+                          flex: "1 1 calc(50% - 16px)",
+                          "& .MuiOutlinedInput-root": {
+                            minHeight: "56px",
+                            borderRadius: "4px",
+                            "& fieldset": {
+                              borderColor: "#ccc",
+                            },
+                            "&.Mui-focused fieldset": {
+                              borderColor: "#5e62d1",
+                            },
+                          },
+                          "& .MuiInputLabel-root": {
+                            color: "rgba(0, 0, 0, 0.6)",
+                          },
+                          "& .MuiInputLabel-root.Mui-focused": {
+                            color: "#5e62d1",
+                          },
+                        }}
+                      />
+                    )}
+                    sx={{
+                      flex: "1 1 calc(50% - 16px)",
+                      "& .MuiAutocomplete-inputRoot": {
+                        minHeight: "56px",
+                      },
+                    }}
                   />
                   <StyledTextField
                     label="Postal"

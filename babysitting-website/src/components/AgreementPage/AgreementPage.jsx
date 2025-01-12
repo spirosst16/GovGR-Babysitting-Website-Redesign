@@ -19,6 +19,7 @@ import {
   Radio,
   Snackbar,
   Alert,
+  Autocomplete,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -36,6 +37,7 @@ import { deleteDoc } from "firebase/firestore";
 import { FIREBASE_DB } from "../../config/firebase";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import DefaultUserImage from "../../assets/Babysitter-image.webp";
+import { greekCities } from "../../utils/greekCities";
 
 const PageContainer = styled(Box)({
   backgroundColor: "#f4f4f4",
@@ -729,15 +731,24 @@ const AgreementPage = () => {
               >
                 Agreement Details
               </Typography>
-              <StyledTextField
-                fullWidth
-                label="Area"
-                name="area"
-                value={formValues.area}
-                onChange={handleInputChange}
-                variant="outlined"
-                required
-                sx={{ fontFamily: "'Poppins', sans-serif" }}
+              <Autocomplete
+                options={greekCities.sort()}
+                value={formValues.area || ""}
+                onChange={(event, value) =>
+                  setFormValues((prevValues) => ({
+                    ...prevValues,
+                    area: value,
+                  }))
+                }
+                renderInput={(params) => (
+                  <StyledTextField
+                    {...params}
+                    label="Area"
+                    variant="outlined"
+                    required
+                    sx={{ fontFamily: "'Poppins', sans-serif" }}
+                  />
+                )}
               />
 
               <FormControl component="fieldset">

@@ -23,6 +23,7 @@ import {
   Tooltip,
   Chip,
   CircularProgress,
+  Autocomplete,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -35,6 +36,7 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { greekCities } from "../../utils/greekCities";
 import "../../style.css";
 
 const BabysitterCard = styled(Card)({
@@ -609,34 +611,44 @@ const BabysittersPage = () => {
                 gap: "10px",
               }}
             >
-              <TextField
-                label="Search by Area"
-                variant="outlined"
-                value={filters.area}
-                onChange={(e) => handleFilterChange("area", e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    applyFilters();
-                  }
-                }}
-                fullWidth
+              <Autocomplete
+                options={greekCities.sort()}
+                value={filters.area || ""}
+                onChange={(event, value) => handleFilterChange("area", value)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Search by Area"
+                    variant="outlined"
+                    fullWidth
+                    sx={{
+                      maxWidth: "500px",
+                      borderRadius: "25px",
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "25px",
+                        minHeight: "56px",
+                        "& fieldset": {
+                          borderColor: "#ccc",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#5e62d1",
+                        },
+                      },
+                      "& .MuiInputLabel-root": {
+                        color: "rgba(0, 0, 0, 0.6)",
+                      },
+                      "& .MuiInputLabel-root.Mui-focused": {
+                        color: "#5e62d1",
+                      },
+                    }}
+                  />
+                )}
                 sx={{
+                  width: "100%",
                   maxWidth: "500px",
-                  borderRadius: "25px",
-                  "& .MuiOutlinedInput-root": {
+                  "& .MuiAutocomplete-inputRoot": {
                     borderRadius: "25px",
-                    "& fieldset": {
-                      borderColor: "#ccc",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#5e62d1",
-                    },
-                  },
-                  "& .MuiInputLabel-root": {
-                    color: "rgba(0, 0, 0, 0.6)",
-                  },
-                  "& .MuiInputLabel-root.Mui-focused": {
-                    color: "#5e62d1",
+                    padding: "0 12px",
                   },
                 }}
               />

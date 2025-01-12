@@ -12,6 +12,7 @@ import {
   IconButton,
   Tooltip,
   CircularProgress,
+  Autocomplete,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { Link, useNavigate } from "react-router-dom";
@@ -21,6 +22,7 @@ import { FIREBASE_DB } from "../../config/firebase";
 import BabysitterImage from "../../assets/Babysitter-image.webp";
 import { FIREBASE_AUTH } from "../../config/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { greekCities } from "../../utils/greekCities";
 import "../../style.css";
 
 const HeroSection = styled(Box)({
@@ -189,39 +191,61 @@ const WelcomePage = () => {
               gap="10px"
               style={{ maxWidth: "500px", marginTop: "20px" }}
             >
-              <TextField
-                inputRef={areaInputRef}
-                label="Enter your area"
-                variant="outlined"
-                fullWidth
+              <Autocomplete
+                options={greekCities.sort()}
+                freeSolo
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    inputRef={areaInputRef}
+                    label="Enter your area"
+                    variant="outlined"
+                    fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        borderRadius: "30px",
+                        minHeight: "56px",
+                        "& fieldset": {
+                          borderColor: "#ccc",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#5e62d1",
+                        },
+                      },
+                      "& .MuiInputLabel-root": {
+                        color: "rgba(0, 0, 0, 0.6)",
+                      },
+                      "& .MuiInputLabel-root.Mui-focused": {
+                        color: "#5e62d1",
+                      },
+                    }}
+                  />
+                )}
                 onKeyDown={(e) => {
                   if (
                     e.key === "Enter" &&
-                    areaInputRef.current.value.trim() !== ""
+                    areaInputRef.current?.value.trim() !== ""
                   ) {
                     navigate("/babysitters", {
                       state: { area: areaInputRef.current.value.trim() },
                     });
                   }
                 }}
+                onChange={(event, value) => {
+                  if (areaInputRef.current) {
+                    areaInputRef.current.value = value || "";
+                  }
+                }}
                 sx={{
-                  "& .MuiOutlinedInput-root": {
+                  width: "100%",
+                  "& .MuiAutocomplete-inputRoot": {
                     borderRadius: "30px",
-                    "& fieldset": {
-                      borderColor: "#ccc",
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#5e62d1",
-                    },
-                  },
-                  "& .MuiInputLabel-root": {
-                    color: "rgba(0, 0, 0, 0.6)",
-                  },
-                  "& .MuiInputLabel-root.Mui-focused": {
-                    color: "#5e62d1",
+                    minHeight: "56px",
+                    padding: "0 12px",
                   },
                 }}
               />
+
               <Tooltip title="Search" arrow>
                 <IconButton
                   onClick={() => {
