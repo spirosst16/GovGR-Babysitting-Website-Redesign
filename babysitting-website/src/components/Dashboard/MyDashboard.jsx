@@ -1055,148 +1055,134 @@ const MyDashboard = () => {
         </Grid>
       );
     } else if (currentTab === 2) {
-      const filteredAgreements = agreements.filter(
-        (agreement) => new Date(agreement.endingDate) <= new Date()
-      );
+      const paymentsByAgreement = agreements.reduce((acc, agreement) => {
+        const { startingDate, lastPaymentDate, amount, otherUser } = agreement;
 
-      const filteredApplications = applications.filter(
-        (application) => new Date(application.endingDate) <= new Date()
-      );
+        if (startingDate && lastPaymentDate && amount) {
+          const startDate = new Date(startingDate);
+          const endDate = new Date(lastPaymentDate);
+
+          const current = new Date(startDate);
+
+          // Iterate through each month from startingDate to lastPaymentDate
+          while (current <= endDate) {
+            const monthYear = `${current.toLocaleString("default", {
+              month: "long",
+            })} ${current.getFullYear()}`;
+
+            if (!acc[agreement.id]) {
+              acc[agreement.id] = {
+                payments: [],
+                otherUser,
+              };
+            }
+
+            acc[agreement.id].payments.push({
+              monthYear,
+              amount: parseFloat(amount),
+            });
+
+            // Move to the next month
+            current.setMonth(current.getMonth() + 1);
+          }
+        }
+
+        return acc;
+      }, {});
 
       return (
-        <Grid
-          container
-          spacing={3}
-          justifyContent="center"
-          alignItems="center"
-          wrap="wrap"
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            padding: "24px",
+          }}
         >
-          {filteredAgreements.length > 0 || filteredApplications.length > 0 ? (
-            <>
-              {filteredAgreements.map((agreement) => (
-                <Grid item xs={12} sm={6} md={4} key={agreement.id}>
-                  <ApplicationCard
-                    onClick={() => navigate(`/agreement/${agreement.id}`)}
-                    style={{
-                      cursor: "pointer",
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: "bold",
+              marginBottom: "16px",
+              textAlign: "center",
+            }}
+          >
+            Payment Details
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              width: "100%",
+              maxWidth: "600px",
+            }}
+          >
+            {Object.entries(paymentsByAgreement).length > 0 ? (
+              Object.entries(paymentsByAgreement).map(
+                ([agreementId, { payments, otherUser }]) => (
+                  <Card
+                    key={agreementId}
+                    sx={{
+                      padding: "16px",
+                      borderRadius: "12px",
+                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                     }}
                   >
-                    <CardContent>
-                      <CardHeader>
-                        <Box display="flex" alignItems="center">
-                          {agreement.otherUser && (
-                            <>
-                              <Avatar
-                                src={agreement.otherUser.photo || ""}
-                                alt={`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
-                                style={{
-                                  marginBottom: "10px",
-                                  marginRight: "6px",
-                                  width: "65px",
-                                  height: "65px",
-                                }}
-                              />
-                              <Typography variant="h6" fontWeight={600}>
-                                {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
-                              </Typography>
-                            </>
-                          )}
-                        </Box>
-                        <StatusChip status={agreement.status}>
-                          {agreement.status}
-                        </StatusChip>
-                      </CardHeader>
-                      <Typography
-                        variant="body1"
-                        marginLeft="20px"
-                        marginTop="10px"
-                      >
-                        <strong>Babysitting Place:</strong>{" "}
-                        {agreement.babysittingPlace}
-                      </Typography>
-                      <CompactWeeklySchedule
-                        availability={agreement.weeklySchedule}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginBottom: "16px",
+                      }}
+                    >
+                      <Avatar
+                        src={otherUser?.photo || ""}
+                        alt={`${otherUser?.firstName} ${otherUser?.lastName}`}
+                        sx={{ width: 56, height: 56, marginRight: "16px" }}
                       />
-                      <ProgressContainer>
-                        {agreement.status === "accepted" && (
-                          <Box display="flex" alignItems="center">
-                            <CircularProgress
-                              variant="determinate"
-                              value={calculateProgress(
-                                agreement.startingDate,
-                                agreement.endingDate
-                              )}
-                              size={40}
-                              thickness={4}
-                            />
-                            <Typography
-                              variant="body1"
-                              style={{ marginLeft: "16px" }}
-                            >
-                              {Math.round(
-                                calculateProgress(
-                                  agreement.startingDate,
-                                  agreement.endingDate
-                                )
-                              )}
-                              % Complete
-                            </Typography>
-                          </Box>
-                        )}
-                      </ProgressContainer>
-                    </CardContent>
-                  </ApplicationCard>
-                </Grid>
-              ))}
-              {filteredApplications.map((application) => (
-                <Grid item xs={12} sm={6} md={4} key={application.id}>
-                  <ApplicationCard
-                    onClick={() => navigate(`/application/${application.id}`)}
-                    style={{
-                      cursor: "pointer",
-                    }}
-                  >
-                    <CardContent>
-                      <CardHeader>
-                        <Typography variant="h6" fontWeight={600}>
-                          {application.area}
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: "bold", color: "#5e62d1" }}
+                      >
+                        {otherUser?.firstName} {otherUser?.lastName}
+                      </Typography>
+                    </Box>
+                    {payments.map((payment, index) => (
+                      <Box key={index}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: "bold",
+                            color: "#5e62d1",
+                          }}
+                        >
+                          {payment.monthYear}
                         </Typography>
-                        <StatusChip status={application.status}>
-                          {application.status}
-                        </StatusChip>
-                      </CardHeader>
-                      <Typography
-                        variant="body1"
-                        marginLeft="20px"
-                        marginTop="10px"
-                      >
-                        <strong>Job Type:</strong> {application.jobType}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        marginLeft="20px"
-                        marginTop="10px"
-                      >
-                        <strong>Babysitting Place:</strong>{" "}
-                        {application.babysittingPlace}
-                      </Typography>
-                      <CompactWeeklySchedule
-                        availability={application.availability}
-                      />
-                    </CardContent>
-                  </ApplicationCard>
-                </Grid>
-              ))}
-            </>
-          ) : (
-            <EmptyState>
-              <HistoryIcon style={{ fontSize: 50, color: "#9E9E9E" }} />
-              <Typography variant="body1" color="textSecondary">
-                No history available yet.
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            marginLeft: "16px",
+                            color: "#555",
+                          }}
+                        >
+                          Payment: €{payment.amount.toFixed(2)}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Card>
+                )
+              )
+            ) : (
+              <Typography
+                variant="body1"
+                sx={{ textAlign: "center", opacity: 0.75 }}
+              >
+                No payment data available for the selected agreements.
               </Typography>
-            </EmptyState>
-          )}
-        </Grid>
+            )}
+          </Box>
+        </Box>
       );
     }
   };
