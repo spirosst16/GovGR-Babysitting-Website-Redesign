@@ -707,9 +707,13 @@ const AgreementPage = () => {
               />
               <Typography
                 variant="h6"
+                onClick={() => handleAvatar(sender.userId)}
                 sx={{
                   fontFamily: "'Poppins', sans-serif",
                   fontWeight: "bold",
+                  "&:hover": {
+                    cursor: "pointer",
+                  },
                 }}
               >
                 {sender?.firstName} {sender?.lastName}
@@ -729,9 +733,13 @@ const AgreementPage = () => {
               />
               <Typography
                 variant="h6"
+                onClick={() => handleAvatar(recipient.userId)}
                 sx={{
                   fontFamily: "'Poppins', sans-serif",
                   fontWeight: "bold",
+                  "&:hover": {
+                    cursor: "pointer",
+                  },
                 }}
               >
                 {recipient?.firstName} {recipient?.lastName}

@@ -626,10 +626,14 @@ const BabysittingApplicationDisplay = () => {
               <ProfileInfo>
                 <Typography
                   variant="h5"
+                  onClick={handleProfile}
                   sx={{
                     marginTop: "20px",
                     fontWeight: "bold",
                     fontFamily: "'Poppins', sans-serif",
+                    "&:hover": {
+                      cursor: "pointer",
+                    },
                   }}
                 >
                   {`${user.firstName} ${user.lastName}`}

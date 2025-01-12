@@ -79,9 +79,9 @@ const WelcomePage = () => {
   }, []);
 
   useEffect(() => {
-    setLoading(true);
     const fetchBabysitters = async () => {
       try {
+        setLoading(true);
         const babysittersCollectionRef = collection(FIREBASE_DB, "babysitters");
         const babysitterSnapshot = await getDocs(babysittersCollectionRef);
         const babysittersList = babysitterSnapshot.docs.map((doc) => ({
@@ -98,6 +98,15 @@ const WelcomePage = () => {
 
     fetchBabysitters();
   }, []);
+
+  const handleProfile = async (userId) => {
+    if (!userId) {
+      alert("No valid user.");
+      return;
+    }
+
+    navigate(`/profile/${userId}`);
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (authUser) => {
@@ -302,7 +311,27 @@ const WelcomePage = () => {
                   .sort((a, b) => b.rating - a.rating)
                   .slice(0, 4)
                   .map((babysitter) => (
-                    <BabysitterCard key={babysitter.id}>
+                    <BabysitterCard
+                      key={babysitter.id}
+                      style={{
+                        transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                        cursor: "pointer",
+                        boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.1)",
+                      }}
+                      onClick={() => {
+                        handleProfile(babysitter.userId);
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = "scale(1.05)";
+                        e.currentTarget.style.boxShadow =
+                          "0px 4px 10px rgba(0, 0, 0, 0.2)";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = "scale(1)";
+                        e.currentTarget.style.boxShadow =
+                          "0px 2px 5px rgba(0, 0, 0, 0.1)";
+                      }}
+                    >
                       <CardContent style={{ textAlign: "center" }}>
                         <Avatar
                           src={babysitter.photo || ""}

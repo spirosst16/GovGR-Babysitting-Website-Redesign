@@ -516,6 +516,15 @@ const MyDashboard = () => {
     return Math.max(Math.min((elapsedDuration / totalDuration) * 100, 100), 0);
   };
 
+  const handleProfile = async (userId) => {
+    if (!userId) {
+      alert("No valid user.");
+      return;
+    }
+
+    navigate(`/profile/${userId}`);
+  };
+
   const renderNotifications = () => {
     if (paymentReadyAgreements.length === 0) return null;
 
@@ -1249,20 +1258,27 @@ const MyDashboard = () => {
                       }}
                     >
                       <Avatar
+                        onClick={() => handleProfile(otherUser?.userId)}
                         src={otherUser?.photo || ""}
                         alt={`${otherUser?.firstName} ${otherUser?.lastName}`}
                         sx={{
                           width: 64,
                           height: 64,
-                          border: "2px solid #5e62d1",
+                          "&:hover": {
+                            cursor: "pointer",
+                          },
                         }}
                       />
                       <Box>
                         <Typography
                           variant="h6"
+                          onClick={() => handleProfile(otherUser?.userId)}
                           sx={{
                             fontWeight: "bold",
-                            color: "#5e62d1",
+                            fontFamily: "'Poppins', sans-serif",
+                            "&:hover": {
+                              cursor: "pointer",
+                            },
                           }}
                         >
                           {otherUser?.firstName} {otherUser?.lastName}
