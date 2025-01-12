@@ -360,18 +360,31 @@ const BabysittingApplicationDisplay = () => {
           getDocs(recipientQuery),
         ]);
 
+        let agreementExistsFlag = false;
+        let agreementPathTemp = null;
+
         if (!senderSnapshot.empty) {
-          const docId = senderSnapshot.docs[0].id;
-          setAgreementExists(true);
-          setAgreementPath(`agreement/${docId}`);
-        } else if (!recipientSnapshot.empty) {
-          const docId = recipientSnapshot.docs[0].id;
-          setAgreementExists(true);
-          setAgreementPath(`agreement/${docId}`);
-        } else {
-          setAgreementExists(false);
-          setAgreementPath(null);
+          const validAgreement = senderSnapshot.docs.find(
+            (doc) => doc.data().status !== "history"
+          );
+          if (validAgreement) {
+            agreementExistsFlag = true;
+            agreementPathTemp = `agreement/${validAgreement.id}`;
+          }
         }
+
+        if (!recipientSnapshot.empty && !agreementExistsFlag) {
+          const validAgreement = recipientSnapshot.docs.find(
+            (doc) => doc.data().status !== "history"
+          );
+          if (validAgreement) {
+            agreementExistsFlag = true;
+            agreementPathTemp = `agreement/${validAgreement.id}`;
+          }
+        }
+
+        setAgreementExists(agreementExistsFlag);
+        setAgreementPath(agreementPathTemp);
       } catch (error) {
         console.error("Error fetching agreement data:", error);
       } finally {
