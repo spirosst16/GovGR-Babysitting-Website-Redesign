@@ -167,11 +167,7 @@ const Navbar = () => {
 
   const handleLogoClick = () => {
     if (isLoggedIn) {
-      if (userRole === "guardian") {
-        navigate("/babysitters");
-      } else if (userRole === "babysitter") {
-        navigate("/babysitting-jobs");
-      }
+      navigate("/my-dashboard");
     } else {
       navigate("/");
     }
