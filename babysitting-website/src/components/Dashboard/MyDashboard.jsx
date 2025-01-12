@@ -254,7 +254,7 @@ const CompactWeeklySchedule = ({ availability }) => {
             textAlign="center"
             fontWeight="bold"
           >
-            {timeSlot.charAt(0)}
+            {timeSlot}
           </Typography>
           {days.map((day) => {
             const isAvailable = availability.includes(
@@ -856,6 +856,36 @@ const MyDashboard = () => {
                             <strong>Babysitting Place:</strong>{" "}
                             {agreement.babysittingPlace}
                           </Typography>
+                          <CompactWeeklySchedule
+                            availability={agreement.weeklySchedule}
+                          />
+                          <ProgressContainer>
+                            {agreement.status === "history" && (
+                              <Box display="flex" alignItems="center">
+                                <CircularProgress
+                                  variant="determinate"
+                                  value={calculateProgress(
+                                    agreement.startingDate,
+                                    agreement.endingDate
+                                  )}
+                                  size={40}
+                                  thickness={4}
+                                />
+                                <Typography
+                                  variant="body1"
+                                  style={{ marginLeft: "16px" }}
+                                >
+                                  {Math.round(
+                                    calculateProgress(
+                                      agreement.startingDate,
+                                      agreement.endingDate
+                                    )
+                                  )}
+                                  % Complete
+                                </Typography>
+                              </Box>
+                            )}
+                          </ProgressContainer>
                         </CardContent>
                       </ApplicationCard>
                     </Grid>
