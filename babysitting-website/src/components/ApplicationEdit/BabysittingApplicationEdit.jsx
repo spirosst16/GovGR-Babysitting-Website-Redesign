@@ -412,7 +412,7 @@ const EditApplicationForm = () => {
 
       setAlert({
         open: true,
-        message: "Application submitted!",
+        message: "Application submitted successfully!",
         severity: "success",
       });
       navigate(`/application/${application.id}`);

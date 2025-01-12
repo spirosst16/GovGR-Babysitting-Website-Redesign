@@ -362,14 +362,14 @@ const ProfilePage = () => {
       }
       setAlert({
         open: true,
-        message: "Profile Changes saved!",
+        message: "Profile changes saved successfully!",
         severity: "success",
       });
     } catch (error) {
       console.error("Error saving data:", error);
       setAlert({
         open: true,
-        message: "Error saving Profile Changes. Please try again.",
+        message: "Error saving profile changes. Please try again.",
         severity: "error",
       });
     }

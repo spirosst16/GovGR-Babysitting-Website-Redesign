@@ -321,10 +321,10 @@ const BabysittingApplicationForm = () => {
         status: status,
       });
 
-      console.log("Document written successfully!");
+      console.log("Application written successfully!");
       setAlert({
         open: true,
-        message: "Form submitted successfully!",
+        message: "Application submitted successfully!",
         severity: "success",
       });
 

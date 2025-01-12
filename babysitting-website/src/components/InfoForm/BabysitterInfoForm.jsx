@@ -245,7 +245,7 @@ const BabysitterInfoForm = () => {
       console.log("Document written successfully!");
       setAlert({
         open: true,
-        message: "Form submitted successfully!",
+        message: "Register was successfull!",
         severity: "success",
       });
 
@@ -279,7 +279,7 @@ const BabysitterInfoForm = () => {
       console.error("Error adding document: ", error);
       setAlert({
         open: true,
-        message: "Error submitting form. Please try again.",
+        message: "Error submitting register form. Please try again.",
         severity: "error",
       });
     }

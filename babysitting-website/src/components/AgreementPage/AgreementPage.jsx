@@ -421,6 +421,7 @@ const AgreementPage = () => {
 
     fetchUserData(userId1, setSender, userId2, setRecipient);
   }, [userId1, userId2]);
+
   const handleAvatar = async (userId) => {
     const auth = getAuth();
     const currentUser = auth.currentUser;
@@ -498,6 +499,11 @@ const AgreementPage = () => {
       });
 
       setStatus("pending");
+      setAlert({
+        open: true,
+        message: "Agreement was sent successfully!",
+        severity: "success",
+      });
       console.log("Agreement sent with ID:", docRef.id);
     } catch (error) {
       console.error("Error sending agreement:", error);
@@ -525,6 +531,11 @@ const AgreementPage = () => {
 
       setStatus("");
       console.log("Agreement unsent and deleted.");
+      setAlert({
+        open: true,
+        message: "Agreement unsent and deleted successfully!",
+        severity: "success",
+      });
     } catch (error) {
       console.error("Error unsending agreement:", error);
       setAlert({
@@ -553,6 +564,11 @@ const AgreementPage = () => {
       });
 
       setStatus("accepted");
+      setAlert({
+        open: true,
+        message: "Agreement was accepted successfully!",
+        severity: "success",
+      });
       console.log("Agreement accepted.");
     } catch (error) {
       console.error("Error accepting agreement:", error);
@@ -580,6 +596,11 @@ const AgreementPage = () => {
 
       setStatus("");
       console.log("Agreement declined and deleted.");
+      setAlert({
+        open: true,
+        message: "Agreement declined and deleted successfully!",
+        severity: "success",
+      });
       navigate("/my-dashboard");
     } catch (error) {
       console.error("Error declining agreement:", error);
