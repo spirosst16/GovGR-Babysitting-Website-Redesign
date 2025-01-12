@@ -60,6 +60,7 @@ const StyledTabs = styled(Tabs)({
   display: "flex",
   justifyContent: "space-around",
   width: "100%",
+  fontFamily: "Poppins, sans-serif",
 });
 
 const StyledTab = styled(Tab)({
@@ -77,7 +78,7 @@ const ApplicationCard = styled(Card)({
   boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
   borderRadius: "10px",
   width: "450px",
-  height: "350px",
+  height: "380px",
   transition: "transform 0.2s, box-shadow 0.2s",
   justifyContent: "space-between",
   "&:hover": {
@@ -96,7 +97,7 @@ const StatusChip = styled(Box)(({ status }) => ({
   backgroundColor:
     status === "temporary" || status === "pending"
       ? "#FFC107"
-      : status === "active"
+      : status === "active" || status === "accepted"
       ? "#4CAF50"
       : "#9E9E9E",
   color: "#fff",
@@ -242,6 +243,7 @@ const CompactWeeklySchedule = ({ availability }) => {
           variant="caption"
           textAlign="center"
           fontWeight="bold"
+          fontFamily="Poppins, sans-serif"
         >
           {day}
         </Typography>
@@ -253,6 +255,7 @@ const CompactWeeklySchedule = ({ availability }) => {
             variant="caption"
             textAlign="center"
             fontWeight="bold"
+            fontFamily="Poppins, sans-serif"
           >
             {timeSlot}
           </Typography>
@@ -278,6 +281,7 @@ const CompactWeeklySchedule = ({ availability }) => {
                     variant="caption"
                     component="span"
                     fontWeight="bold"
+                    fontFamily="Poppins, sans-serif"
                     color="white"
                   >
                     ✔
@@ -442,7 +446,7 @@ const MyDashboard = () => {
             const nextMonthDate = new Date(lastPaymentDate);
             nextMonthDate.setMonth(nextMonthDate.getMonth() + monthsPassed);
 
-            if (monthsPassed >= 2) {
+            if (monthsPassed >= 2 && agreement.paymentStatus !== "unknown") {
               let newLastPaymentDate = new Date(lastPaymentDate);
               newLastPaymentDate.setMonth(
                 newLastPaymentDate.getMonth() + monthsPassed - 1
@@ -549,6 +553,7 @@ const MyDashboard = () => {
           sx={{
             fontWeight: "bold",
             marginBottom: "16px",
+            fontFamily: "Poppins, sans-serif",
           }}
         >
           Agreements Pending Payment
@@ -559,6 +564,7 @@ const MyDashboard = () => {
             marginBottom: "24px",
             opacity: 0.85,
             maxWidth: "800px",
+            fontFamily: "Poppins, sans-serif",
           }}
         >
           Please review and complete the payments listed below to proceed with
@@ -620,6 +626,7 @@ const MyDashboard = () => {
                     fontWeight: "bold",
                     color: "#5e62d1",
                     marginBottom: "4px",
+                    fontFamily: "Poppins, sans-serif",
                   }}
                 >
                   {agreement.otherUser?.firstName}{" "}
@@ -630,6 +637,7 @@ const MyDashboard = () => {
                   sx={{
                     color: "black",
                     opacity: 0.75,
+                    fontFamily: "Poppins, sans-serif",
                   }}
                 >
                   Payment details available. Click to review.
@@ -721,7 +729,11 @@ const MyDashboard = () => {
                                       height: "65px",
                                     }}
                                   />
-                                  <Typography variant="h6" fontWeight={600}>
+                                  <Typography
+                                    variant="h6"
+                                    fontWeight={600}
+                                    fontFamily="Poppins, sans-serif"
+                                  >
                                     {`${agreement.otherUser.firstName} ${agreement.otherUser.lastName}`}
                                   </Typography>
                                 </>
@@ -736,6 +748,15 @@ const MyDashboard = () => {
                             variant="body1"
                             marginLeft="20px"
                             marginTop="10px"
+                            fontFamily="Poppins, sans-serif"
+                          >
+                            <strong>Area:</strong> {agreement.area}
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            marginLeft="20px"
+                            marginTop="10px"
+                            fontFamily="Poppins, sans-serif"
                           >
                             <strong>Babysitting Place:</strong>{" "}
                             {agreement.babysittingPlace}
@@ -757,7 +778,10 @@ const MyDashboard = () => {
                                 />
                                 <Typography
                                   variant="body1"
-                                  style={{ marginLeft: "16px" }}
+                                  style={{
+                                    marginLeft: "16px",
+                                    fontFamily: "Poppins, sans-serif",
+                                  }}
                                 >
                                   {Math.round(
                                     calculateProgress(
@@ -802,7 +826,11 @@ const MyDashboard = () => {
                         <AddCircleOutlineIcon
                           style={{ fontSize: 50, color: "#9E9E9E" }}
                         />
-                        <Typography variant="body1" color="textSecondary">
+                        <Typography
+                          variant="body1"
+                          color="textSecondary"
+                          fontFamily="Poppins, sans-serif"
+                        >
                           Browse {isBabysitter ? "Guardians" : "Babysitters"}
                         </Typography>
                       </ApplicationCard>
@@ -861,6 +889,14 @@ const MyDashboard = () => {
                             variant="body1"
                             marginLeft="20px"
                             marginTop="10px"
+                            fontFamily="Poppins, sans-serif"
+                          >
+                            <strong>Area:</strong> {agreement.area}
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            marginLeft="20px"
+                            marginTop="10px"
                           >
                             <strong>Babysitting Place:</strong>{" "}
                             {agreement.babysittingPlace}
@@ -882,7 +918,10 @@ const MyDashboard = () => {
                                 />
                                 <Typography
                                   variant="body1"
-                                  style={{ marginLeft: "16px" }}
+                                  style={{
+                                    marginLeft: "16px",
+                                    fontFamily: "Poppins, sans-serif",
+                                  }}
                                 >
                                   {Math.round(
                                     calculateProgress(
@@ -903,7 +942,11 @@ const MyDashboard = () => {
                   <Typography
                     variant="body1"
                     color="textSecondary"
-                    sx={{ textAlign: "center", marginTop: "20px" }}
+                    sx={{
+                      textAlign: "center",
+                      marginTop: "20px",
+                      fontFamily: "Poppins, sans-serif",
+                    }}
                   >
                     No history found.
                   </Typography>
@@ -954,6 +997,7 @@ const MyDashboard = () => {
                     }
                     style={{
                       cursor: "pointer",
+                      height: "320px",
                     }}
                   >
                     <CardContent>
@@ -967,6 +1011,7 @@ const MyDashboard = () => {
                         variant="body1"
                         marginLeft="20px"
                         marginTop="10px"
+                        fontFamily="Poppins, sans-serif"
                       >
                         <strong>Job Type:</strong>{" "}
                         {submittedApplication.jobType}
@@ -975,6 +1020,7 @@ const MyDashboard = () => {
                         variant="body1"
                         marginLeft="20px"
                         marginTop="10px"
+                        fontFamily="Poppins, sans-serif"
                       >
                         <strong>Babysitting Place:</strong>{" "}
                         {Array.isArray(submittedApplication.babysittingPlace)
@@ -1005,7 +1051,11 @@ const MyDashboard = () => {
                     <AddCircleOutlineIcon
                       style={{ fontSize: 50, color: "#9E9E9E" }}
                     />
-                    <Typography variant="body1" color="textSecondary">
+                    <Typography
+                      variant="body1"
+                      color="textSecondary"
+                      fontFamily="Poppins, sans-serif"
+                    >
                       Create Application
                     </Typography>
                   </ApplicationCard>
@@ -1034,11 +1084,16 @@ const MyDashboard = () => {
                       onClick={() => navigate(`/application/${application.id}`)}
                       style={{
                         cursor: "pointer",
+                        height: "320px",
                       }}
                     >
                       <CardContent>
                         <CardHeader>
-                          <Typography variant="h6" fontWeight={600}>
+                          <Typography
+                            variant="h6"
+                            fontWeight={600}
+                            fontFamily="Poppins, sans-serif"
+                          >
                             {application.area}
                           </Typography>
                           <StatusChip status="temporary">Temporary</StatusChip>
@@ -1047,6 +1102,7 @@ const MyDashboard = () => {
                           variant="body1"
                           marginLeft="20px"
                           marginTop="10px"
+                          fontFamily="Poppins, sans-serif"
                         >
                           <strong>Job Type:</strong> {application.jobType}
                         </Typography>
@@ -1054,6 +1110,7 @@ const MyDashboard = () => {
                           variant="body1"
                           marginLeft="20px"
                           marginTop="10px"
+                          fontFamily="Poppins, sans-serif"
                         >
                           <strong>Babysitting Place:</strong>{" "}
                           {Array.isArray(application.babysittingPlace)
@@ -1071,6 +1128,7 @@ const MyDashboard = () => {
                 <Typography
                   variant="body1"
                   color="textSecondary"
+                  fontFamily="Poppins, sans-serif"
                   sx={{ textAlign: "center", marginTop: "20px" }}
                 >
                   No temporary applications found.
@@ -1099,11 +1157,16 @@ const MyDashboard = () => {
                       onClick={() => navigate(`/application/${application.id}`)}
                       style={{
                         cursor: "pointer",
+                        height: "320px",
                       }}
                     >
                       <CardContent>
                         <CardHeader>
-                          <Typography variant="h6" fontWeight={600}>
+                          <Typography
+                            variant="h6"
+                            fontWeight={600}
+                            fontFamily="Poppins, sans-serif"
+                          >
                             {application.area}
                           </Typography>
                           <StatusChip status="history">History</StatusChip>
@@ -1112,6 +1175,7 @@ const MyDashboard = () => {
                           variant="body1"
                           marginLeft="20px"
                           marginTop="10px"
+                          fontFamily="Poppins, sans-serif"
                         >
                           <strong>Job Type:</strong> {application.jobType}
                         </Typography>
@@ -1119,6 +1183,7 @@ const MyDashboard = () => {
                           variant="body1"
                           marginLeft="20px"
                           marginTop="10px"
+                          fontFamily="Poppins, sans-serif"
                         >
                           <strong>Babysitting Place:</strong>{" "}
                           {Array.isArray(application.babysittingPlace)
@@ -1136,6 +1201,7 @@ const MyDashboard = () => {
                 <Typography
                   variant="body1"
                   color="textSecondary"
+                  fontFamily="Poppins, sans-serif"
                   sx={{ textAlign: "center", marginTop: "20px" }}
                 >
                   No history found.
@@ -1225,6 +1291,7 @@ const MyDashboard = () => {
             sx={{
               marginBottom: "24px",
               textAlign: "center",
+              fontFamily: "Poppins, sans-serif",
             }}
           >
             Payment Details
@@ -1285,7 +1352,11 @@ const MyDashboard = () => {
                         </Typography>
                         <Typography
                           variant="body2"
-                          sx={{ color: "#757575", marginTop: "4px" }}
+                          sx={{
+                            color: "#757575",
+                            marginTop: "4px",
+                            fontFamily: "Poppins, sans-serif",
+                          }}
                         >
                           Agreement ID: {agreementId}
                         </Typography>
@@ -1318,6 +1389,7 @@ const MyDashboard = () => {
                             sx={{
                               fontWeight: "bold",
                               color: payment.isLastMonth ? "#5e62d1" : "#555",
+                              fontFamily: "Poppins, sans-serif",
                             }}
                           >
                             {payment.monthYear}
@@ -1327,9 +1399,10 @@ const MyDashboard = () => {
                             sx={{
                               color: "#757575",
                               marginTop: "4px",
+                              fontFamily: "Poppins, sans-serif",
                             }}
                           >
-                            Payment: €{payment.amount.toFixed(2)}
+                            Payment: {payment.amount.toFixed(2)}€
                           </Typography>
                         </Box>
                         {payment.isLastMonth && (
@@ -1339,8 +1412,9 @@ const MyDashboard = () => {
                               <Typography
                                 variant="body2"
                                 sx={{
-                                  color: "#d32f2f",
+                                  color: "#3c3fad",
                                   fontWeight: "bold",
+                                  fontFamily: "Poppins, sans-serif",
                                 }}
                               >
                                 Pending guardian's action
@@ -1349,8 +1423,9 @@ const MyDashboard = () => {
                               <Typography
                                 variant="body2"
                                 sx={{
-                                  color: "#0288d1",
+                                  color: "#3c3fad",
                                   fontWeight: "bold",
+                                  fontFamily: "Poppins, sans-serif",
                                 }}
                               >
                                 Babysitting in progress
@@ -1360,8 +1435,9 @@ const MyDashboard = () => {
                               <Typography
                                 variant="body2"
                                 sx={{
-                                  color: "#4caf50",
+                                  color: "#3c3fad",
                                   fontWeight: "bold",
+                                  fontFamily: "Poppins, sans-serif",
                                 }}
                               >
                                 Payment voucher sent
@@ -1372,9 +1448,10 @@ const MyDashboard = () => {
                                 sx={{
                                   padding: "8px 20px",
                                   backgroundColor: "#5e62d1",
+                                  fontFamily: "Poppins, sans-serif",
                                   color: "#fff",
                                   "&:hover": {
-                                    backgroundColor: "#4d56b1",
+                                    backgroundColor: "#3c3fad",
                                   },
                                 }}
                                 onClick={() =>
@@ -1401,6 +1478,7 @@ const MyDashboard = () => {
                   textAlign: "center",
                   color: "#5e62d1",
                   opacity: 0.85,
+                  fontFamily: "Poppins, sans-serif",
                 }}
               >
                 No payment data available for the selected agreements.
