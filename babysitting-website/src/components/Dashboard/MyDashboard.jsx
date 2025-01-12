@@ -320,8 +320,31 @@ const MyDashboard = () => {
       if (!userId) return;
       setLoading(true);
       try {
-        const userData = await fetchUserData(userId);
-        setCurrentUser(userData);
+        const babysittersRef = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("userId", "==", userId)
+        );
+        const babysittersSnapshot = await getDocs(babysittersRef);
+
+        if (!babysittersSnapshot.empty) {
+          setIsBabysitter(true);
+          setCurrentUser(babysittersSnapshot.docs[0].data());
+          return;
+        }
+
+        const guardiansRef = query(
+          collection(FIREBASE_DB, "guardians"),
+          where("userId", "==", userId)
+        );
+        const guardiansSnapshot = await getDocs(guardiansRef);
+
+        if (!guardiansSnapshot.empty) {
+          setIsBabysitter(false);
+          setCurrentUser(guardiansSnapshot.docs[0].data());
+          return;
+        }
+
+        throw new Error(`User with ID ${userId} not found`);
       } catch (error) {
         console.error("Error fetching current user data:", error);
       } finally {
@@ -336,6 +359,7 @@ const MyDashboard = () => {
     try {
       let userData = null;
       setLoading(true);
+
       const babysittersRef = query(
         collection(FIREBASE_DB, "babysitters"),
         where("userId", "==", userId)
@@ -343,7 +367,6 @@ const MyDashboard = () => {
       const babysittersSnapshot = await getDocs(babysittersRef);
       if (!babysittersSnapshot.empty) {
         userData = babysittersSnapshot.docs[0].data();
-        setIsBabysitter(true);
       } else {
         const guardiansRef = query(
           collection(FIREBASE_DB, "guardians"),
@@ -352,11 +375,11 @@ const MyDashboard = () => {
         const guardiansSnapshot = await getDocs(guardiansRef);
         if (!guardiansSnapshot.empty) {
           userData = guardiansSnapshot.docs[0].data();
-          setIsBabysitter(false);
         }
       }
 
       if (!userData) throw new Error(`User with ID ${userId} not found`);
+
       setLoading(false);
       return userData;
     } catch (error) {
@@ -407,6 +430,35 @@ const MyDashboard = () => {
             if (isExpired) {
               await updateDoc(doc.ref, { status: "history" });
               agreement.status = "history";
+            }
+
+            const currentDate = new Date();
+            const lastPaymentDate = new Date(agreement.lastPaymentDate);
+
+            let monthsPassed =
+              (currentDate.getFullYear() - lastPaymentDate.getFullYear()) * 12 +
+              (currentDate.getMonth() - lastPaymentDate.getMonth());
+
+            const nextMonthDate = new Date(lastPaymentDate);
+            nextMonthDate.setMonth(nextMonthDate.getMonth() + monthsPassed);
+
+            if (monthsPassed >= 2) {
+              let newLastPaymentDate = new Date(lastPaymentDate);
+              newLastPaymentDate.setMonth(
+                newLastPaymentDate.getMonth() + monthsPassed - 1
+              );
+
+              const formattedDate = newLastPaymentDate
+                .toISOString()
+                .split("T")[0];
+
+              await updateDoc(doc.ref, {
+                paymentStatus: "pending guardian",
+                lastPaymentDate: formattedDate,
+              });
+
+              agreement.lastPaymentDate = formattedDate;
+              agreement.paymentStatus = "pending guardian";
             }
 
             const otherUserId =
@@ -1056,16 +1108,31 @@ const MyDashboard = () => {
       );
     } else if (currentTab === 2) {
       const paymentsByAgreement = agreements.reduce((acc, agreement) => {
-        const { startingDate, lastPaymentDate, amount, otherUser } = agreement;
+        const {
+          startingDate,
+          lastPaymentDate,
+          amount,
+          otherUser,
+          paymentStatus,
+        } = agreement;
 
         if (startingDate && lastPaymentDate && amount) {
           const startDate = new Date(startingDate);
-          const endDate = new Date(lastPaymentDate);
+          const lastDate = new Date(lastPaymentDate);
+          const currentDate = new Date();
 
-          const current = new Date(startDate);
+          const monthsPassed =
+            (currentDate.getFullYear() - lastDate.getFullYear()) * 12 +
+            (currentDate.getMonth() - lastDate.getMonth());
 
-          // Iterate through each month from startingDate to lastPaymentDate
-          while (current <= endDate) {
+          const lastFullMonthDate = new Date(lastDate);
+          if (monthsPassed >= 1) {
+            lastFullMonthDate.setMonth(lastDate.getMonth() + monthsPassed - 1);
+          }
+
+          let current = new Date(startDate);
+
+          while (current <= currentDate) {
             const monthYear = `${current.toLocaleString("default", {
               month: "long",
             })} ${current.getFullYear()}`;
@@ -1074,15 +1141,20 @@ const MyDashboard = () => {
               acc[agreement.id] = {
                 payments: [],
                 otherUser,
+                paymentStatus,
               };
             }
+
+            const isLastMonth =
+              current.getFullYear() === lastFullMonthDate.getFullYear() &&
+              current.getMonth() === lastFullMonthDate.getMonth();
 
             acc[agreement.id].payments.push({
               monthYear,
               amount: parseFloat(amount),
+              isLastMonth,
             });
 
-            // Move to the next month
             current.setMonth(current.getMonth() + 1);
           }
         }
@@ -1097,14 +1169,16 @@ const MyDashboard = () => {
             flexDirection: "column",
             alignItems: "center",
             padding: "24px",
+            backgroundColor: "#f9f9f9",
           }}
         >
           <Typography
-            variant="h5"
+            variant="h4"
             sx={{
               fontWeight: "bold",
-              marginBottom: "16px",
+              marginBottom: "24px",
               textAlign: "center",
+              color: "#3f51b5",
             }}
           >
             Payment Details
@@ -1113,61 +1187,111 @@ const MyDashboard = () => {
             sx={{
               display: "flex",
               flexDirection: "column",
-              gap: "16px",
+              gap: "24px",
               width: "100%",
-              maxWidth: "600px",
+              maxWidth: "700px",
             }}
           >
             {Object.entries(paymentsByAgreement).length > 0 ? (
               Object.entries(paymentsByAgreement).map(
-                ([agreementId, { payments, otherUser }]) => (
+                ([agreementId, { payments, otherUser, paymentStatus }]) => (
                   <Card
                     key={agreementId}
                     sx={{
-                      padding: "16px",
+                      padding: "20px",
                       borderRadius: "12px",
-                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                      boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
+                      backgroundColor: "white",
                     }}
                   >
                     <Box
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        marginBottom: "16px",
+                        marginBottom: "20px",
+                        gap: "16px",
                       }}
                     >
                       <Avatar
                         src={otherUser?.photo || ""}
                         alt={`${otherUser?.firstName} ${otherUser?.lastName}`}
-                        sx={{ width: 56, height: 56, marginRight: "16px" }}
+                        sx={{
+                          width: 64,
+                          height: 64,
+                          border: "2px solid #3f51b5",
+                        }}
                       />
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: "bold", color: "#5e62d1" }}
-                      >
-                        {otherUser?.firstName} {otherUser?.lastName}
-                      </Typography>
-                    </Box>
-                    {payments.map((payment, index) => (
-                      <Box key={index}>
+                      <Box>
                         <Typography
-                          variant="body2"
+                          variant="h6"
                           sx={{
                             fontWeight: "bold",
-                            color: "#5e62d1",
+                            color: "#3f51b5",
                           }}
                         >
-                          {payment.monthYear}
+                          {otherUser?.firstName} {otherUser?.lastName}
                         </Typography>
                         <Typography
                           variant="body2"
-                          sx={{
-                            marginLeft: "16px",
-                            color: "#555",
-                          }}
+                          sx={{ color: "#757575", marginTop: "4px" }}
                         >
-                          Payment: €{payment.amount.toFixed(2)}
+                          Agreement ID: {agreementId}
                         </Typography>
+                      </Box>
+                    </Box>
+                    {payments.map((payment, index) => (
+                      <Box
+                        key={index}
+                        sx={{
+                          marginBottom: "16px",
+                          padding: "12px",
+                          borderRadius: "8px",
+                          backgroundColor: payment.isLastMonth
+                            ? "#e8f0fe"
+                            : "#f9f9f9",
+                          boxShadow: payment.isLastMonth
+                            ? "0 4px 12px rgba(63, 81, 181, 0.2)"
+                            : "none",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Box>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              fontWeight: "bold",
+                              color: payment.isLastMonth ? "#3f51b5" : "#555",
+                            }}
+                          >
+                            {payment.monthYear}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "#757575", marginTop: "4px" }}
+                          >
+                            Payment: €{payment.amount.toFixed(2)}
+                          </Typography>
+                        </Box>
+                        {payment.isLastMonth && (
+                          <Button
+                            variant="contained"
+                            color={
+                              paymentStatus === "pending babysitter" &&
+                              isBabysitter
+                                ? "primary"
+                                : "secondary"
+                            }
+                            sx={{ padding: "6px 16px" }}
+                            onClick={() => navigate(`/payment/${agreementId}`)}
+                          >
+                            {paymentStatus === "pending babysitter" &&
+                            isBabysitter
+                              ? `Accept for ${payment.monthYear}`
+                              : `Pay €${payment.amount.toFixed(2)}`}
+                          </Button>
+                        )}
                       </Box>
                     ))}
                   </Card>
