@@ -13,6 +13,8 @@ import {
   MenuItem,
   IconButton,
   CircularProgress,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
@@ -186,6 +188,11 @@ const ProfilePage = () => {
   const [reviewerData, setReviewerData] = useState([]);
   const [role, setRole] = useState(true);
   const [userId, setUserId] = useState(null);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
   const [profileData, setProfileData] = useState({
     city: "",
     bio: "",
@@ -332,7 +339,11 @@ const ProfilePage = () => {
 
   const handleSave = async () => {
     if (!profileData.id) {
-      alert("No valid profile data to save.");
+      setAlert({
+        open: true,
+        message: "No valid profile data to save.",
+        severity: "error",
+      });
       return;
     }
 
@@ -347,12 +358,23 @@ const ProfilePage = () => {
         const docRef = doc(FIREBASE_DB, "guardians", profileData.id);
         await updateDoc(docRef, newProfileData);
       }
-
-      alert("Changes in profile saved");
+      setAlert({
+        open: true,
+        message: "Profile Changes saved!",
+        severity: "success",
+      });
     } catch (error) {
       console.error("Error saving data:", error);
-      alert("Error saving profile changes. Please try again.");
+      setAlert({
+        open: true,
+        message: "Error saving Profile Changes. Please try again.",
+        severity: "error",
+      });
     }
+  };
+
+  const handleAlertClose = () => {
+    setAlert({ ...alert, open: false });
   };
 
   if (!profileData) {
@@ -831,6 +853,20 @@ const ProfilePage = () => {
             )}
           </Box>
         </Box>
+        <Snackbar
+          open={alert.open}
+          autoHideDuration={6000}
+          onClose={handleAlertClose}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleAlertClose}
+            severity={alert.severity}
+            sx={{ width: "100%" }}
+          >
+            {alert.message}
+          </Alert>
+        </Snackbar>
       </Box>
     );
   } else {
@@ -1189,6 +1225,20 @@ const ProfilePage = () => {
             )}
           </Box>
         </Box>
+        <Snackbar
+          open={alert.open}
+          autoHideDuration={6000}
+          onClose={handleAlertClose}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleAlertClose}
+            severity={alert.severity}
+            sx={{ width: "100%" }}
+          >
+            {alert.message}
+          </Alert>
+        </Snackbar>
       </Box>
     );
   }

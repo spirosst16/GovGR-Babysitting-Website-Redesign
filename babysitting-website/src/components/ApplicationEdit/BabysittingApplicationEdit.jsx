@@ -428,21 +428,6 @@ const EditApplicationForm = () => {
     setAlert({ ...alert, open: false });
   };
 
-  // if (loading) {
-  //   return (
-  //     <Box
-  //       sx={{
-  //         display: "flex",
-  //         justifyContent: "center",
-  //         alignItems: "center",
-  //         height: "100vh",
-  //         backgroundColor: "#f4f4f4",
-  //       }}
-  //     >
-  //       <CircularProgress sx={{ color: "#5e62d1" }} />
-  //     </Box>
-  //   );
-  // } else {
   return (
     <PageContainer>
       <CustomSeparator />
@@ -826,7 +811,6 @@ const EditApplicationForm = () => {
       </Snackbar>
     </PageContainer>
   );
-  // }
 };
 
 export default EditApplicationForm;
