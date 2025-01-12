@@ -897,6 +897,7 @@ const MyDashboard = () => {
                             variant="body1"
                             marginLeft="20px"
                             marginTop="10px"
+                            fontFamily="Poppins, sans-serif"
                           >
                             <strong>Babysitting Place:</strong>{" "}
                             {agreement.babysittingPlace}
