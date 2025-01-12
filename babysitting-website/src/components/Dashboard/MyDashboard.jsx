@@ -513,7 +513,7 @@ const MyDashboard = () => {
     const totalDuration = end - start;
     const elapsedDuration = currentDate - start;
 
-    return Math.min((elapsedDuration / totalDuration) * 100, 100);
+    return Math.max(Math.min((elapsedDuration / totalDuration) * 100, 100), 0);
   };
 
   const renderNotifications = () => {
@@ -1115,6 +1115,10 @@ const MyDashboard = () => {
           otherUser,
           paymentStatus,
         } = agreement;
+
+        if (paymentStatus === "unknown") {
+          return acc;
+        }
 
         if (startingDate && lastPaymentDate && amount) {
           const startDate = new Date(startingDate);
