@@ -1169,16 +1169,13 @@ const MyDashboard = () => {
             flexDirection: "column",
             alignItems: "center",
             padding: "24px",
-            backgroundColor: "#f9f9f9",
           }}
         >
           <Typography
             variant="h4"
             sx={{
-              fontWeight: "bold",
               marginBottom: "24px",
               textAlign: "center",
-              color: "#3f51b5",
             }}
           >
             Payment Details
@@ -1201,7 +1198,6 @@ const MyDashboard = () => {
                       padding: "20px",
                       borderRadius: "12px",
                       boxShadow: "0 6px 16px rgba(0, 0, 0, 0.1)",
-                      backgroundColor: "white",
                     }}
                   >
                     <Box
@@ -1226,7 +1222,6 @@ const MyDashboard = () => {
                           variant="h6"
                           sx={{
                             fontWeight: "bold",
-                            color: "#3f51b5",
                           }}
                         >
                           {otherUser?.firstName} {otherUser?.lastName}
@@ -1275,22 +1270,60 @@ const MyDashboard = () => {
                           </Typography>
                         </Box>
                         {payment.isLastMonth && (
-                          <Button
-                            variant="contained"
-                            color={
-                              paymentStatus === "pending babysitter" &&
-                              isBabysitter
-                                ? "primary"
-                                : "secondary"
-                            }
-                            sx={{ padding: "6px 16px" }}
-                            onClick={() => navigate(`/payment/${agreementId}`)}
-                          >
-                            {paymentStatus === "pending babysitter" &&
-                            isBabysitter
-                              ? `Accept for ${payment.monthYear}`
-                              : `Pay €${payment.amount.toFixed(2)}`}
-                          </Button>
+                          <>
+                            {paymentStatus === "pending guardian" &&
+                            isBabysitter ? (
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: "#d32f2f",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                Pending guardian's action
+                              </Typography>
+                            ) : paymentStatus === "not available yet" ? (
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: "#0288d1",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                Babysitting in progress
+                              </Typography>
+                            ) : paymentStatus === "pending babysitter" &&
+                              !isBabysitter ? (
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: "#4caf50",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                Payment voucher sent
+                              </Typography>
+                            ) : (
+                              <Button
+                                variant="contained"
+                                color={
+                                  paymentStatus === "pending babysitter" &&
+                                  isBabysitter
+                                    ? "primary"
+                                    : "secondary"
+                                }
+                                sx={{ padding: "6px 16px" }}
+                                onClick={() =>
+                                  navigate(`/payment/${agreementId}`)
+                                }
+                              >
+                                {paymentStatus === "pending babysitter" &&
+                                isBabysitter
+                                  ? `Accept for ${payment.monthYear}`
+                                  : `Pay €${payment.amount.toFixed(2)}`}
+                              </Button>
+                            )}
+                          </>
                         )}
                       </Box>
                     ))}
