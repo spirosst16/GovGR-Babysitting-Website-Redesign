@@ -150,8 +150,8 @@ const CustomSeparator = () => {
   };
 
   const getHomePath = () => {
-    if (userRole === "guardian") return "/babysitters";
-    if (userRole === "babysitter") return "/babysitting-jobs";
+    if (userRole) return "/my-dashboard";
+
     return "/";
   };
 
@@ -394,7 +394,9 @@ const BabysittingApplicationDisplay = () => {
     if (currentUser.uid === user.userId) {
       navigate(`/profile`);
     } else {
-      navigate(`/profile/${user.userId}`);
+      navigate(`/profile/${user.userId}`, {
+        state: { from: location.pathname, grandparent: location.state?.from },
+      });
     }
   };
 

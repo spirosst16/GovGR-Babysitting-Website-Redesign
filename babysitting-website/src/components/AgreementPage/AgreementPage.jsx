@@ -183,8 +183,8 @@ const CustomSeparator = () => {
   };
 
   const getHomePath = () => {
-    if (userRole === "guardian") return "/babysitters";
-    if (userRole === "babysitter") return "/babysitting-jobs";
+    if (userRole) return "/my-dashboard";
+
     return "/";
   };
 
@@ -229,20 +229,20 @@ const CustomSeparator = () => {
     >
       Home
     </Link>,
-    state?.from && (
-      <Link
-        underline="none"
-        key="2"
-        color="inherit"
-        onClick={() => handleNavigate(state.from)}
-        sx={{
-          "&:hover": { color: "#5e62d1", cursor: "pointer" },
-          fontFamily: "Poppins, sans-serif",
-        }}
-      >
-        {getPageName(state.from)}
-      </Link>
-    ),
+    // state?.from && (
+    //   <Link
+    //     underline="none"
+    //     key="2"
+    //     color="inherit"
+    //     onClick={() => handleNavigate(state.from)}
+    //     sx={{
+    //       "&:hover": { color: "#5e62d1", cursor: "pointer" },
+    //       fontFamily: "Poppins, sans-serif",
+    //     }}
+    //   >
+    //     {getPageName(state.from)}
+    //   </Link>
+    // ),
     <Link
       underline="none"
       key="3"
@@ -277,6 +277,7 @@ const CustomSeparator = () => {
 const AgreementPage = () => {
   const { agreementId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [userId1, setUserId1] = useState(null);
   const [userId2, setUserId2] = useState(null);
   const [sender, setSender] = useState(null);
@@ -312,8 +313,8 @@ const AgreementPage = () => {
   });
 
   useEffect(() => {
-    const fetchUserData = async (userId, setUser) => {
-      if (!userId) {
+    const fetchUserData = async (userId1, setUser1, userId2, setUser2) => {
+      if (!userId1 || !userId2) {
         return;
       }
       try {
@@ -322,7 +323,7 @@ const AgreementPage = () => {
 
         const babysittersRef = query(
           collection(FIREBASE_DB, "babysitters"),
-          where("userId", "==", userId)
+          where("userId", "==", userId1)
         );
         const babysittersSnapshot = await getDocs(babysittersRef);
         if (!babysittersSnapshot.empty) {
@@ -333,7 +334,7 @@ const AgreementPage = () => {
         } else {
           const guardiansRef = query(
             collection(FIREBASE_DB, "guardians"),
-            where("userId", "==", userId)
+            where("userId", "==", userId1)
           );
           const guardiansSnapshot = await getDocs(guardiansRef);
           if (!guardiansSnapshot.empty) {
@@ -344,11 +345,36 @@ const AgreementPage = () => {
           }
         }
 
-        if (!userData) throw new Error(`User with ID ${userId} not found`);
-        setUser(userData);
-        if (userData.userId === userId2) {
-          setLoading(false);
+        if (!userData) throw new Error(`User with ID ${userId1} not found`);
+        setUser1(userData);
+
+        const babysittersRef2 = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("userId", "==", userId2)
+        );
+        const babysittersSnapshot2 = await getDocs(babysittersRef2);
+        if (!babysittersSnapshot2.empty) {
+          userData = babysittersSnapshot2.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))[0];
+        } else {
+          const guardiansRef = query(
+            collection(FIREBASE_DB, "guardians"),
+            where("userId", "==", userId1)
+          );
+          const guardiansSnapshot = await getDocs(guardiansRef);
+          if (!guardiansSnapshot.empty) {
+            userData = guardiansSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            }))[0];
+          }
         }
+
+        if (!userData) throw new Error(`User with ID ${userId2} not found`);
+        setUser2(userData);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching user data:", error);
         setLoading(false);
@@ -391,8 +417,7 @@ const AgreementPage = () => {
 
     fetchAgreementData();
 
-    if (userId1) fetchUserData(userId1, setSender);
-    if (userId2) fetchUserData(userId2, setRecipient);
+    fetchUserData(userId1, setSender, userId2, setRecipient);
   }, [userId1, userId2]);
   const handleAvatar = async (userId) => {
     const auth = getAuth();
@@ -408,7 +433,9 @@ const AgreementPage = () => {
     if (currentUser.uid === userId) {
       navigate(`/profile`);
     } else {
-      navigate(`/profile/${userId}`);
+      navigate(`/profile/${userId}`, {
+        state: { from: location.pathname },
+      });
     }
   };
 

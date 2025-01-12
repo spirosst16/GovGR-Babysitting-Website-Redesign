@@ -175,10 +175,8 @@ const CustomSeparator = () => {
       key="1"
       color="inherit"
       onClick={() => {
-        if (userRole === "guardian") {
-          handleNavigate("/babysitters");
-        } else if (userRole === "babysitter") {
-          handleNavigate("/babysitting-jobs");
+        if (userRole) {
+          handleNavigate("/my-dashboard");
         } else {
           handleNavigate("/");
         }
@@ -638,7 +636,11 @@ const MyDashboard = () => {
                   activeAgreements.map((agreement) => (
                     <Grid item xs={12} sm={6} md={8} key={agreement.id}>
                       <ApplicationCard
-                        onClick={() => navigate(`/agreement/${agreement.id}`)}
+                        onClick={() =>
+                          navigate(`/agreement/${agreement.id}`, {
+                            state: { from: "my-dashboard" },
+                          })
+                        }
                         style={{
                           cursor: "pointer",
                         }}

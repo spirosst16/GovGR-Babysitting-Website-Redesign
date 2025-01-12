@@ -111,10 +111,8 @@ const CustomSeparator = () => {
       key="1"
       color="inherit"
       onClick={() => {
-        if (userRole === "guardian") {
-          handleNavigate("/babysitters");
-        } else if (userRole === "babysitter") {
-          handleNavigate("/babysitting-jobs");
+        if (userRole) {
+          handleNavigate("/my-dashboard");
         } else {
           handleNavigate("/");
         }
