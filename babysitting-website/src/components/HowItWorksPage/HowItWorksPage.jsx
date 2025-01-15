@@ -235,12 +235,6 @@ const HowItWorksPage = () => {
         "Receive the payment amount and the necessary payment details directly to your account.",
       ],
     },
-    {
-      title: "Leave Reviews",
-      description: [
-        "Review your experience and collaboration with the family to build trust in the community.",
-      ],
-    },
   ];
 
   const renderTabContent = () => {

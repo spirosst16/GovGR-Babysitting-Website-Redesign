@@ -41,7 +41,7 @@ import "../../style.css";
 
 const GuardianCard = styled(Card)({
   width: "250px",
-  height: "380px",
+  height: "330px",
   margin: "-15px 20px",
   boxShadow: "0 8px 15px rgba(0, 0, 0, 0.15)",
   borderRadius: "15px",
@@ -539,21 +539,6 @@ const BabysittingJobsPage = () => {
               );
             })}
             <Button
-              onClick={applyFilters}
-              variant="contained"
-              sx={{
-                backgroundColor: "#5e62d1",
-                color: "#ffffff",
-                "&:hover": {
-                  backgroundColor: "#4a54c2",
-                },
-                textTransform: "none",
-                borderRadius: "25px",
-              }}
-            >
-              Apply Filters
-            </Button>
-            <Button
               onClick={() =>
                 setFilters({
                   area: "",
@@ -565,11 +550,10 @@ const BabysittingJobsPage = () => {
               }
               variant="outlined"
               sx={{
-                backgroundColor: "#ffffff",
-                color: "#5e62d1",
-                border: "1px solid #5e62d1",
+                backgroundColor: "#5e62d1",
+                color: "#ffffff",
                 "&:hover": {
-                  backgroundColor: "#f0f4ff",
+                  backgroundColor: "#4a54c2",
                 },
                 textTransform: "none",
                 borderRadius: "25px",
@@ -804,15 +788,6 @@ const BabysittingJobsPage = () => {
                       >
                         {guardian.preferredArea}
                       </Typography>
-                      <Box sx={{ display: "flex", justifyContent: "center" }}>
-                        <Rating
-                          name={`rating-${guardian.id}`}
-                          value={guardian.rating}
-                          precision={0.5}
-                          readOnly
-                          size="small"
-                        />
-                      </Box>
                     </CardContentWrapper>
                   </GuardianCard>
                 ))

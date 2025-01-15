@@ -107,8 +107,6 @@ const GuardianInfoForm = () => {
     childrenAgeGroups: [],
     childrenDescription: "",
     photo: "",
-    rating: 0,
-    reviews: [],
   });
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -241,8 +239,6 @@ const GuardianInfoForm = () => {
         childrenAgeGroups: [],
         childrenDescription: "",
         photo: "",
-        rating: 0,
-        reviews: [],
       });
       setCurrentStep(0);
     } catch (error) {

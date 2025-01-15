@@ -647,13 +647,15 @@ const BabysittingApplicationDisplay = () => {
                 >
                   {user.city}
                 </Typography>
-                <Rating
-                  name={`rating-${user.id}`}
-                  value={user.rating}
-                  precision={0.5}
-                  readOnly
-                  size="large"
-                />
+                {viewedUserRole === "babysitter" && (
+                  <Rating
+                    name={`rating-${user.id}`}
+                    value={user.rating}
+                    precision={0.5}
+                    readOnly
+                    size="large"
+                  />
+                )}
               </ProfileInfo>
 
               <Box

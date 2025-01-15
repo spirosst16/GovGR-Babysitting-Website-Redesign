@@ -912,23 +912,27 @@ const ProfilePage = () => {
         <Box
           sx={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "100vh",
             backgroundColor: "#f4f4f4",
             pb: 4,
           }}
         >
-          {/* Left Section - Profile Form */}
+          {/* Profile Form */}
           <Box
             sx={{
-              flex: 2,
+              flex: "0 1 auto",
               padding: "20px",
               backgroundColor: "#fff",
               borderRadius: "10px",
               boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-              marginLeft: "250px",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              maxWidth: "900px",
+              width: "100%",
+              margin: "0 20px",
             }}
           >
             {/* Profile Picture */}
@@ -952,11 +956,6 @@ const ProfilePage = () => {
                 }}
                 variant="h6"
               >{`${profileData.firstName} ${profileData.lastName}`}</Typography>
-              <Rating
-                value={profileData.rating}
-                readOnly
-                sx={{ margin: "10px 0" }}
-              />
             </Box>
 
             {/* Editable Form */}
@@ -1160,91 +1159,6 @@ const ProfilePage = () => {
                 </Button>
               </Box>
             </Box>
-          </Box>
-
-          {/* Right Section - Reviews */}
-          <Box
-            sx={{
-              flex: 1,
-              padding: "20px",
-              backgroundColor: "#fff",
-              borderRadius: "10px",
-              boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-              marginLeft: "20px",
-              marginRight: "250px",
-              height: "fit-content",
-            }}
-          >
-            <Typography
-              variant="h6"
-              sx={{
-                marginBottom: "20px",
-                fontWeight: "bold",
-                fontFamily: "Poppins, sans-serif",
-              }}
-            >
-              My Reviews
-            </Typography>
-            {reviews.length > 0 ? (
-              reviews.map(({ reviewer, review }, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "15px",
-                    marginBottom: "20px",
-                    padding: "15px",
-                    borderRadius: "8px",
-                    backgroundColor: "#f9f9f9",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                  }}
-                >
-                  {/* Avatar */}
-                  <Avatar
-                    sx={{
-                      width: 50,
-                      height: 50,
-                      backgroundColor: reviewer?.photo
-                        ? "transparent"
-                        : "#1976d2",
-                      color: reviewer?.photo ? "inherit" : "#fff",
-                    }}
-                    src={reviewer?.photo || undefined}
-                  ></Avatar>
-
-                  {/* Reviewer Info */}
-                  <Box sx={{ flex: 1 }}>
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        fontWeight: "bold",
-                        fontSize: "16px",
-                        fontFamily: "Poppins, sans-serif",
-                      }}
-                    >
-                      {`${reviewer?.firstName} ${reviewer?.lastName}`}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "#555", fontFamily: "Poppins, sans-serif" }}
-                    >
-                      {review.reviewText}
-                    </Typography>
-                  </Box>
-
-                  {/* Rating */}
-                  <Rating value={review.rating} readOnly size="small" />
-                </Box>
-              ))
-            ) : (
-              <Typography
-                variant="body2"
-                sx={{ color: "#888", fontFamily: "Poppins, sans-serif" }}
-              >
-                No reviews available.
-              </Typography>
-            )}
           </Box>
         </Box>
         <Snackbar
