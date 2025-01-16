@@ -231,20 +231,6 @@ const CustomSeparator = () => {
     >
       Home
     </Link>,
-    // state?.from && (
-    //   <Link
-    //     underline="none"
-    //     key="2"
-    //     color="inherit"
-    //     onClick={() => handleNavigate(state.from)}
-    //     sx={{
-    //       "&:hover": { color: "#5e62d1", cursor: "pointer" },
-    //       fontFamily: "Poppins, sans-serif",
-    //     }}
-    //   >
-    //     {getPageName(state.from)}
-    //   </Link>
-    // ),
     <Link
       underline="none"
       key="3"
@@ -564,6 +550,43 @@ const AgreementPage = () => {
       });
 
       setStatus("accepted");
+      const agreementsRef = collection(FIREBASE_DB, "agreements");
+
+      const pendingSenderQuery = query(
+        agreementsRef,
+        where("status", "==", "pending"),
+        where("senderId", "in", [userId1, userId2])
+      );
+
+      const pendingRecipientQuery = query(
+        agreementsRef,
+        where("status", "==", "pending"),
+        where("recipientId", "in", [userId1, userId2])
+      );
+
+      try {
+        const [senderSnapshot, recipientSnapshot] = await Promise.all([
+          getDocs(pendingSenderQuery),
+          getDocs(pendingRecipientQuery),
+        ]);
+
+        const combinedDocs = [
+          ...senderSnapshot.docs,
+          ...recipientSnapshot.docs,
+        ];
+
+        const uniqueDocs = Array.from(
+          new Map(combinedDocs.map((doc) => [doc.id, doc])).values()
+        );
+
+        const deletePromises = uniqueDocs.map((doc) => deleteDoc(doc.ref));
+        await Promise.all(deletePromises);
+
+        console.log("All pending agreements deleted successfully.");
+      } catch (error) {
+        console.error("Error deleting pending agreements:", error);
+      }
+
       setAlert({
         open: true,
         message: "Agreement was accepted successfully!",
