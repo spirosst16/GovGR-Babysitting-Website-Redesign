@@ -1255,17 +1255,32 @@ const MyDashboard = () => {
               };
             }
 
-            const isLastMonth =
-              agreement.status !== "history"
-                ? current.getFullYear() === lastFullMonthDate.getFullYear() &&
-                  current.getMonth() === lastFullMonthDate.getMonth()
-                : null;
+            let isLastMonth = false;
+
+            if (
+              paymentStatus === "not available yet" &&
+              new Date(agreement.endingDate) > currentDate
+            ) {
+              isLastMonth =
+                current.getFullYear() === currentDate.getFullYear() &&
+                current.getMonth() === currentDate.getMonth();
+            } else {
+              isLastMonth =
+                agreement.status !== "history"
+                  ? current.getFullYear() === lastFullMonthDate.getFullYear() &&
+                    current.getMonth() === lastFullMonthDate.getMonth()
+                  : null;
+            }
 
             acc[agreement.id].payments.push({
               monthYear,
               amount: parseFloat(amount),
               isLastMonth,
             });
+
+            if (isLastMonth) {
+              break;
+            }
 
             current.setMonth(current.getMonth() + 1);
           }
