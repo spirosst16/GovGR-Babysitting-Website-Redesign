@@ -112,6 +112,11 @@ const PaymentTracker = () => {
   const [rating, setRating] = useState("");
   const [hoveredRating, setHoveredRating] = useState(0);
   const [isReviewSubmitted, setIsReviewSubmitted] = useState(false);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   useEffect(() => {
     const auth = getAuth();
@@ -392,11 +397,19 @@ const PaymentTracker = () => {
     doc.save("PaymentVoucher.pdf");
   };
 
+  const handleAlertClose = () => {
+    setAlert({ ...alert, open: false });
+  };
+
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
 
     if (!reviewText || !rating) {
-      alert("Please provide both a review and a rating.");
+      setAlert({
+        open: true,
+        message: "Please provide both a review and a rating.",
+        severity: "error",
+      });
       return;
     }
 
@@ -428,7 +441,12 @@ const PaymentTracker = () => {
       }
 
       if (!babysitterRef) {
-        alert("Babysitter could not be determined.");
+        setAlert({
+          open: true,
+          message: "Babysitter could not be determined.",
+          severity: "error",
+        });
+
         return;
       }
 
@@ -459,13 +477,21 @@ const PaymentTracker = () => {
         rating: averageRating,
       });
 
-      alert("Thank you for your review!");
+      setAlert({
+        open: true,
+        message: "Thank you for your review!",
+        severity: "success",
+      });
       setReviewText("");
       setRating("");
       setIsReviewSubmitted(true);
     } catch (error) {
       console.error("Error submitting review:", error.message);
-      alert("An error occurred. Please try again.");
+      setAlert({
+        open: true,
+        message: "An error occurred. Please try again.",
+        severity: "error",
+      });
     }
   };
 
@@ -1231,9 +1257,13 @@ const PaymentTracker = () => {
                       console.error(
                         "Error: senderId or recipientId is undefined"
                       );
-                      alert(
-                        "Sender or Recipient information is missing. Cannot proceed."
-                      );
+                      setAlert({
+                        open: true,
+                        message:
+                          "Sender or Recipient information is missing. Cannot proceed.",
+                        severity: "error",
+                      });
+
                       return;
                     }
 
@@ -1278,25 +1308,34 @@ const PaymentTracker = () => {
                           paymentStatus: paymentStatus,
                         }));
 
-                        alert(
-                          "Verification Completed! Payment status updated to 'not available yet.'"
-                        );
+                        setAlert({
+                          open: true,
+                          message: "Verification Completed!",
+                          severity: "success",
+                        });
+                        navigate("/my-dashboard");
                       } else {
                         console.error(
                           "No agreement found for the provided sender and recipient."
                         );
-                        alert(
-                          "No agreement found for the provided sender and recipient."
-                        );
+                        setAlert({
+                          open: true,
+                          message:
+                            "No agreement found for the provided sender and recipient.",
+                          severity: "error",
+                        });
                       }
                     } catch (error) {
                       console.error(
                         "Error fetching or updating agreement:",
                         error.message
                       );
-                      alert(
-                        "An error occurred while processing. Please try again."
-                      );
+                      setAlert({
+                        open: true,
+                        message:
+                          "An error occurred while processing. Please try again.",
+                        severity: "error",
+                      });
                     }
                   }}
                 >
@@ -1313,6 +1352,20 @@ const PaymentTracker = () => {
           <Typography variant="body1">Loading...</Typography>
         )}
       </Container>
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={6000}
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleAlertClose}
+          severity={alert.severity}
+          sx={{ width: "100%" }}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
