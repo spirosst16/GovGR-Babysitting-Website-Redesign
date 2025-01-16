@@ -1213,7 +1213,13 @@ const MyDashboard = () => {
         </Grid>
       );
     } else if (currentTab === 2) {
-      const paymentsByAgreement = agreements.reduce((acc, agreement) => {
+      const sortedAgreements = agreements.sort((a, b) => {
+        const dateA = new Date(a.lastPaymentDate || a.startingDate);
+        const dateB = new Date(b.lastPaymentDate || b.startingDate);
+        return dateB - dateA;
+      });
+
+      const paymentsByAgreement = sortedAgreements.reduce((acc, agreement) => {
         const {
           startingDate,
           lastPaymentDate,
