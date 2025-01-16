@@ -255,6 +255,8 @@ const BabysittingApplicationDisplay = () => {
   const [viewedUserRole, setViewedUserRole] = useState(null);
   const [agreementExists, setAgreementExists] = useState(false);
   const [agreementPath, setAgreementPath] = useState(null);
+  const [hasAcceptedAgreement, setHasAcceptedAgreement] = useState(false);
+  const [hasAcceptedAgreement2, setHasAcceptedAgreement2] = useState(false);
   const [alert, setAlert] = useState({
     open: false,
     message: "",
@@ -382,6 +384,67 @@ const BabysittingApplicationDisplay = () => {
             agreementPathTemp = `agreement/${validAgreement.id}`;
           }
         }
+
+        const senderQuery2 = query(
+          agreementsRef,
+          where("senderId", "==", application.userId)
+        );
+
+        const recipientQuery2 = query(
+          agreementsRef,
+          where("recipientId", "==", application.userId)
+        );
+
+        const [senderSnapshot2, recipientSnapshot2] = await Promise.all([
+          getDocs(senderQuery2),
+          getDocs(recipientQuery2),
+        ]);
+
+        // Combine agreements from both queries
+        const allAgreements = [
+          ...senderSnapshot2.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
+          ...recipientSnapshot2.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })),
+        ];
+
+        // Check if any agreement has the status "accepted"
+        const hasAcceptedAgreement = allAgreements.some(
+          (agreement) => agreement.status === "accepted"
+        );
+        const senderQuery3 = query(
+          agreementsRef,
+          where("senderId", "==", currentUser.uid)
+        );
+
+        const recipientQuery3 = query(
+          agreementsRef,
+          where("recipientId", "==", currentUser.uid)
+        );
+
+        const [senderSnapshot3, recipientSnapshot3] = await Promise.all([
+          getDocs(senderQuery3),
+          getDocs(recipientQuery3),
+        ]);
+
+        // Combine agreements from both queries
+        const allAgreements2 = [
+          ...senderSnapshot3.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
+          ...recipientSnapshot3.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })),
+        ];
+
+        // Check if any agreement has the status "accepted"
+        const hasAcceptedAgreement2 = allAgreements2.some(
+          (agreement) => agreement.status === "accepted"
+        );
+
+        setHasAcceptedAgreement(hasAcceptedAgreement);
+
+        setHasAcceptedAgreement2(hasAcceptedAgreement2);
 
         setAgreementExists(agreementExistsFlag);
         setAgreementPath(agreementPathTemp);
@@ -903,7 +966,9 @@ const BabysittingApplicationDisplay = () => {
                                 from: location.pathname,
                               },
                             })
-                          : handleCreateAgreement()
+                          : !hasAcceptedAgreement &&
+                            !hasAcceptedAgreement2 &&
+                            handleCreateAgreement()
                       }
                       sx={{
                         backgroundColor: "#5e62d1",
@@ -912,15 +977,27 @@ const BabysittingApplicationDisplay = () => {
                         padding: "12px 30px",
                         textTransform: "none",
                         "&:hover": {
-                          backgroundColor: "#4a54c1",
+                          backgroundColor:
+                            (hasAcceptedAgreement || hasAcceptedAgreement2) &&
+                            !agreementExists
+                              ? "#d3d3d3"
+                              : "#4a54c1",
                         },
                         fontFamily: "'Poppins', sans-serif",
                         margin: "10px auto",
                       }}
+                      disabled={
+                        (hasAcceptedAgreement || hasAcceptedAgreement2) &&
+                        !agreementExists
+                      }
                     >
                       {agreementExists
                         ? "Inspect Agreement"
-                        : "Create Agreement"}
+                        : hasAcceptedAgreement2
+                        ? "You have already an active agreement"
+                        : !hasAcceptedAgreement
+                        ? "Create Agreement"
+                        : `${user.firstName} has already an active agreement`}
                     </Button>
                   )}
                 {currentUser?.uid === application.userId &&
