@@ -799,7 +799,7 @@ const ProfileInspect = () => {
                   fontFamily: "Poppins, sans-serif",
                 }}
               >
-                My Reviews
+                {`${profileData.firstName}`}'s Reviews
               </Typography>
               {reviews.length > 0 ? (
                 reviews.map(({ reviewer, review }, index) => (
