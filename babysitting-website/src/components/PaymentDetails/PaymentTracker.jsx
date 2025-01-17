@@ -32,6 +32,7 @@ import {
   Stack,
   Breadcrumbs,
   Link,
+  CircularProgress,
   Snackbar,
   Alert,
   TextField,
@@ -94,6 +95,98 @@ const steps = [
   "Review Babysitter",
 ];
 
+const CustomSeparator = () => {
+  const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const email = user.email;
+
+        // Check if user is a babysitter
+        const babysitterQuery = query(
+          collection(FIREBASE_DB, "babysitters"),
+          where("email", "==", email)
+        );
+        const babysitterSnapshot = await getDocs(babysitterQuery);
+        if (!babysitterSnapshot.empty) {
+          setUserRole("babysitter");
+          return;
+        }
+
+        // Check if user is a guardian
+        const guardianQuery = query(
+          collection(FIREBASE_DB, "guardians"),
+          where("email", "==", email)
+        );
+        const guardianSnapshot = await getDocs(guardianQuery);
+        if (!guardianSnapshot.empty) {
+          setUserRole("guardian");
+          return;
+        }
+      }
+      setUserRole(null); // Not logged in
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleNavigate = (path) => {
+    navigate(path);
+  };
+
+  const breadcrumbs = [
+    <Link
+      underline="none"
+      key="1"
+      color="inherit"
+      onClick={() => {
+        if (userRole) {
+          handleNavigate("/my-dashboard");
+        } else {
+          handleNavigate("/");
+        }
+      }}
+      sx={{
+        "&:hover": { color: "#5e62d1", cursor: "pointer" },
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Home
+    </Link>,
+    <Link
+      underline="none"
+      key="2"
+      color="inherit"
+      sx={{
+        fontFamily: "Poppins, sans-serif",
+      }}
+    >
+      Payment
+    </Link>,
+  ];
+
+  return (
+    <Stack
+      sx={{
+        position: "absolute",
+        top: "80px",
+        left: "70px",
+        alignItems: "flex-start",
+      }}
+    >
+      <Breadcrumbs
+        separator={<NavigateNextIcon fontSize="small" />}
+        aria-label="breadcrumb"
+      >
+        {breadcrumbs}
+      </Breadcrumbs>
+    </Stack>
+  );
+};
+
 const PaymentTracker = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -111,6 +204,7 @@ const PaymentTracker = () => {
   const [reviewText, setReviewText] = useState("");
   const [rating, setRating] = useState("");
   const [hoveredRating, setHoveredRating] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [isReviewSubmitted, setIsReviewSubmitted] = useState(false);
   const [alert, setAlert] = useState({
     open: false,
@@ -289,10 +383,12 @@ const PaymentTracker = () => {
             }));
           }
         }
+        setLoading(false);
       } else {
         console.log(
           "No agreement found for the provided sender and recipient."
         );
+        setLoading(false);
       }
     } catch (error) {
       console.error("Error fetching data:", error.message);
@@ -920,462 +1016,480 @@ const PaymentTracker = () => {
     }
   };
 
-  return (
-    <div
-      style={{
-        paddingTop: "120px",
-        backgroundColor: "#f4f4f4",
-        minHeight: "100vh",
-        paddingBottom: "70px",
-        fontFamily: "Poppins, sans-serif",
-      }}
-    >
-      <Navbar />
-      <Container component="main" maxWidth="md">
-        {agreement ? (
-          agreement.paymentStatus === "not available yet" ||
-          (agreement.paymentStatus === "pending guardian" &&
-            currentUserRole === "Babysitter") ||
-          (agreement.paymentStatus === "pending babysitter" &&
-            currentUserRole === "Guardian") ? (
-            <PageContainer>
-              <Typography
-                variant="h5"
-                sx={{
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  fontFamily: "'Poppins', sans-serif",
-                  paddingBottom: "20px",
-                }}
-              >
-                Payment Not Available Yet
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  textAlign: "center",
-                  fontFamily: "'Poppins', sans-serif",
-                }}
-              >
-                The payment for this agreement is not available yet. Please wait{" "}
-                <strong>
-                  {(() => {
-                    const currentDate = new Date();
-                    const endingDate = new Date(agreement.endingDate);
-
-                    const daysInMonth = (date) => {
-                      const year = date.getFullYear();
-                      const month = date.getMonth() + 1;
-                      return new Date(year, month, 0).getDate();
-                    };
-
-                    const remainingDays = Math.ceil(
-                      (endingDate - currentDate) / (1000 * 60 * 60 * 24)
-                    );
-
-                    if (remainingDays > 0) {
-                      const daysInEndingMonth = daysInMonth(endingDate);
-                      return (
-                        remainingDays % daysInEndingMonth || daysInEndingMonth
-                      );
-                    } else {
-                      return 0;
-                    }
-                  })()}
-                </strong>{" "}
-                days until the agreement's end date.
-              </Typography>
-            </PageContainer>
-          ) : agreement.paymentStatus === "pending guardian" &&
-            currentUserRole === "Guardian" ? (
-            <>
-              <Typography
-                variant="h4"
-                component="h1"
-                textAlign="center"
-                sx={{
-                  mb: 3,
-                  fontFamily: "Poppins, sans-serif",
-                }}
-              >
-                Professional Payment Tracker
-              </Typography>
-              <Stepper
-                activeStep={currentStep}
-                alternativeLabel
-                sx={{
-                  ".MuiStepIcon-root": {
-                    color: "#5e62d1",
-                  },
-                  ".MuiStepIcon-root.Mui-active": {
-                    color: "#5e62d1",
-                  },
-                  ".MuiStepIcon-root.Mui-completed": {
-                    color: "#5e62d1",
-                  },
-                }}
-              >
-                {steps.map((label, index) => (
-                  <Step key={index}>
-                    <StepLabel>{label}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-              <Box
-                sx={{
-                  mt: 4,
-                  p: 3,
-                  backgroundColor: "white",
-                  borderRadius: "10px",
-                  boxShadow: 4,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 3,
-                }}
-              >
-                {renderStepContent(currentStep)}
-                {currentStep < steps.length - 1 && (
-                  <Box
-                    sx={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <StyledButton
-                      variant="contained"
-                      onClick={handleBack}
-                      disabled={currentStep === 0}
-                      sx={{
-                        backgroundColor: "#5e62d1",
-                        "&:hover": {
-                          backgroundColor: "#4a4fbf",
-                        },
-                      }}
-                    >
-                      Back
-                    </StyledButton>
-                    <StyledButton
-                      variant="contained"
-                      onClick={handleNext}
-                      disabled={currentStep === 0 && !workConfirmed}
-                      sx={{
-                        backgroundColor: "#5e62d1",
-                        "&:hover": {
-                          backgroundColor: "#4a4fbf",
-                        },
-                      }}
-                    >
-                      Next
-                    </StyledButton>
-                  </Box>
-                )}
-              </Box>
-            </>
-          ) : agreement.paymentStatus === "pending babysitter" &&
-            currentUserRole === "Babysitter" ? (
-            <PageContainer>
-              <Typography
-                variant="h4"
-                sx={{
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  fontFamily: "'Poppins', sans-serif",
-                  paddingBottom: "20px",
-                }}
-              >
-                Babysitter Action Required
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  mt: 2,
-                  mb: 4,
-                  textAlign: "center",
-                  fontFamily: "'Poppins', sans-serif",
-                  fontSize: "1.1rem",
-                }}
-              >
-                The payment is now pending babysitter confirmation. Please
-                review the details below and proceed with the verification.
-              </Typography>
-              <Card
-                sx={{
-                  mt: 4,
-                  p: 4,
-                  borderRadius: "15px",
-                  boxShadow: 10,
-                  backgroundColor: "#ffffff",
-                  border: "none",
-                  width: 800,
-                  margin: "auto",
-                  transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                  overflow: "hidden",
-                  position: "relative",
-                }}
-              >
-                <Box
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+          backgroundColor: "#f4f4f4",
+        }}
+      >
+        <CircularProgress sx={{ color: "#5e62d1" }} />
+      </Box>
+    );
+  } else {
+    return (
+      <div
+        style={{
+          paddingTop: "120px",
+          backgroundColor: "#f4f4f4",
+          minHeight: "100vh",
+          paddingBottom: "70px",
+          fontFamily: "Poppins, sans-serif",
+        }}
+      >
+        <CustomSeparator />
+        <Container component="main" maxWidth="md">
+          {agreement ? (
+            agreement.paymentStatus === "not available yet" ||
+            (agreement.paymentStatus === "pending guardian" &&
+              currentUserRole === "Babysitter") ||
+            (agreement.paymentStatus === "pending babysitter" &&
+              currentUserRole === "Guardian") ? (
+              <PageContainer>
+                <Typography
+                  variant="h5"
                   sx={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    backgroundImage:
-                      "linear-gradient(135deg, #5e62d1, #3f51b5)",
-                    borderRadius: "15px",
-                    zIndex: -1,
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontFamily: "'Poppins', sans-serif",
+                    paddingBottom: "20px",
                   }}
-                />
-                <CardContent sx={{ paddingBottom: "16px" }}>
-                  <Box
-                    sx={{
-                      backgroundImage:
-                        "linear-gradient(135deg, #5e62d1, #3f51b5)",
-                      borderRadius: "10px",
-                      padding: "12px",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    <Typography
-                      variant="h5"
-                      sx={{
-                        fontWeight: "bold",
-                        fontSize: "1.5rem",
-                        color: "white",
-                        fontFamily: "'Poppins', sans-serif",
-                        textAlign: "center",
-                        letterSpacing: "0.5px",
-                      }}
-                    >
-                      Digital Voucher
-                    </Typography>
-                  </Box>
-                  <Divider sx={{ mt: 3, mb: 3, borderColor: "#e0e0e0" }} />
-                  {agreement && (
-                    <Grid container spacing={3}>
-                      <Grid item xs={12} sm={6}>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            mb: 2,
-                            fontWeight: 600,
-                            fontSize: "1rem",
-                            color: "#333333",
-                            fontFamily: "'Poppins', sans-serif",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                          }}
-                        >
-                          <AttachMoneyIcon sx={{ color: "#5e62d1" }} />
-                          <strong>Amount:</strong> {agreement.amount || "N/A"}€
-                        </Typography>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            mb: 2,
-                            fontWeight: 600,
-                            fontSize: "1rem",
-                            color: "#333333",
-                            fontFamily: "'Poppins', sans-serif",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                          }}
-                        >
-                          <LocationOnIcon sx={{ color: "#5e62d1" }} />
-                          <strong>Area:</strong> {agreement.area || "N/A"}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            mb: 2,
-                            fontWeight: 600,
-                            fontSize: "1rem",
-                            color: "#333333",
-                            fontFamily: "'Poppins', sans-serif",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                          }}
-                        >
-                          <AccessTimeIcon sx={{ color: "#5e62d1" }} />
-                          <strong>Service Period:</strong> 1 Month
-                        </Typography>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            mb: 2,
-                            fontWeight: 600,
-                            fontSize: "1rem",
-                            color: "#333333",
-                            fontFamily: "'Poppins', sans-serif",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                          }}
-                        >
-                          <PlaceIcon sx={{ color: "#5e62d1" }} />
-                          <strong>Service Location:</strong>{" "}
-                          {agreement.babysittingPlace || "N/A"}
-                        </Typography>
-                      </Grid>
-                    </Grid>
-                  )}
-                </CardContent>
-              </Card>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  flexDirection: "column",
-                  mt: 8,
-                }}
-              >
-                <StyledButton
-                  onClick={generatePDF}
+                >
+                  Payment Not Available Yet
+                </Typography>
+                <Typography
+                  variant="h6"
                   sx={{
-                    backgroundColor: "white",
-                    color: "#5e62d1",
-                    outline: "1px solid #5e62d1",
-                    borderRadius: "30px",
-                    padding: "8px 16px",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    "&:hover": {
-                      backgroundColor: "#f0f4ff",
+                    textAlign: "center",
+                    fontFamily: "'Poppins', sans-serif",
+                  }}
+                >
+                  The payment for this agreement is not available yet. Please
+                  wait{" "}
+                  <strong>
+                    {(() => {
+                      const currentDate = new Date();
+                      const endingDate = new Date(agreement.endingDate);
+
+                      const daysInMonth = (date) => {
+                        const year = date.getFullYear();
+                        const month = date.getMonth() + 1;
+                        return new Date(year, month, 0).getDate();
+                      };
+
+                      const remainingDays = Math.ceil(
+                        (endingDate - currentDate) / (1000 * 60 * 60 * 24)
+                      );
+
+                      if (remainingDays > 0) {
+                        const daysInEndingMonth = daysInMonth(endingDate);
+                        return (
+                          remainingDays % daysInEndingMonth || daysInEndingMonth
+                        );
+                      } else {
+                        return 0;
+                      }
+                    })()}
+                  </strong>{" "}
+                  days until the agreement's end date.
+                </Typography>
+              </PageContainer>
+            ) : agreement.paymentStatus === "pending guardian" &&
+              currentUserRole === "Guardian" ? (
+              <>
+                <Typography
+                  variant="h4"
+                  component="h1"
+                  textAlign="center"
+                  sx={{
+                    mb: 3,
+                    fontFamily: "Poppins, sans-serif",
+                  }}
+                >
+                  Professional Payment Tracker
+                </Typography>
+                <Stepper
+                  activeStep={currentStep}
+                  alternativeLabel
+                  sx={{
+                    ".MuiStepIcon-root": {
+                      color: "#5e62d1",
+                    },
+                    ".MuiStepIcon-root.Mui-active": {
+                      color: "#5e62d1",
+                    },
+                    ".MuiStepIcon-root.Mui-completed": {
+                      color: "#5e62d1",
                     },
                   }}
                 >
-                  <DownloadIcon sx={{ mr: 1, fontSize: "20px" }} />{" "}
-                  <span>Download Voucher</span>
-                </StyledButton>
-                <StyledButton
-                  variant="contained"
+                  {steps.map((label, index) => (
+                    <Step key={index}>
+                      <StepLabel>{label}</StepLabel>
+                    </Step>
+                  ))}
+                </Stepper>
+                <Box
                   sx={{
-                    mt: 8,
-                    backgroundColor: "#5e62d1",
-                    "&:hover": {
-                      backgroundColor: "#4a4fbf",
-                    },
+                    mt: 4,
+                    p: 3,
+                    backgroundColor: "white",
+                    borderRadius: "10px",
+                    boxShadow: 4,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 3,
                   }}
-                  onClick={async () => {
-                    if (!userId1 || !userId2) {
-                      console.error(
-                        "Error: senderId or recipientId is undefined"
-                      );
-                      setAlert({
-                        open: true,
-                        message:
-                          "Sender or Recipient information is missing. Cannot proceed.",
-                        severity: "error",
-                      });
-
-                      return;
-                    }
-
-                    try {
-                      const agreementRef = query(
-                        collection(FIREBASE_DB, "agreements"),
-                        where("senderId", "==", userId1),
-                        where("recipientId", "==", userId2)
-                      );
-
-                      const agreementSnapshot = await getDocs(agreementRef);
-
-                      if (!agreementSnapshot.empty) {
-                        const agreementDoc = agreementSnapshot.docs[0];
-                        const agreementData = agreementDoc.data();
-                        setAgreement({
-                          id: agreementDoc.id,
-                          ...agreementData,
-                        });
-
-                        console.log("Agreement data fetched:", agreementData);
-
-                        const currentDate = new Date();
-                        const endingDate = new Date(agreementData.endingDate);
-                        const paymentStatus =
-                          currentDate >= endingDate
-                            ? "completed"
-                            : "not available yet";
-
-                        const agreementDocRef = doc(
-                          FIREBASE_DB,
-                          "agreements",
-                          agreementDoc.id
-                        );
-
-                        await updateDoc(agreementDocRef, {
-                          paymentStatus: paymentStatus,
-                        });
-
-                        setAgreement((prev) => ({
-                          ...prev,
-                          paymentStatus: paymentStatus,
-                        }));
-
-                        setAlert({
-                          open: true,
-                          message: "Verification Completed!",
-                          severity: "success",
-                        });
-                        navigate("/my-dashboard");
-                      } else {
+                >
+                  {renderStepContent(currentStep)}
+                  {currentStep < steps.length - 1 && (
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <StyledButton
+                        variant="contained"
+                        onClick={handleBack}
+                        disabled={currentStep === 0}
+                        sx={{
+                          backgroundColor: "#5e62d1",
+                          "&:hover": {
+                            backgroundColor: "#4a4fbf",
+                          },
+                        }}
+                      >
+                        Back
+                      </StyledButton>
+                      <StyledButton
+                        variant="contained"
+                        onClick={handleNext}
+                        disabled={currentStep === 0 && !workConfirmed}
+                        sx={{
+                          backgroundColor: "#5e62d1",
+                          "&:hover": {
+                            backgroundColor: "#4a4fbf",
+                          },
+                        }}
+                      >
+                        Next
+                      </StyledButton>
+                    </Box>
+                  )}
+                </Box>
+              </>
+            ) : agreement.paymentStatus === "pending babysitter" &&
+              currentUserRole === "Babysitter" ? (
+              <PageContainer>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    textAlign: "center",
+                    fontWeight: "bold",
+                    fontFamily: "'Poppins', sans-serif",
+                    paddingBottom: "20px",
+                  }}
+                >
+                  Babysitter Action Required
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    mt: 2,
+                    mb: 4,
+                    textAlign: "center",
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: "1.1rem",
+                  }}
+                >
+                  The payment is now pending babysitter confirmation. Please
+                  review the details below and proceed with the verification.
+                </Typography>
+                <Card
+                  sx={{
+                    mt: 4,
+                    p: 4,
+                    borderRadius: "15px",
+                    boxShadow: 10,
+                    backgroundColor: "#ffffff",
+                    border: "none",
+                    width: 800,
+                    margin: "auto",
+                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    overflow: "hidden",
+                    position: "relative",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      backgroundImage:
+                        "linear-gradient(135deg, #5e62d1, #3f51b5)",
+                      borderRadius: "15px",
+                      zIndex: -1,
+                    }}
+                  />
+                  <CardContent sx={{ paddingBottom: "16px" }}>
+                    <Box
+                      sx={{
+                        backgroundImage:
+                          "linear-gradient(135deg, #5e62d1, #3f51b5)",
+                        borderRadius: "10px",
+                        padding: "12px",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <Typography
+                        variant="h5"
+                        sx={{
+                          fontWeight: "bold",
+                          fontSize: "1.5rem",
+                          color: "white",
+                          fontFamily: "'Poppins', sans-serif",
+                          textAlign: "center",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        Digital Voucher
+                      </Typography>
+                    </Box>
+                    <Divider sx={{ mt: 3, mb: 3, borderColor: "#e0e0e0" }} />
+                    {agreement && (
+                      <Grid container spacing={3}>
+                        <Grid item xs={12} sm={6}>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              mb: 2,
+                              fontWeight: 600,
+                              fontSize: "1rem",
+                              color: "#333333",
+                              fontFamily: "'Poppins', sans-serif",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <AttachMoneyIcon sx={{ color: "#5e62d1" }} />
+                            <strong>Amount:</strong> {agreement.amount || "N/A"}
+                            €
+                          </Typography>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              mb: 2,
+                              fontWeight: 600,
+                              fontSize: "1rem",
+                              color: "#333333",
+                              fontFamily: "'Poppins', sans-serif",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <LocationOnIcon sx={{ color: "#5e62d1" }} />
+                            <strong>Area:</strong> {agreement.area || "N/A"}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              mb: 2,
+                              fontWeight: 600,
+                              fontSize: "1rem",
+                              color: "#333333",
+                              fontFamily: "'Poppins', sans-serif",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <AccessTimeIcon sx={{ color: "#5e62d1" }} />
+                            <strong>Service Period:</strong> 1 Month
+                          </Typography>
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              mb: 2,
+                              fontWeight: 600,
+                              fontSize: "1rem",
+                              color: "#333333",
+                              fontFamily: "'Poppins', sans-serif",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                            }}
+                          >
+                            <PlaceIcon sx={{ color: "#5e62d1" }} />
+                            <strong>Service Location:</strong>{" "}
+                            {agreement.babysittingPlace || "N/A"}
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    )}
+                  </CardContent>
+                </Card>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    mt: 8,
+                  }}
+                >
+                  <StyledButton
+                    onClick={generatePDF}
+                    sx={{
+                      backgroundColor: "white",
+                      color: "#5e62d1",
+                      outline: "1px solid #5e62d1",
+                      borderRadius: "30px",
+                      padding: "8px 16px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      "&:hover": {
+                        backgroundColor: "#f0f4ff",
+                      },
+                    }}
+                  >
+                    <DownloadIcon sx={{ mr: 1, fontSize: "20px" }} />{" "}
+                    <span>Download Voucher</span>
+                  </StyledButton>
+                  <StyledButton
+                    variant="contained"
+                    sx={{
+                      mt: 8,
+                      backgroundColor: "#5e62d1",
+                      "&:hover": {
+                        backgroundColor: "#4a4fbf",
+                      },
+                    }}
+                    onClick={async () => {
+                      if (!userId1 || !userId2) {
                         console.error(
-                          "No agreement found for the provided sender and recipient."
+                          "Error: senderId or recipientId is undefined"
                         );
                         setAlert({
                           open: true,
                           message:
-                            "No agreement found for the provided sender and recipient.",
+                            "Sender or Recipient information is missing. Cannot proceed.",
+                          severity: "error",
+                        });
+
+                        return;
+                      }
+
+                      try {
+                        const agreementRef = query(
+                          collection(FIREBASE_DB, "agreements"),
+                          where("senderId", "==", userId1),
+                          where("recipientId", "==", userId2)
+                        );
+
+                        const agreementSnapshot = await getDocs(agreementRef);
+
+                        if (!agreementSnapshot.empty) {
+                          const agreementDoc = agreementSnapshot.docs[0];
+                          const agreementData = agreementDoc.data();
+                          setAgreement({
+                            id: agreementDoc.id,
+                            ...agreementData,
+                          });
+
+                          console.log("Agreement data fetched:", agreementData);
+
+                          const currentDate = new Date();
+                          const endingDate = new Date(agreementData.endingDate);
+                          const paymentStatus =
+                            currentDate >= endingDate
+                              ? "completed"
+                              : "not available yet";
+
+                          const agreementDocRef = doc(
+                            FIREBASE_DB,
+                            "agreements",
+                            agreementDoc.id
+                          );
+
+                          await updateDoc(agreementDocRef, {
+                            paymentStatus: paymentStatus,
+                          });
+
+                          setAgreement((prev) => ({
+                            ...prev,
+                            paymentStatus: paymentStatus,
+                          }));
+
+                          setAlert({
+                            open: true,
+                            message: "Verification Completed!",
+                            severity: "success",
+                          });
+                          navigate("/my-dashboard");
+                        } else {
+                          console.error(
+                            "No agreement found for the provided sender and recipient."
+                          );
+                          setAlert({
+                            open: true,
+                            message:
+                              "No agreement found for the provided sender and recipient.",
+                            severity: "error",
+                          });
+                        }
+                      } catch (error) {
+                        console.error(
+                          "Error fetching or updating agreement:",
+                          error.message
+                        );
+                        setAlert({
+                          open: true,
+                          message:
+                            "An error occurred while processing. Please try again.",
                           severity: "error",
                         });
                       }
-                    } catch (error) {
-                      console.error(
-                        "Error fetching or updating agreement:",
-                        error.message
-                      );
-                      setAlert({
-                        open: true,
-                        message:
-                          "An error occurred while processing. Please try again.",
-                        severity: "error",
-                      });
-                    }
-                  }}
-                >
-                  Confirm & Verify
-                </StyledButton>
-              </Box>
-            </PageContainer>
+                    }}
+                  >
+                    Confirm & Verify
+                  </StyledButton>
+                </Box>
+              </PageContainer>
+            ) : (
+              <PageContainer>
+                <Typography variant="body1">Unknown payment status</Typography>
+              </PageContainer>
+            )
           ) : (
-            <PageContainer>
-              <Typography variant="body1">Unknown payment status</Typography>
-            </PageContainer>
-          )
-        ) : (
-          <Typography variant="body1">Loading...</Typography>
-        )}
-      </Container>
-      <Snackbar
-        open={alert.open}
-        autoHideDuration={6000}
-        onClose={handleAlertClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
+            <Typography variant="body1">Loading...</Typography>
+          )}
+        </Container>
+        <Snackbar
+          open={alert.open}
+          autoHideDuration={6000}
           onClose={handleAlertClose}
-          severity={alert.severity}
-          sx={{ width: "100%" }}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
         >
-          {alert.message}
-        </Alert>
-      </Snackbar>
-    </div>
-  );
+          <Alert
+            onClose={handleAlertClose}
+            severity={alert.severity}
+            sx={{ width: "100%" }}
+          >
+            {alert.message}
+          </Alert>
+        </Snackbar>
+      </div>
+    );
+  }
 };
 
 export default PaymentTracker;

@@ -351,8 +351,6 @@ const MyDashboard = () => {
         throw new Error(`User with ID ${userId} not found`);
       } catch (error) {
         console.error("Error fetching current user data:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -384,7 +382,6 @@ const MyDashboard = () => {
 
       if (!userData) throw new Error(`User with ID ${userId} not found`);
 
-      setLoading(false);
       return userData;
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -1480,11 +1477,13 @@ const MyDashboard = () => {
                                 variant="contained"
                                 sx={{
                                   padding: "8px 20px",
+                                  fontFamily: "'Poppins', sans-serif",
+                                  fontSize: "1rem",
+                                  textTransform: "none",
+                                  borderRadius: "30px",
                                   backgroundColor: "#5e62d1",
-                                  fontFamily: "Poppins, sans-serif",
-                                  color: "#fff",
                                   "&:hover": {
-                                    backgroundColor: "#3c3fad",
+                                    backgroundColor: "#4a4fbf",
                                   },
                                 }}
                                 onClick={() =>
