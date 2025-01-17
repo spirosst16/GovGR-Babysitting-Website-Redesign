@@ -419,6 +419,9 @@ const BabysitterInfoForm = () => {
                     value={formValues.dateOfBirth}
                     onChange={handleChange}
                     InputLabelProps={{ shrink: true }}
+                    inputProps={{
+                      min: "1950-01-01",
+                    }}
                     required
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}

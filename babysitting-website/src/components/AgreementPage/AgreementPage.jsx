@@ -412,7 +412,7 @@ const AgreementPage = () => {
     const auth = getAuth();
     const currentUser = auth.currentUser;
     if (!userId) {
-      alert("No valid profile data to save.");
+      alert("No valid profile.");
       return;
     }
     if (currentUser === null) {
@@ -455,6 +455,22 @@ const AgreementPage = () => {
       setAlert({
         open: true,
         message: "Please fill in all required fields.",
+        severity: "error",
+      });
+      return;
+    }
+
+    const startDate = new Date(formValues.startingDate);
+    const endDate = new Date(formValues.endingDate);
+
+    const oneMonthLater = new Date(startDate);
+    oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+
+    if (endDate < oneMonthLater) {
+      setAlert({
+        open: true,
+        message:
+          "The ending date must be at least one month after the starting date.",
         severity: "error",
       });
       return;
@@ -976,6 +992,9 @@ const AgreementPage = () => {
                 onChange={handleInputChange}
                 type="date"
                 InputLabelProps={{ shrink: true }}
+                inputProps={{
+                  min: "2000-01-01",
+                }}
                 required
                 sx={{ fontFamily: "'Poppins', sans-serif" }}
               />
@@ -988,6 +1007,17 @@ const AgreementPage = () => {
                 onChange={handleInputChange}
                 type="date"
                 InputLabelProps={{ shrink: true }}
+                inputProps={{
+                  min: formValues.startingDate
+                    ? new Date(
+                        new Date(formValues.startingDate).setMonth(
+                          new Date(formValues.startingDate).getMonth() + 1
+                        )
+                      )
+                        .toISOString()
+                        .split("T")[0]
+                    : "2000-01-01",
+                }}
                 required
                 sx={{ fontFamily: "'Poppins', sans-serif" }}
               />
