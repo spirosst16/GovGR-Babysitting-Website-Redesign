@@ -446,7 +446,11 @@ const MyDashboard = () => {
             const nextMonthDate = new Date(lastPaymentDate);
             nextMonthDate.setMonth(nextMonthDate.getMonth() + monthsPassed);
 
-            if (monthsPassed >= 2 && agreement.paymentStatus !== "unknown") {
+            if (
+              monthsPassed >= 1 &&
+              agreement.status === "accepted" &&
+              agreement.paymentStatus !== "completed"
+            ) {
               let newLastPaymentDate = new Date(lastPaymentDate);
               newLastPaymentDate.setMonth(
                 newLastPaymentDate.getMonth() + monthsPassed - 1
@@ -1263,7 +1267,14 @@ const MyDashboard = () => {
 
             let isLastMonth = false;
 
-            if (
+            if (paymentStatus === "pending babysitter") {
+              const lastMonthBeforeDate = new Date(lastDate);
+              lastMonthBeforeDate.setMonth(lastDate.getMonth() - 1);
+
+              isLastMonth =
+                current.getFullYear() === lastMonthBeforeDate.getFullYear() &&
+                current.getMonth() === lastMonthBeforeDate.getMonth();
+            } else if (
               paymentStatus === "not available yet" &&
               new Date(agreement.endingDate) > currentDate
             ) {

@@ -340,13 +340,21 @@ const PaymentTracker = () => {
         const agreementData = agreementSnapshot.docs[0].data();
 
         if (agreementData.paymentStatus !== "pending babysitter") {
+          const lastPaymentDate = new Date(agreementData.lastPaymentDate);
+          let newLastPaymentDate = new Date(lastPaymentDate);
+          newLastPaymentDate.setMonth(newLastPaymentDate.getMonth() + 1);
+
+          const formattedDate = newLastPaymentDate.toISOString().split("T")[0];
+
           await updateDoc(agreementDocRef, {
             paymentStatus: "pending babysitter",
+            lastPaymentDate: formattedDate,
           });
 
           setAgreement((prev) => ({
             ...prev,
             paymentStatus: "pending babysitter",
+            lastPaymentDate: formattedDate,
           }));
           console.log("Payment status updated to pending babysitter.");
         } else {
