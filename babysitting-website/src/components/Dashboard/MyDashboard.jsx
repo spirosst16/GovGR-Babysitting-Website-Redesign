@@ -13,8 +13,10 @@ import {
   Breadcrumbs,
   Stack,
   Link,
+  Snackbar,
+  Alert,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { styled } from "@mui/system";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -297,6 +299,7 @@ const CompactWeeklySchedule = ({ availability }) => {
 };
 
 const MyDashboard = () => {
+  const location = useLocation();
   const [currentUser, setCurrentUser] = useState(null);
   const [currentTab, setCurrentTab] = useState(0);
   const [agreements, setAgreements] = useState([]);
@@ -306,6 +309,11 @@ const MyDashboard = () => {
   const [isBabysitter, setIsBabysitter] = useState(false);
   const [paymentReadyAgreements, setPaymentReadyAgreements] = useState([]);
   const navigate = useNavigate();
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   useEffect(() => {
     const auth = getAuth();
@@ -509,6 +517,20 @@ const MyDashboard = () => {
   const handleTabChange = (event, newValue) => {
     setCurrentTab(newValue);
   };
+
+  const handleAlertClose = () => {
+    setAlert({ ...alert, open: false });
+  };
+
+  useEffect(() => {
+    if (location.state?.alertMessage) {
+      setAlert({
+        open: true,
+        message: location.state.alertMessage,
+        severity: "success",
+      });
+    }
+  }, [location.state]);
 
   const calculateProgress = (startingDate, endingDate) => {
     const currentDate = new Date();
@@ -1577,6 +1599,20 @@ const MyDashboard = () => {
         </TabContainer>
 
         {renderTabContent()}
+        <Snackbar
+          open={alert.open}
+          autoHideDuration={6000}
+          onClose={handleAlertClose}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert
+            onClose={handleAlertClose}
+            severity={alert.severity}
+            sx={{ width: "100%" }}
+          >
+            {alert.message}
+          </Alert>
+        </Snackbar>
       </Container>
     );
   }

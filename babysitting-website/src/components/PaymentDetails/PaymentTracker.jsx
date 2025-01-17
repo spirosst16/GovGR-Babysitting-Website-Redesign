@@ -471,7 +471,7 @@ const PaymentTracker = () => {
       await updatePaymentStatusToPendingBabysitter();
       setCurrentStep(0);
       setWorkConfirmed(false);
-      navigate("/my-dashboard");
+      navigate("/my-dashboard", { state: { alertMessage: "Voucher sent!" } });
     } catch (error) {
       console.error("Error resetting and updating status:", error.message);
     }
@@ -1429,12 +1429,9 @@ const PaymentTracker = () => {
                             paymentStatus: paymentStatus,
                           }));
 
-                          setAlert({
-                            open: true,
-                            message: "Verification Completed!",
-                            severity: "success",
+                          navigate("/my-dashboard", {
+                            state: { alertMessage: "Voucher accepted!" },
                           });
-                          navigate("/my-dashboard");
                         } else {
                           console.error(
                             "No agreement found for the provided sender and recipient."
