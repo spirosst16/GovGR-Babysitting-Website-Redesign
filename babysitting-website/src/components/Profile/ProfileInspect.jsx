@@ -540,6 +540,7 @@ const ProfileInspect = () => {
                 <Rating
                   value={profileData.rating}
                   readOnly
+                  precision={0.5}
                   sx={{ margin: "10px 0" }}
                 />
               </Box>
@@ -853,7 +854,12 @@ const ProfileInspect = () => {
                     </Box>
 
                     {/* Rating */}
-                    <Rating value={review.rating} readOnly size="small" />
+                    <Rating
+                      value={review.rating}
+                      precision={0.5}
+                      readOnly
+                      size="small"
+                    />
                   </Box>
                 ))
               ) : (

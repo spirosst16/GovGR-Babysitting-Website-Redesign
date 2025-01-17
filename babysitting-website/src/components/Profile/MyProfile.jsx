@@ -463,6 +463,7 @@ const ProfilePage = () => {
               >{`${profileData.firstName} ${profileData.lastName}`}</Typography>
               <Rating
                 value={profileData.rating}
+                precision={0.5}
                 readOnly
                 sx={{ margin: "10px 0" }}
               />
@@ -852,7 +853,12 @@ const ProfilePage = () => {
                   </Box>
 
                   {/* Rating */}
-                  <Rating value={review.rating} readOnly size="small" />
+                  <Rating
+                    value={review.rating}
+                    readOnly
+                    precision={0.5}
+                    size="small"
+                  />
                 </Box>
               ))
             ) : (
