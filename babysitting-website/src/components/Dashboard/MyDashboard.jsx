@@ -452,7 +452,7 @@ const MyDashboard = () => {
             nextMonthDate.setMonth(nextMonthDate.getMonth() + monthsPassed);
 
             if (
-              monthsPassed >= 1 &&
+              monthsPassed >= 2 &&
               agreement.status === "accepted" &&
               agreement.paymentStatus !== "completed"
             ) {
@@ -461,17 +461,35 @@ const MyDashboard = () => {
                 newLastPaymentDate.getMonth() + monthsPassed - 1
               );
 
-              const formattedDate = newLastPaymentDate
-                .toISOString()
-                .split("T")[0];
+              if (agreement.paymentStatus !== "pending babysitter") {
+                const currentDate = new Date();
+                if (currentDate.getDate() < newLastPaymentDate.getDate()) {
+                  newLastPaymentDate.setMonth(
+                    newLastPaymentDate.getMonth() - 1
+                  );
+                }
 
-              await updateDoc(doc.ref, {
-                paymentStatus: "pending guardian",
-                lastPaymentDate: formattedDate,
-              });
+                const formattedDate = newLastPaymentDate
+                  .toISOString()
+                  .split("T")[0];
+                await updateDoc(doc.ref, {
+                  paymentStatus: "pending guardian",
+                  lastPaymentDate: formattedDate,
+                });
 
-              agreement.lastPaymentDate = formattedDate;
-              agreement.paymentStatus = "pending guardian";
+                agreement.lastPaymentDate = formattedDate;
+                agreement.paymentStatus = "pending guardian";
+              } else {
+                const formattedDate = newLastPaymentDate
+                  .toISOString()
+                  .split("T")[0];
+
+                await updateDoc(doc.ref, {
+                  lastPaymentDate: formattedDate,
+                });
+
+                agreement.lastPaymentDate = formattedDate;
+              }
             }
 
             const otherUserId =
@@ -1294,18 +1312,44 @@ const MyDashboard = () => {
                 current.getFullYear() === lastMonthBeforeDate.getFullYear() &&
                 current.getMonth() === lastMonthBeforeDate.getMonth();
             } else if (
-              paymentStatus === "not available yet" &&
+              (paymentStatus === "not available yet" ||
+                paymentStatus === "pending guardian") &&
               new Date(agreement.endingDate) > currentDate
             ) {
+              const previousMonthDate = new Date(currentDate);
+
+              if (currentDate.getDate() < lastDate.getDate()) {
+                previousMonthDate.setMonth(currentDate.getMonth() - 1);
+              }
+
+              const monthsPassed =
+                (currentDate.getFullYear() - lastDate.getFullYear()) * 12 +
+                (currentDate.getMonth() - lastDate.getMonth());
+
+              if (monthsPassed >= 2) {
+                previousMonthDate.setMonth(previousMonthDate.getMonth() - 1);
+              }
+
               isLastMonth =
-                current.getFullYear() === currentDate.getFullYear() &&
-                current.getMonth() === currentDate.getMonth();
+                current.getFullYear() === previousMonthDate.getFullYear() &&
+                current.getMonth() === previousMonthDate.getMonth();
+
+              console.log(current.getMonth(), isLastMonth);
             } else {
-              isLastMonth =
-                agreement.status !== "history"
-                  ? current.getFullYear() === lastFullMonthDate.getFullYear() &&
-                    current.getMonth() === lastFullMonthDate.getMonth()
-                  : null;
+              if (agreement.status !== "history") {
+                const adjustedDate = new Date(current);
+
+                if (current.getDate() < lastFullMonthDate.getDate()) {
+                  adjustedDate.setMonth(current.getMonth() - 1);
+                }
+
+                isLastMonth =
+                  adjustedDate.getFullYear() ===
+                    lastFullMonthDate.getFullYear() &&
+                  adjustedDate.getMonth() === lastFullMonthDate.getMonth();
+              } else {
+                isLastMonth = null;
+              }
             }
 
             acc[agreement.id].payments.push({
@@ -1313,7 +1357,6 @@ const MyDashboard = () => {
               amount: parseFloat(amount),
               isLastMonth,
             });
-
             if (isLastMonth) {
               break;
             }
