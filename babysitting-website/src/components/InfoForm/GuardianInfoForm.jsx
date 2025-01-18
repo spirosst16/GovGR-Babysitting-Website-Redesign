@@ -222,7 +222,7 @@ const GuardianInfoForm = () => {
         severity: "success",
       });
 
-      navigate("/babysitters");
+      navigate("/my-dashboard");
 
       setFormValues({
         firstName: "",

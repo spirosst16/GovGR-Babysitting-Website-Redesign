@@ -249,7 +249,7 @@ const BabysitterInfoForm = () => {
         severity: "success",
       });
 
-      navigate("/babysitting-jobs");
+      navigate("/my-dashboard");
 
       setFormValues({
         firstName: "",

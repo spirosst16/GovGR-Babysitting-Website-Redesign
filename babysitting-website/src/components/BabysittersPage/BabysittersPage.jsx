@@ -24,6 +24,7 @@ import {
   Chip,
   CircularProgress,
   Autocomplete,
+  Pagination,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -186,6 +187,8 @@ const BabysittersPage = () => {
     childAges: [],
     jobType: "",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
   const [filteredBabysitters, setFilteredBabysitters] = useState([]);
   const navigate = useNavigate();
   const location = useLocation();
@@ -400,6 +403,16 @@ const BabysittersPage = () => {
       }
     }
   }, [location.state, babysitters, loading]);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentBabysitters = Array.isArray(displayBabysitters)
+    ? displayBabysitters.slice(startIndex, endIndex)
+    : [];
 
   if (loading) {
     return (
@@ -750,73 +763,83 @@ const BabysittersPage = () => {
                 gap: 3,
               }}
             >
-              {Array.isArray(displayBabysitters) ? (
-                displayBabysitters.map((babysitter) => (
-                  <BabysitterCard
-                    key={babysitter.userId}
-                    onClick={() => {
-                      const application = babysittingApplications.find(
-                        (app) => app.userId === babysitter.userId
-                      );
+              {currentBabysitters.map((babysitter) => (
+                <BabysitterCard
+                  key={babysitter.userId}
+                  onClick={() => {
+                    const application = babysittingApplications.find(
+                      (app) => app.userId === babysitter.userId
+                    );
 
-                      if (application) {
-                        navigate(`/application/${application.id}`, {
-                          state: { from: location.pathname },
-                        });
-                      } else {
-                        console.error(
-                          "No application found for this babysitter."
-                        );
-                      }
-                    }}
-                  >
-                    <AvatarWrapper src={babysitter.photo || ""} />
-                    <CardContentWrapper>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontFamily: "Poppins, sans-serif",
-                          color: "#000",
-                          fontWeight: "600",
-                          textAlign: "center",
-                        }}
-                      >
-                        {`${babysitter.firstName} ${babysitter.lastName}`}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontFamily: "Poppins, sans-serif",
-                          color: "#888",
-                          mb: 1,
-                          textAlign: "center",
-                        }}
-                      >
-                        {babysitter.preferredArea}
-                      </Typography>
-                      <Box sx={{ display: "flex", justifyContent: "center" }}>
-                        <Rating
-                          name={`rating-${babysitter.id}`}
-                          value={babysitter.rating}
-                          precision={0.5}
-                          readOnly
-                          size="small"
-                        />
-                      </Box>
-                    </CardContentWrapper>
-                  </BabysitterCard>
-                ))
-              ) : (
-                <Typography
-                  sx={{
-                    fontFamily: "Poppins, sans-serif",
-                    color: "#888",
-                    fontStyle: "italic",
+                    if (application) {
+                      navigate(`/application/${application.id}`, {
+                        state: { from: location.pathname },
+                      });
+                    } else {
+                      console.error(
+                        "No application found for this babysitter."
+                      );
+                    }
                   }}
                 >
-                  {displayBabysitters}
-                </Typography>
-              )}
+                  <AvatarWrapper src={babysitter.photo || ""} />
+                  <CardContentWrapper>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        color: "#000",
+                        fontWeight: "600",
+                        textAlign: "center",
+                      }}
+                    >
+                      {`${babysitter.firstName} ${babysitter.lastName}`}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        color: "#888",
+                        mb: 1,
+                        textAlign: "center",
+                      }}
+                    >
+                      {babysitter.preferredArea}
+                    </Typography>
+                    <Box sx={{ display: "flex", justifyContent: "center" }}>
+                      <Rating
+                        name={`rating-${babysitter.id}`}
+                        value={babysitter.rating}
+                        precision={0.5}
+                        readOnly
+                        size="small"
+                      />
+                    </Box>
+                  </CardContentWrapper>
+                </BabysitterCard>
+              ))}
             </Box>
+
+            {Array.isArray(displayBabysitters) &&
+              displayBabysitters.length > itemsPerPage && (
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+                  <Pagination
+                    count={Math.ceil(displayBabysitters.length / itemsPerPage)}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                    color="primary"
+                    sx={{
+                      fontFamily: "Poppins, sans-serif",
+                      "& .MuiPaginationItem-root": {
+                        color: "#5e62d1",
+                      },
+                      "& .Mui-selected": {
+                        backgroundColor: "#5e62d1 !important",
+                        color: "#fff !important",
+                      },
+                    }}
+                  />
+                </Box>
+              )}
           </Box>
         </Box>
 

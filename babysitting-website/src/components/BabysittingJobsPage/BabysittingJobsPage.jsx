@@ -24,6 +24,7 @@ import {
   Chip,
   CircularProgress,
   Autocomplete,
+  Pagination,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -197,6 +198,8 @@ const BabysittingJobsPage = () => {
     childAges: [],
     jobType: "",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 4;
   const [filteredGuardians, setFilteredGuardians] = useState([]);
   const [openFilterDialog, setOpenFilterDialog] = useState(false);
   const navigate = useNavigate();
@@ -395,6 +398,16 @@ const BabysittingJobsPage = () => {
   } else {
     displayGuardians = guardians;
   }
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentGuardians = Array.isArray(displayGuardians)
+    ? displayGuardians.slice(startIndex, endIndex)
+    : [];
 
   if (loading) {
     return (
@@ -745,64 +758,72 @@ const BabysittingJobsPage = () => {
                 gap: 3,
               }}
             >
-              {Array.isArray(displayGuardians) ? (
-                displayGuardians.map((guardian) => (
-                  <GuardianCard
-                    key={guardian.userId}
-                    onClick={() => {
-                      const application = babysittingApplications.find(
-                        (app) => app.userId === guardian.userId
-                      );
+              {currentGuardians.map((guardian) => (
+                <GuardianCard
+                  key={guardian.userId}
+                  onClick={() => {
+                    const application = babysittingApplications.find(
+                      (app) => app.userId === guardian.userId
+                    );
 
-                      if (application) {
-                        navigate(`/application/${application.id}`, {
-                          state: { from: location.pathname },
-                        });
-                      } else {
-                        console.error(
-                          "No application found for this babysitter."
-                        );
-                      }
-                    }}
-                  >
-                    <AvatarWrapper src={guardian.photo || ""} />
-                    <CardContentWrapper>
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          fontFamily: "Poppins, sans-serif",
-                          color: "#000",
-                          fontWeight: "600",
-                          textAlign: "center",
-                        }}
-                      >
-                        {`${guardian.firstName} ${guardian.lastName}`}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontFamily: "Poppins, sans-serif",
-                          color: "#888",
-                          mb: 1,
-                          textAlign: "center",
-                        }}
-                      >
-                        {guardian.preferredArea}
-                      </Typography>
-                    </CardContentWrapper>
-                  </GuardianCard>
-                ))
-              ) : (
-                <Typography
-                  sx={{
-                    fontFamily: "Poppins, sans-serif",
-                    color: "#888",
-                    fontStyle: "italic",
+                    if (application) {
+                      navigate(`/application/${application.id}`, {
+                        state: { from: location.pathname },
+                      });
+                    } else {
+                      console.error("No application found for this guardian.");
+                    }
                   }}
                 >
-                  {displayGuardians}
-                </Typography>
-              )}
+                  <AvatarWrapper src={guardian.photo || ""} />
+                  <CardContentWrapper>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        color: "#000",
+                        fontWeight: "600",
+                        textAlign: "center",
+                      }}
+                    >
+                      {`${guardian.firstName} ${guardian.lastName}`}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontFamily: "Poppins, sans-serif",
+                        color: "#888",
+                        mb: 1,
+                        textAlign: "center",
+                      }}
+                    >
+                      {guardian.preferredArea}
+                    </Typography>
+                  </CardContentWrapper>
+                </GuardianCard>
+              ))}
             </Box>
+
+            {Array.isArray(displayGuardians) &&
+              displayGuardians.length > itemsPerPage && (
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+                  <Pagination
+                    count={Math.ceil(displayGuardians.length / itemsPerPage)}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                    color="primary"
+                    sx={{
+                      fontFamily: "Poppins, sans-serif",
+                      "& .MuiPaginationItem-root": {
+                        color: "#5e62d1",
+                      },
+                      "& .Mui-selected": {
+                        backgroundColor: "#5e62d1 !important",
+                        color: "#fff !important",
+                      },
+                    }}
+                  />
+                </Box>
+              )}
           </Box>
         </Box>
 
