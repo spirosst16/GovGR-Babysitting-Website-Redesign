@@ -497,6 +497,7 @@ const GuardianInfoForm = () => {
                 </Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
                   <StyledTextField
+                    select
                     label="Number of Children"
                     name="numberOfChildren"
                     value={formValues.numberOfChildren}
@@ -504,7 +505,13 @@ const GuardianInfoForm = () => {
                     required
                     fullWidth
                     sx={{ flex: "1 1 calc(50% - 16px)" }}
-                  />
+                  >
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <MenuItem key={i + 1} value={i + 1}>
+                        {i + 1}
+                      </MenuItem>
+                    ))}
+                  </StyledTextField>
                   <StyledTextField
                     select
                     label="Children Age Groups"

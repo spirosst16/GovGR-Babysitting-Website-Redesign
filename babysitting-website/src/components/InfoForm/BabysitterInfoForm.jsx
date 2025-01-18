@@ -105,6 +105,8 @@ const childcareActivities = [
   "Meal Preparation",
   "Tutoring",
   "Nap Time Assistance",
+  "Board Games",
+  "Gardening",
 ];
 
 // Babysitter Info Form Component

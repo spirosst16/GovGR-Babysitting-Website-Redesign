@@ -415,7 +415,9 @@ const EditApplicationForm = () => {
         message: "Application submitted successfully!",
         severity: "success",
       });
-      navigate(`/application/${application.id}`);
+      navigate(`/application/${application.id}`, {
+        state: { alertMessage: "Application submitted successfully!" },
+      });
     } catch (error) {
       console.error("Error submitting form:", error);
       setAlert({

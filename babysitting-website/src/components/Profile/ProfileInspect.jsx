@@ -693,24 +693,19 @@ const ProfileInspect = () => {
                     }}
                     variant="body1"
                   >
-                    First Aid Certification:
+                    First Aid Certification:&nbsp;
+                    <Box
+                      component="span"
+                      sx={{
+                        fontWeight: "normal",
+                        fontWeight: "normal",
+                        display: "inline",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {profileData.firstAidCertificateUploaded ? "Yes" : "No"}
+                    </Box>
                   </Typography>
-                  <Checkbox
-                    checked={profileData.firstAidCertificateUploaded || false}
-                    sx={{
-                      marginTop: "20px",
-                      color: "#5e62d1", // Default color (unchecked)
-                      "&.Mui-checked": {
-                        color: "#5e62d1", // Checked color
-                      },
-                      "&:hover": {
-                        backgroundColor: "transparent",
-                      },
-                      transition: "none",
-                      pointerEvents: "none",
-                      cursor: "default",
-                    }}
-                  />
                 </Box>
 
                 <Typography

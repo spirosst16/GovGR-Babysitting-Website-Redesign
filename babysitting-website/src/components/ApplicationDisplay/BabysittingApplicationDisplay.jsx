@@ -524,6 +524,16 @@ const BabysittingApplicationDisplay = () => {
     fetchUserRole(application.userId, setViewedUserRole);
   }, [application]);
 
+  useEffect(() => {
+    if (location.state?.alertMessage) {
+      setAlert({
+        open: true,
+        message: location.state.alertMessage,
+        severity: "success",
+      });
+    }
+  }, [location.state]);
+
   if (!user || !application)
     return (
       <Box
@@ -606,7 +616,9 @@ const BabysittingApplicationDisplay = () => {
       await updateDoc(applicationDocRef, {
         status: "history",
       });
-      navigate("/my-dashboard");
+      navigate("/my-dashboard", {
+        state: { alertMessage: "Application deleted successfully!" },
+      });
     } catch (error) {
       console.error("Error deleting application: ", error);
       setAlert({

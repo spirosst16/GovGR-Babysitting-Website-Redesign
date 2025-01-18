@@ -587,6 +587,7 @@ const BabysittersPage = () => {
               display: "flex",
               flexDirection: "column",
               gap: 3,
+              paddingTop: babysitters.length > itemsPerPage ? "100px" : "0",
             }}
           >
             <Typography

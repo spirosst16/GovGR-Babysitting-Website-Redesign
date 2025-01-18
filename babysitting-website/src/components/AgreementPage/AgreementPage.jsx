@@ -528,15 +528,36 @@ const AgreementPage = () => {
         return;
       }
 
-      const agreementDocRef = doc(FIREBASE_DB, "agreements", agreementId);
-      await deleteDoc(agreementDocRef);
+      const agreementsRef = collection(FIREBASE_DB, "agreements");
+      const agreementQuery = query(
+        agreementsRef,
+        where("status", "==", "pending"),
+        where("senderId", "==", userId1),
+        where("recipientId", "==", userId2)
+      );
+
+      const querySnapshot = await getDocs(agreementQuery);
+
+      if (querySnapshot.empty) {
+        setAlert({
+          open: true,
+          message: "No pending agreement found.",
+          severity: "error",
+        });
+        return;
+      }
+
+      // Delete the pending agreement
+      const deletePromises = querySnapshot.docs.map((doc) =>
+        deleteDoc(doc.ref)
+      );
+      await Promise.all(deletePromises);
 
       setStatus("");
       console.log("Agreement unsent and deleted.");
-      setAlert({
-        open: true,
-        message: "Agreement unsent and deleted successfully!",
-        severity: "success",
+
+      navigate("/my-dashboard", {
+        state: { alertMessage: "Agreement unsent and deleted successfully!!" },
       });
     } catch (error) {
       console.error("Error unsending agreement:", error);
@@ -635,12 +656,9 @@ const AgreementPage = () => {
 
       setStatus("");
       console.log("Agreement declined and deleted.");
-      setAlert({
-        open: true,
-        message: "Agreement declined and deleted successfully!",
-        severity: "success",
+      navigate("/my-dashboard", {
+        state: { alertMessage: "Agreement declined successfully!" },
       });
-      navigate("/my-dashboard");
     } catch (error) {
       console.error("Error declining agreement:", error);
       setAlert({

@@ -328,7 +328,9 @@ const BabysittingApplicationForm = () => {
         severity: "success",
       });
 
-      navigate("/my-dashboard");
+      navigate("/my-dashboard", {
+        state: { alertMessage: "Application saved successfully!" },
+      });
 
       setFormValues({
         area: "",

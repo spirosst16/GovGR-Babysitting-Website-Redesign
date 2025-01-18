@@ -64,6 +64,8 @@ const childcareActivities = [
   "Meal Preparation",
   "Tutoring",
   "Nap Time Assistance",
+  "Board Games",
+  "Gardening",
 ];
 
 const ageGroups = [
@@ -1021,11 +1023,12 @@ const ProfilePage = () => {
                 Number of Children
               </Typography>
               <StyledTextField
+                select
                 variant="outlined"
                 onChange={(e) =>
                   setProfileData({
                     ...profileData,
-                    experience: e.target.value,
+                    numberOfChildren: e.target.value,
                   })
                 }
                 size="small"
@@ -1037,7 +1040,16 @@ const ProfilePage = () => {
                   marginLeft: "10%",
                   fontFamily: "Poppins, sans-serif",
                 }}
-              />
+                InputProps={{
+                  style: { textAlign: "left" }, // Aligns text to the left
+                }}
+              >
+                {Array.from({ length: 10 }, (_, i) => (
+                  <MenuItem key={i + 1} value={i + 1}>
+                    {i + 1}
+                  </MenuItem>
+                ))}
+              </StyledTextField>
 
               <Typography
                 sx={{
