@@ -297,7 +297,8 @@ const BabysittersPage = () => {
               childAges: application ? application.childAges : "",
               jobType: application ? application.jobType : "",
             };
-          });
+          })
+          .sort((a, b) => b.rating - a.rating);
 
         setBabysittingApplications(applicationsList);
         setBabysitters(combinedData);
