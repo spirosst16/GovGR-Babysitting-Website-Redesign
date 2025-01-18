@@ -349,7 +349,7 @@ const AgreementPage = () => {
         } else {
           const guardiansRef = query(
             collection(FIREBASE_DB, "guardians"),
-            where("userId", "==", userId1)
+            where("userId", "==", userId2)
           );
           const guardiansSnapshot = await getDocs(guardiansRef);
           if (!guardiansSnapshot.empty) {

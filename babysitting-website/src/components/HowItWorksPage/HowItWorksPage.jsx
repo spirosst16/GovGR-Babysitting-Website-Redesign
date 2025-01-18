@@ -181,7 +181,7 @@ const HowItWorksPage = () => {
       title: "Match and Connect",
       description: [
         "Send personalized messages to start a conversation.",
-        "Schedule interviews to find the perfect fit for your family",
+        "Schedule interviews to find the perfect fit for your family.",
       ],
     },
     {
