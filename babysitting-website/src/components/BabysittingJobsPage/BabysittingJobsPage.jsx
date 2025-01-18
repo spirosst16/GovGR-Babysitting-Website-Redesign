@@ -583,6 +583,7 @@ const BabysittingJobsPage = () => {
               flexDirection: "column",
               gap: 3,
               paddingTop: guardians.length > itemsPerPage ? "100px" : "0",
+              paddingBottom: guardians.length > itemsPerPage ? "30px" : "0",
             }}
           >
             <Typography
@@ -756,7 +757,6 @@ const BabysittingJobsPage = () => {
                 flexWrap: "wrap",
                 justifyContent: "center",
                 alignItems: "center",
-                gap: 3,
               }}
             >
               {currentGuardians.map((guardian) => (

@@ -588,6 +588,7 @@ const BabysittersPage = () => {
               flexDirection: "column",
               gap: 3,
               paddingTop: babysitters.length > itemsPerPage ? "100px" : "0",
+              paddingBottom: babysitters.length > itemsPerPage ? "35px" : "0",
             }}
           >
             <Typography
@@ -761,7 +762,6 @@ const BabysittersPage = () => {
                 flexWrap: "wrap",
                 justifyContent: "center",
                 alignItems: "center",
-                gap: 3,
               }}
             >
               {currentBabysitters.map((babysitter) => (
