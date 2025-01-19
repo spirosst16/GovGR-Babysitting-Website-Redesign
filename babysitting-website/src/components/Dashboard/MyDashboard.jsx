@@ -433,8 +433,14 @@ const MyDashboard = () => {
             const agreementId = doc.id;
 
             const isExpired =
-              new Date(agreement.endingDate) < new Date() &&
-              agreement.status === "accepted";
+              (new Date(agreement.endingDate) <= new Date() &&
+                agreement.paymentStatus === "completed") ||
+              new Date() >
+                new Date(
+                  new Date(agreement.endingDate).setDate(
+                    new Date(agreement.endingDate).getDate() + 30
+                  )
+                );
 
             if (isExpired) {
               await updateDoc(doc.ref, { status: "history" });
@@ -452,7 +458,8 @@ const MyDashboard = () => {
             nextMonthDate.setMonth(nextMonthDate.getMonth() + monthsPassed);
 
             if (
-              monthsPassed >= 2 &&
+              (monthsPassed >= 2 ||
+                new Date() >= new Date(agreement.endingDate)) &&
               agreement.status === "accepted" &&
               agreement.paymentStatus !== "completed"
             ) {
@@ -463,7 +470,10 @@ const MyDashboard = () => {
 
               if (agreement.paymentStatus !== "pending babysitter") {
                 const currentDate = new Date();
-                if (currentDate.getDate() < newLastPaymentDate.getDate()) {
+                if (
+                  currentDate.getDate() < newLastPaymentDate.getDate() &&
+                  new Date() < new Date(agreement.endingDate)
+                ) {
                   newLastPaymentDate.setMonth(
                     newLastPaymentDate.getMonth() - 1
                   );
@@ -722,7 +732,6 @@ const MyDashboard = () => {
 
       return (
         <>
-          {renderNotifications()}
           <Grid
             container
             spacing={4}
@@ -1306,7 +1315,12 @@ const MyDashboard = () => {
 
             if (paymentStatus === "pending babysitter") {
               const lastMonthBeforeDate = new Date(lastDate);
-              lastMonthBeforeDate.setMonth(lastDate.getMonth() - 1);
+              if (
+                new Date() < new Date(agreement.endingDate) &&
+                agreement.paymentStatus !== "completed"
+              ) {
+                lastMonthBeforeDate.setMonth(lastDate.getMonth() - 1);
+              }
 
               isLastMonth =
                 current.getFullYear() === lastMonthBeforeDate.getFullYear() &&
@@ -1314,7 +1328,8 @@ const MyDashboard = () => {
             } else if (
               (paymentStatus === "not available yet" ||
                 paymentStatus === "pending guardian") &&
-              new Date(agreement.endingDate) > currentDate
+              new Date(agreement.endingDate) > currentDate &&
+              agreement.paymentStatus !== "completed"
             ) {
               const previousMonthDate = new Date(currentDate);
 
@@ -1338,7 +1353,7 @@ const MyDashboard = () => {
                 current.getMonth() === previousMonthDate.getMonth();
 
               console.log(current.getMonth(), isLastMonth);
-            } else {
+            } else if (agreement.paymentStatus !== "completed") {
               if (agreement.status !== "history") {
                 const adjustedDate = new Date(current);
 
@@ -1355,12 +1370,36 @@ const MyDashboard = () => {
               }
             }
 
+            if (
+              new Date(agreement.endingDate) <= currentDate &&
+              (paymentStatus === "pending guardian" ||
+                paymentStatus === "pending babysitter")
+            ) {
+              const endingDate = new Date(agreement.endingDate);
+              endingDate.setMonth(endingDate.getMonth() - 1);
+
+              isLastMonth =
+                current.getFullYear() === endingDate.getFullYear() &&
+                current.getMonth() === endingDate.getMonth();
+            }
+
             acc[agreement.id].payments.push({
               monthYear,
               amount: parseFloat(amount),
               isLastMonth,
             });
             if (isLastMonth) {
+              break;
+            }
+            const oneMonthBeforeEndingDate = new Date(agreement.endingDate);
+            oneMonthBeforeEndingDate.setMonth(
+              oneMonthBeforeEndingDate.getMonth() - 1
+            );
+            if (
+              current.getFullYear() ===
+                oneMonthBeforeEndingDate.getFullYear() &&
+              current.getMonth() === oneMonthBeforeEndingDate.getMonth()
+            ) {
               break;
             }
 
