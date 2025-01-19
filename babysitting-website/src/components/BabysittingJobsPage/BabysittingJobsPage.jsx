@@ -63,7 +63,7 @@ const AvatarWrapper = styled(Avatar)({
   width: "180px",
   height: "180px",
   marginTop: "20px",
-  borderRadius: "10%",
+  borderRadius: "50%",
 });
 
 const CardContentWrapper = styled(CardContent)({
