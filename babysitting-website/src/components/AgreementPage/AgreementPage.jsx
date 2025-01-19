@@ -20,6 +20,7 @@ import {
   Snackbar,
   Alert,
   Autocomplete,
+  MenuItem,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -282,6 +283,7 @@ const AgreementPage = () => {
     additionalNotes: "",
     amount: "",
   });
+  const [endingDateOptions, setEndingDateOptions] = useState([]);
   const [errors, setErrors] = useState({
     area: false,
     weeklySchedule: false,
@@ -434,6 +436,25 @@ const AgreementPage = () => {
       ...prevValues,
       [name]: value,
     }));
+
+    if (name === "startingDate") {
+      if (value) {
+        const startDate = new Date(value);
+        const options = Array.from({ length: 12 }, (_, index) => {
+          const optionDate = new Date(
+            Date.UTC(
+              startDate.getUTCFullYear(),
+              startDate.getUTCMonth() + index + 1,
+              startDate.getUTCDate()
+            )
+          );
+          return optionDate.toISOString().split("T")[0];
+        });
+        setEndingDateOptions(options);
+      } else {
+        setEndingDateOptions([]);
+      }
+    }
   };
 
   const validateForm = () => {
@@ -1018,27 +1039,21 @@ const AgreementPage = () => {
               />
 
               <StyledTextField
+                select
                 fullWidth
-                label="Ending Date"
+                label="Ending Date*"
                 name="endingDate"
                 value={formValues.endingDate}
                 onChange={handleInputChange}
-                type="date"
-                InputLabelProps={{ shrink: true }}
-                inputProps={{
-                  min: formValues.startingDate
-                    ? new Date(
-                        new Date(formValues.startingDate).setMonth(
-                          new Date(formValues.startingDate).getMonth() + 1
-                        )
-                      )
-                        .toISOString()
-                        .split("T")[0]
-                    : "2000-01-01",
-                }}
-                required
+                disabled={!formValues.startingDate}
                 sx={{ fontFamily: "'Poppins', sans-serif" }}
-              />
+              >
+                {endingDateOptions.map((date) => (
+                  <MenuItem key={date} value={date}>
+                    {date}
+                  </MenuItem>
+                ))}
+              </StyledTextField>
 
               <StyledTextField
                 fullWidth
