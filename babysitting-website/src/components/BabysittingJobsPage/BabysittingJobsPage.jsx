@@ -204,6 +204,7 @@ const BabysittingJobsPage = () => {
   const [openFilterDialog, setOpenFilterDialog] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [hasApplication, setHasApplication] = useState(false);
 
   const availabilityOptions = [
     "Monday Morning",
@@ -244,6 +245,16 @@ const BabysittingJobsPage = () => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const email = user.email;
+
+        const applicationsQuery = query(
+          collection(FIREBASE_DB, "babysittingApplications"),
+          where("userId", "==", user.uid)
+        );
+        const applicationsSnapshot = await getDocs(applicationsQuery);
+
+        if (!applicationsSnapshot.empty) {
+          setHasApplication(true);
+        }
 
         // Check if user is a babysitter
         const babysitterQuery = query(
@@ -828,45 +839,48 @@ const BabysittingJobsPage = () => {
           </Box>
         </Box>
 
-        <ApplicationSectionWrapper>
-          <Typography
-            variant="h4"
-            style={{
-              fontFamily: "Poppins, sans-serif",
-              color: "#fff",
-              marginBottom: "10px",
-            }}
-          >
-            Need a Babysitting Job? Let us help you find the perfect match!
-          </Typography>
-          <Typography
-            variant="subtitle1"
-            style={{
-              fontFamily: "Poppins, sans-serif",
-              color: "#e0e0e0",
-              marginBottom: "20px",
-            }}
-          >
-            Create an application with your needs and connect with qualified
-            families in your area.
-          </Typography>
-          <Button
-            variant="contained"
-            style={{
-              backgroundColor: "#fff",
-              color: "#5e62d1",
-              fontFamily: "Poppins, sans-serif",
-              textTransform: "none",
-              padding: "10px 20px",
-              borderRadius: "30px",
-              fontWeight: "600",
-              fontSize: "16px",
-            }}
-            onClick={handleApplication}
-          >
-            Create an application now
-          </Button>
-        </ApplicationSectionWrapper>
+        {!hasApplication && (
+          <ApplicationSectionWrapper>
+            <Typography
+              variant="h4"
+              style={{
+                fontFamily: "Poppins, sans-serif",
+                color: "#fff",
+                marginBottom: "10px",
+              }}
+            >
+              Need a Babysitting Job? Let us help you find the perfect match!
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              style={{
+                fontFamily: "Poppins, sans-serif",
+                color: "#e0e0e0",
+                marginBottom: "20px",
+              }}
+            >
+              Create an application with your needs and connect with qualified
+              families in your area.
+            </Typography>
+            <Button
+              variant="contained"
+              style={{
+                backgroundColor: "#fff",
+                color: "#5e62d1",
+                fontFamily: "Poppins, sans-serif",
+                textTransform: "none",
+                padding: "10px 20px",
+                borderRadius: "30px",
+                fontWeight: "600",
+                fontSize: "16px",
+              }}
+              onClick={handleApplication}
+            >
+              Create an application now
+            </Button>
+          </ApplicationSectionWrapper>
+        )}
+
         <Container style={{ margin: "50px auto" }}>
           <Typography
             variant="h4"
