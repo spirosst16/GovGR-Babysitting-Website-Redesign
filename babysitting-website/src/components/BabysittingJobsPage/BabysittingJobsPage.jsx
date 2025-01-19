@@ -345,28 +345,30 @@ const BabysittingJobsPage = () => {
     });
   };
 
-  const applyFilters = () => {
+  const applyFilters = (currentFilters = filters) => {
     const filtered = guardians.filter((guardian) => {
       const matchesArea =
-        !filters.area ||
+        !currentFilters.area ||
         guardian.preferredArea
           .toLowerCase()
-          .includes(filters.area.toLowerCase());
+          .includes(currentFilters.area.toLowerCase());
       const matchesAvailability =
-        filters.availability.length === 0 ||
-        filters.availability.every((time) =>
+        currentFilters.availability.length === 0 ||
+        currentFilters.availability.every((time) =>
           guardian.availability?.includes(time)
         );
       const matchesPlace =
-        filters.babysittingPlace.length === 0 ||
-        filters.babysittingPlace.some((place) =>
+        currentFilters.babysittingPlace.length === 0 ||
+        currentFilters.babysittingPlace.some((place) =>
           guardian.babysittingPlace?.includes(place)
         );
       const matchesChildAges =
-        filters.childAges.length === 0 ||
-        filters.childAges.some((age) => guardian.childAges?.includes(age));
+        currentFilters.childAges.length === 0 ||
+        currentFilters.childAges.some((age) =>
+          guardian.childAges?.includes(age)
+        );
       const matchesJobType =
-        !filters.jobType || guardian.jobType === filters.jobType;
+        !currentFilters.jobType || guardian.jobType === currentFilters.jobType;
 
       return (
         matchesArea &&
