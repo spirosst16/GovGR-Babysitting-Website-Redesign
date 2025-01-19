@@ -37,6 +37,7 @@ import { FIREBASE_DB } from "../../config/firebase";
 import "../../style.css";
 import { styled } from "@mui/system";
 import { greekCities } from "../../utils/greekCities";
+import defaultProfile from "../../assets/default-profile.jpg";
 
 const StyledTextField = styled(TextField)({
   fontFamily: "'Poppins', sans-serif",
@@ -208,6 +209,7 @@ const ProfilePage = () => {
     numberOfChildren: "",
     firstname: "",
     lastname: "",
+    photo: "",
     childrenDescription: "",
     childrenAgeGroups: [],
   });
@@ -324,6 +326,17 @@ const ProfilePage = () => {
 
     fetchProfileData(userId);
   }, [userId]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileData({ ...profileData, photo: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   if (loading) {
     return (
@@ -444,18 +457,53 @@ const ProfilePage = () => {
           >
             {/* Profile Picture */}
             <Box sx={{ textAlign: "center", marginBottom: "20px" }}>
-              <Avatar
-                src={profileData.photo}
-                alt={profileData.name}
-                sx={{
-                  width: 200,
-                  height: 200,
+              <div
+                style={{
+                  position: "relative",
+                  width: "200px",
                   margin: "0 auto",
-                  marginBottom: "10px",
-                  borderRadius: "50%",
-                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
                 }}
-              />
+              >
+                <Avatar
+                  src={profileData.photo}
+                  alt={profileData.name}
+                  sx={{
+                    width: 200,
+                    height: 200,
+                    marginBottom: "10px",
+                    borderRadius: "50%",
+                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+                  }}
+                />
+                <Button
+                  component="label"
+                  sx={{
+                    position: "absolute",
+                    bottom: "0px",
+                    right: "0px",
+                    width: "60px",
+                    height: "60px",
+                    backgroundColor: "#5e62d1",
+                    color: "white",
+                    borderRadius: "50%",
+                    fontSize: "24px",
+                    fontWeight: "bold",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+                  }}
+                >
+                  <EditIcon />
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                </Button>
+              </div>
+
               <Typography
                 sx={{
                   fontFamily: "Poppins, sans-serif",
@@ -945,18 +993,52 @@ const ProfilePage = () => {
           >
             {/* Profile Picture */}
             <Box sx={{ textAlign: "center", marginBottom: "20px" }}>
-              <Avatar
-                src={profileData.photo}
-                alt={profileData.name}
-                sx={{
-                  width: 200,
-                  height: 200,
+              <div
+                style={{
+                  position: "relative",
+                  width: "200px",
                   margin: "0 auto",
-                  marginBottom: "10px",
-                  borderRadius: "50%",
-                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
                 }}
-              />
+              >
+                <Avatar
+                  src={profileData.photo}
+                  alt={profileData.name}
+                  sx={{
+                    width: 200,
+                    height: 200,
+                    marginBottom: "10px",
+                    borderRadius: "50%",
+                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+                  }}
+                />
+                <Button
+                  component="label"
+                  sx={{
+                    position: "absolute",
+                    bottom: "0px",
+                    right: "0px",
+                    width: "60px",
+                    height: "60px",
+                    backgroundColor: "#5e62d1",
+                    color: "white",
+                    borderRadius: "50%",
+                    fontSize: "24px",
+                    fontWeight: "bold",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2)",
+                  }}
+                >
+                  <EditIcon />
+                  <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                </Button>
+              </div>
               <Typography
                 sx={{
                   fontFamily: "Poppins, sans-serif",
