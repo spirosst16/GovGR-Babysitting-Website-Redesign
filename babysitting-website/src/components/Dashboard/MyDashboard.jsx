@@ -1318,7 +1318,10 @@ const MyDashboard = () => {
             ) {
               const previousMonthDate = new Date(currentDate);
 
-              if (currentDate.getDate() < lastDate.getDate()) {
+              if (
+                currentDate.getDate() < lastDate.getDate() ||
+                paymentStatus === "pending guardian"
+              ) {
                 previousMonthDate.setMonth(currentDate.getMonth() - 1);
               }
 
