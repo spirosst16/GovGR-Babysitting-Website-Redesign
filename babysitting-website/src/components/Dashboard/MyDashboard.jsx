@@ -1087,7 +1087,24 @@ const MyDashboard = () => {
               ) : (
                 <Grid item xs={12}>
                   <ApplicationCard
-                    onClick={() => navigate("/babysitting-application")}
+                    onClick={() => {
+                      const hasActiveApplication = applications.some(
+                        (app) =>
+                          app.status === "temporary" ||
+                          app.status === "submitted"
+                      );
+
+                      if (!hasActiveApplication) {
+                        navigate("/babysitting-application");
+                      } else {
+                        setAlert({
+                          open: true,
+                          message:
+                            "You already have an active/temporary application.",
+                          severity: "warning",
+                        });
+                      }
+                    }}
                     style={{
                       cursor: "pointer",
                       border: "2px dashed #9E9E9E",
